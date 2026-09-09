@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Heart, Menu, MessageCircle, Phone, Search, ShoppingBag, Truck, User, X, Zap } from "lucide-react";
-import { IMAGES, NAV_LINKS } from "./data";
+import { IMAGES } from "./data";
 
 export function TopBar() {
   return (
@@ -20,21 +22,43 @@ export function TopBar() {
           <a href="tel:03001234567" className="flex items-center gap-1.5 hover:text-leaf">
             <Phone className="h-3.5 w-3.5" /> 0300-1234567
           </a>
-          <a href="#faq" className="hidden items-center gap-1.5 hover:text-leaf sm:flex">
-            <MessageCircle className="h-3.5 w-3.5" /> WhatsApp Help
-          </a>
+          <Link href="/contact" className="hidden items-center gap-1.5 hover:text-leaf sm:flex">
+            <MessageCircle className="h-3.5 w-3.5" /> Contact Us
+          </Link>
         </div>
       </div>
     </div>
   );
 }
 
-export function Header({ cartCount }) {
+export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
+  const navLinks = [
+    { href: "/shop", label: "All Plants" },
+    { href: "/shop?category=indoor-plants", label: "Indoor Plants" },
+    { href: "/shop?category=outdoor-plants", label: "Outdoor Plants" },
+    { href: "/shop?category=flowering-plants", label: "Flowering" },
+    { href: "/shop?category=herbs", label: "Herbs" },
+    { href: "/categories", label: "Categories" },
+    { href: "/about", label: "About" },
+    { href: "/faq", label: "Plant Care Guide" },
+  ];
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+      setMenuOpen(false);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b bg-card/95 shadow-sm backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
-        <a href="#" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3">
           <img
             src={IMAGES.logo}
             alt="Noor Nursery Official Insignia"
@@ -48,47 +72,43 @@ export function Header({ cartCount }) {
               Pakistan&apos;s Living Heritage
             </p>
           </div>
-        </a>
+        </Link>
 
-        <div className="ml-2 hidden flex-1 items-center gap-2 lg:flex">
+        <form onSubmit={handleSearch} className="ml-2 hidden flex-1 items-center gap-2 lg:flex">
           <div className="flex flex-1 items-center gap-2 rounded-full border bg-surface-low px-4 py-2">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-              placeholder="Search 300+ plants, seeds, pots..."
+              placeholder="Search plants, seeds, pots..."
               aria-label="Search plants"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-        </div>
+        </form>
 
         <div className="ml-auto flex items-center gap-2">
-          <button
-            className="relative hidden rounded-full border bg-surface-low p-2.5 text-foreground transition hover:bg-surface-mid sm:block"
-            aria-label="Wishlist"
-          >
-            <Heart className="h-5 w-5" />
-            <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-gold text-[10px] font-bold text-gold-foreground">
-              3
-            </span>
-          </button>
-          <button
+          <Link
+            href="/account"
             className="hidden items-center gap-2 rounded-full border border-primary bg-card px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-surface-low sm:flex"
-            aria-label="Login"
+            aria-label="Account"
           >
             <User className="h-4 w-4" />
-            Login
-          </button>
-          <button
+            Account
+          </Link>
+          <Link
+            href="/cart"
             className="flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-forest"
-            aria-label="Cart"
+            aria-label={`Cart, ${cartCount} items`}
           >
             <ShoppingBag className="h-5 w-5" />
-            <span className="hidden sm:inline">PKR 0.00</span>
+            <span className="hidden sm:inline">{cartTotal}</span>
             <span className="rounded-full bg-leaf px-2 py-0.5 text-xs font-bold text-leaf-foreground">
               {cartCount} items
             </span>
-          </button>
+          </Link>
           <button
+            type="button"
             className="rounded-full border bg-surface-low p-2.5 text-foreground transition hover:bg-surface-mid lg:hidden"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
@@ -102,56 +122,56 @@ export function Header({ cartCount }) {
       {menuOpen && (
         <div className="border-t bg-card lg:hidden">
           <div className="mx-auto max-w-7xl px-4 py-4">
-            <button className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-forest">
+            <form onSubmit={handleSearch} className="mb-3">
+              <div className="flex items-center gap-2 rounded-full border bg-surface-low px-4 py-2">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <input
+                  className="w-full bg-transparent text-sm outline-none"
+                  placeholder="Search plants..."
+                  aria-label="Search plants"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </form>
+            <Link
+              href="/login"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
+              onClick={() => setMenuOpen(false)}
+            >
               <User className="h-4 w-4" />
               Login / Create Account
-            </button>
-            <nav className="mt-3 grid gap-1" aria-label="Mobile categories">
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link}
-                  href="#plants"
+            </Link>
+            <nav className="mt-3 grid gap-1" aria-label="Mobile navigation">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
                   onClick={() => setMenuOpen(false)}
                   className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-surface-low hover:text-secondary"
                 >
-                  {link}
-                </a>
+                  {link.label}
+                </Link>
               ))}
             </nav>
           </div>
         </div>
       )}
 
-      <div className="border-t bg-card">
-        <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-2 text-sm">
-          <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Quick:
-          </span>
-          {["Indoor Plants", "Fruit Trees", "Herbs", "Snake Plant", "Fertilizer"].map((q, i, arr) => (
-            <span key={q} className="flex shrink-0 items-center gap-2">
-              <a href="#plants" className="font-medium text-foreground hover:text-secondary">
-                {q}
-              </a>
-              {i < arr.length - 1 && <span className="text-outline-var">•</span>}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <nav className="hidden border-t bg-surface-low lg:block">
+      <nav className="hidden border-t bg-surface-low lg:block" aria-label="Main navigation">
         <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4">
-          {NAV_LINKS.map((link, i) => (
-            <a
-              key={link}
-              href="#plants"
+          {navLinks.map((link, i) => (
+            <Link
+              key={link.href}
+              href={link.href}
               className={`shrink-0 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${
                 i === 0
                   ? "border-b-2 border-secondary font-semibold text-secondary"
                   : "text-foreground hover:text-secondary"
               }`}
             >
-              {link}
-            </a>
+              {link.label}
+            </Link>
           ))}
         </div>
       </nav>

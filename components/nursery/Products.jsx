@@ -82,7 +82,7 @@ function ProductCard({ product, onAdd }) {
 
           <div className="mt-3 flex gap-2">
             <button
-              onClick={onAdd}
+              onClick={() => onAdd?.(product, size)}
               className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-forest"
             >
               <ShoppingCart className="h-4 w-4" /> Add to Cart

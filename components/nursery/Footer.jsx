@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Camera, Globe, MessageCircle, PlayCircle, ShieldCheck } from "lucide-react";
 import { IMAGES } from "./data";
 
@@ -11,7 +12,7 @@ export function Footer() {
           <div className="flex items-center gap-3">
             <img
               src={IMAGES.logo}
-              alt="Noor Nursery logo"
+              alt=""
               className="h-12 w-12 rounded-full object-cover ring-2 ring-leaf"
             />
             <div>
@@ -24,37 +25,24 @@ export function Footer() {
             plants acclimatized for Karachi coastal air, Punjab plains, and Northern hill climates
             directly to your doorstep with guaranteed live arrival.
           </p>
-          <div className="mt-4 flex gap-2">
-            {[Globe, Camera, PlayCircle, MessageCircle].map((Icon, i) => (
-              <a
-                key={i}
-                href="#"
-                aria-label="Social link"
-                className="grid h-10 w-10 place-items-center rounded-full bg-forest transition hover:bg-secondary"
-              >
-                <Icon className="h-5 w-5 text-leaf" />
-              </a>
-            ))}
-          </div>
         </div>
 
         <div>
           <h4 className="font-display text-sm font-bold uppercase tracking-widest text-gold">
-            Popular Plants
+            Shop
           </h4>
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/80">
             {[
-              "Low Light Indoor Plants",
-              "Pakistani Fruit Trees (Chunsa, Kinnow)",
-              "Fragrant Jasmine & Motia (موتیا)",
-              "Air Purifying Snake & ZZ Plants",
-              "Fresh Kitchen Herb Garden",
-              "Balcony Starter Combos",
+              { href: "/shop", label: "All Plants" },
+              { href: "/shop?category=indoor-plants", label: "Indoor Plants" },
+              { href: "/shop?category=flowering-plants", label: "Flowering Plants" },
+              { href: "/categories", label: "All Categories" },
+              { href: "/shop?featured=true", label: "Featured Plants" },
             ].map((l) => (
-              <li key={l}>
-                <a href="#plants" className="hover:text-leaf">
-                  {l}
-                </a>
+              <li key={l.href}>
+                <Link href={l.href} className="hover:text-leaf">
+                  {l.label}
+                </Link>
               </li>
             ))}
           </ul>
@@ -66,22 +54,39 @@ export function Footer() {
           </h4>
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/80">
             {[
-              "48-Hour Live Plant Guarantee",
-              "Express Courier Packaging",
-              "Lahore Same-Day Van Delivery",
-              "Seasonal Watering Calendar",
-              "AI Leaf Health Scanner",
-              "Track Your Shipment",
+              { href: "/shipping-policy", label: "48-Hour Live Plant Guarantee" },
+              { href: "/shipping-policy", label: "Express Courier Packaging" },
+              { href: "/shipping-policy", label: "Delivery Information" },
+              { href: "/faq", label: "Plant Care FAQ" },
+              { href: "/track-order", label: "Track Your Order" },
             ].map((l) => (
-              <li key={l}>
-                <a href="#faq" className="hover:text-leaf">
-                  {l}
-                </a>
+              <li key={l.label}>
+                <Link href={l.href} className="hover:text-leaf">
+                  {l.label}
+                </Link>
               </li>
             ))}
           </ul>
         </div>
 
+        <div>
+          <h4 className="font-display text-sm font-bold uppercase tracking-widest text-gold">
+            Company
+          </h4>
+          <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/80">
+            {[
+              { href: "/about", label: "About Us" },
+              { href: "/contact", label: "Contact" },
+              { href: "/faq", label: "FAQ" },
+            ].map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="hover:text-leaf">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className="border-t border-forest">
@@ -90,19 +95,15 @@ export function Footer() {
             <ShieldCheck className="h-4 w-4 text-leaf" />
             Safe Payments Across Pakistan:
             <span className="font-normal text-primary-foreground/70">
-              Cash on Delivery (COD) • JazzCash • EasyPaisa • Direct Bank Transfer (HBL/Meezan) •
-              Visa &amp; Mastercard
+              Cash on Delivery (COD) • JazzCash • EasyPaisa • Bank Transfer • PayFast
             </span>
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-forest pt-4 text-xs text-primary-foreground/60">
-            <p>
-              © 2024 Noor Nursery Pakistan. All rights reserved. Cultivating lush Pakistani spaces
-              nationwide.
-            </p>
+            <p>© {new Date().getFullYear()} Noor Nursery Pakistan. All rights reserved.</p>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-leaf">Privacy Policy</a>
-              <a href="#" className="hover:text-leaf">Terms of Service</a>
-              <a href="#faq" className="hover:text-leaf">Refund Policy</a>
+              <Link href="/privacy-policy" className="hover:text-leaf">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-leaf">Terms of Service</Link>
+              <Link href="/return-policy" className="hover:text-leaf">Return Policy</Link>
             </div>
           </div>
         </div>
