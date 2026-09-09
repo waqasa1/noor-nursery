@@ -1,7 +1,7 @@
-import { destroySession } from "@/lib/auth/session";
-import { jsonSuccess } from "@/lib/api-response";
+import { NextResponse } from "next/server";
+import { clearSessionCookieOnResponse } from "@/lib/auth/session";
 
 export async function POST() {
-  await destroySession();
-  return jsonSuccess({ message: "Logged out" });
+  const response = NextResponse.json({ success: true, message: "Logged out" });
+  return clearSessionCookieOnResponse(response);
 }

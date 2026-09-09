@@ -1,23 +1,14 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-
-const SESSION_COOKIE = "noor_session";
+import { SESSION_COOKIE, getAuthSecretKey } from "@/lib/auth/session";
 
 const adminPaths = ["/admin"];
 const authPaths = ["/login", "/signup", "/forgot-password", "/reset-password"];
 const protectedPaths = ["/account", "/checkout"];
 
-function getSecret() {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret || secret.length < 32) {
-    return new TextEncoder().encode("dev-only-secret-min-32-chars!!");
-  }
-  return new TextEncoder().encode(secret);
-}
-
 async function verifySession(token) {
   try {
-    const { payload } = await jwtVerify(token, getSecret());
+    const { payload } = await jwtVerify(token, getAuthSecretKey());
     return payload;
   } catch {
     return null;

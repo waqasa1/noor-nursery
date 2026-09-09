@@ -2,9 +2,8 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { verifyPassword, normalizeEmail } from "@/lib/auth/password";
-import { createSession } from "@/lib/auth/session";
 import { rateLimit, getClientIp } from "@/lib/auth/rate-limit";
-import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
+import { jsonSuccessWithSession, jsonError, handleApiError } from "@/lib/api-response";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -33,9 +32,7 @@ export async function POST(request) {
       return jsonError("Invalid email or password", 401);
     }
 
-    await createSession(user);
-
-    return jsonSuccess({
+    return jsonSuccessWithSession(user, {
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
   } catch (error) {

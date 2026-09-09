@@ -2,9 +2,8 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { hashPassword, normalizeEmail, validatePassword } from "@/lib/auth/password";
-import { createSession } from "@/lib/auth/session";
 import { rateLimit, getClientIp } from "@/lib/auth/rate-limit";
-import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
+import { jsonSuccessWithSession, jsonError, handleApiError } from "@/lib/api-response";
 import { sendWelcomeEmail } from "@/lib/email";
 
 const signupSchema = z.object({
@@ -51,13 +50,13 @@ export async function POST(request) {
       role: "customer",
     });
 
-    await createSession(user);
-
     sendWelcomeEmail({ name: user.name, email: user.email }).catch(() => {});
 
-    return jsonSuccess({
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
-    }, 201);
+    return jsonSuccessWithSession(
+      user,
+      { user: { id: user._id, name: user.name, email: user.email, role: user.role } },
+      201
+    );
   } catch (error) {
     return handleApiError(error);
   }
