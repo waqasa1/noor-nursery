@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { FlashDeal, Header, TopBar } from "@/components/nursery/Header";
@@ -14,10 +14,16 @@ import { formatPKR } from "@/lib/utils/currency";
 
 export default function Page() {
   const [toast, setToast] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const timer = useRef(null);
+  
   const itemCount = useCartStore((s) => s.getItemCount());
   const subtotal = useCartStore((s) => s.getSubtotal());
   const addItem = useCartStore((s) => s.addItem);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const addToCart = useCallback(
     (product, sizeIndex = 0) => {
@@ -40,10 +46,13 @@ export default function Page() {
     [addItem]
   );
 
+  const displayCount = isMounted ? itemCount : 0;
+  const displayTotal = isMounted ? formatPKR(subtotal) : formatPKR(0);
+
   return (
     <div className="min-h-screen bg-background">
       <TopBar />
-      <Header cartCount={itemCount} cartTotal={formatPKR(subtotal)} />
+      <Header cartCount={displayCount} cartTotal={displayTotal} />
       <FlashDeal />
       <main>
         <Hero />

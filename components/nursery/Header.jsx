@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Heart, Menu, MessageCircle, Phone, Search, ShoppingBag, Truck, User, X, Zap } from "lucide-react";
 import { IMAGES } from "./data";
 
@@ -30,6 +30,65 @@ export function TopBar() {
     </div>
   );
 }
+
+function NavigationLinks({ navLinks, setMenuOpen }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  
+  const currentPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : "");
+
+  return (
+    <>
+      {navLinks.map((link) => {
+        const isActive = currentPath === link.href || (link.href === "/shop" && currentPath.startsWith("/shop") && !searchParams.toString());
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            onClick={() => setMenuOpen && setMenuOpen(false)}
+            className={`shrink-0 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${
+              isActive
+                ? "border-b-2 border-secondary font-semibold text-secondary"
+                : "text-foreground hover:text-secondary"
+            }`}
+          >
+            {link.label}
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+
+function MobileNavigationLinks({ navLinks, setMenuOpen }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  
+  const currentPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : "");
+
+  return (
+    <>
+      {navLinks.map((link) => {
+        const isActive = currentPath === link.href || (link.href === "/shop" && currentPath.startsWith("/shop") && !searchParams.toString());
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            onClick={() => setMenuOpen && setMenuOpen(false)}
+            className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+              isActive
+                ? "bg-surface-low text-secondary font-semibold"
+                : "text-foreground hover:bg-surface-low hover:text-secondary"
+            }`}
+          >
+            {link.label}
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+
 
 export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -143,16 +202,9 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
               Login / Create Account
             </Link>
             <nav className="mt-3 grid gap-1" aria-label="Mobile navigation">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-surface-low hover:text-secondary"
-                >
-                  {link.label}
-                </Link>
-              ))}
+              <Suspense fallback={null}>
+                <MobileNavigationLinks navLinks={navLinks} setMenuOpen={setMenuOpen} />
+              </Suspense>
             </nav>
           </div>
         </div>
@@ -160,19 +212,9 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
 
       <nav className="hidden border-t bg-surface-low lg:block" aria-label="Main navigation">
         <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4">
-          {navLinks.map((link, i) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`shrink-0 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${
-                i === 0
-                  ? "border-b-2 border-secondary font-semibold text-secondary"
-                  : "text-foreground hover:text-secondary"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          <Suspense fallback={null}>
+            <NavigationLinks navLinks={navLinks} />
+          </Suspense>
         </div>
       </nav>
     </header>
