@@ -224,7 +224,7 @@ export const FAQS = [
   },
   {
     q: "What happens if my plant arrives broken or wilted? (48-Hr Guarantee)",
-    a: "We offer an absolute 100% Live Arrival Guarantee. Simply snap a quick photo of the damaged plant within 48 hours of parcel delivery and WhatsApp it to 0300-1234567. We will immediately dispatch a fresh replacement or issue a full refund without questions.",
+    a: "We offer an absolute 100% Live Arrival Guarantee. Simply snap a quick photo of the damaged plant within 48 hours of parcel delivery and WhatsApp it to +92 349 2849062. We will immediately dispatch a fresh replacement or issue a full refund without questions.",
   },
   {
     q: "Do you offer Cash on Delivery (COD) in Karachi, Islamabad & other cities?",

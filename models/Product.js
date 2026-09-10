@@ -47,7 +47,6 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-productSchema.index({ slug: 1 });
 productSchema.index({ categoryId: 1, isActive: 1 });
 productSchema.index({ featured: 1, isActive: 1 });
 productSchema.index({ nameEn: "text", nameUr: "text", tags: "text" });

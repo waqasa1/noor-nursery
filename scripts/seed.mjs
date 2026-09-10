@@ -219,7 +219,7 @@ async function seed() {
     await User.create({
       name: "Admin",
       email: adminEmail,
-      phone: "03001234567",
+      phone: "+92 349 2849062",
       passwordHash,
       role: "admin",
     });

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "prestart": "test -f .next/routes-manifest.json || npm run build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",

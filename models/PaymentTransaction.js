@@ -25,7 +25,6 @@ const paymentTransactionSchema = new mongoose.Schema(
 );
 
 paymentTransactionSchema.index({ orderId: 1 });
-paymentTransactionSchema.index({ idempotencyKey: 1 });
 paymentTransactionSchema.index({ externalReference: 1 });
 
 export default mongoose.models.PaymentTransaction ||

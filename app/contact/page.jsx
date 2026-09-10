@@ -7,7 +7,7 @@ export default function ContactPage() {
     <PolicyPage title="Contact Us" titleUr="رابطہ کریں">
       <p>We&apos;re here to help with orders, plant care, and bulk inquiries.</p>
       <h2>Phone &amp; WhatsApp</h2>
-      <p><a href="tel:03001234567" className="text-secondary font-semibold hover:underline">0300-1234567</a></p>
+      <p><a href="tel:+923492849062" className="text-secondary font-semibold hover:underline">+92 349 2849062</a></p>
       <h2>Email</h2>
       <p><a href="mailto:orders@noornursery.pk" className="text-secondary font-semibold hover:underline">orders@noornursery.pk</a></p>
       <h2>Delivery Areas</h2>

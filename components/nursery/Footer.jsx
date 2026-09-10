@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Camera, Globe, MessageCircle, PlayCircle, ShieldCheck } from "lucide-react";
+import { Camera, Globe, MessageCircle, PlayCircle, ShieldCheck, Facebook, Instagram, Phone } from "lucide-react";
 import { IMAGES } from "./data";
 
 export function Footer() {
@@ -25,6 +25,17 @@ export function Footer() {
             plants acclimatized for Karachi coastal air, Punjab plains, and Northern hill climates
             directly to your doorstep with guaranteed live arrival.
           </p>
+          <div className="mt-6 flex items-center gap-4">
+            <a href="https://www.facebook.com/Noor.Nursery.24hr" target="_blank" rel="noopener noreferrer" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Facebook">
+              <Facebook className="h-4 w-4" />
+            </a>
+            <a href="https://www.instagram.com/noornursery_official/" target="_blank" rel="noopener noreferrer" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Instagram">
+              <Instagram className="h-4 w-4" />
+            </a>
+            <a href="tel:+923492849062" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Phone">
+              <Phone className="h-4 w-4" />
+            </a>
+          </div>
         </div>
 
         <div>

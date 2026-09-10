@@ -91,7 +91,6 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-orderSchema.index({ orderNumber: 1 });
 orderSchema.index({ userId: 1, createdAt: -1 });
 orderSchema.index({ "customer.email": 1 });
 orderSchema.index({ "customer.phone": 1 });

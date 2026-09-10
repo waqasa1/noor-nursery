@@ -58,8 +58,8 @@ export const HELP_FAQ = [
     questionEn: "How can I contact Noor Nursery?",
     questionUr: "نور نرسری سے رابطہ کیسے کریں؟",
     answerEn:
-      "Call us at 0300-1234567, visit our Contact page, or message us on WhatsApp. We respond within business hours.",
+      "Call us at +92 349 2849062, visit our Contact page, or message us on WhatsApp. We respond within business hours.",
     answerUr:
-      "0300-1234567 پر کال کریں، رابطہ صفحہ دیکھیں، یا WhatsApp پر پیغام بھیجیں۔",
+      "+92 349 2849062 پر کال کریں، رابطہ صفحہ دیکھیں، یا WhatsApp پر پیغام بھیجیں۔",
   },
 ];

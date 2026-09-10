@@ -163,7 +163,7 @@ export function Faq() {
 
         <div className="mt-8 flex items-center justify-center gap-3 text-sm text-muted-foreground">
           <HeartHandshake className="h-5 w-5 text-secondary" />
-          Still unsure? Our horticulturists reply within minutes on 0300-1234567.
+          Still unsure? Our horticulturists reply within minutes on +92 349 2849062.
         </div>
       </div>
     </section>
