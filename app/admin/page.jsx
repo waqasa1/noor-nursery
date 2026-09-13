@@ -2,13 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
+import { AdminMetricsSkeleton, AdminPanelSkeleton } from "@/components/admin/AdminSkeleton";
 import { formatPKR } from "@/lib/utils/currency";
 
 export default function AdminDashboard() {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/admin/dashboard").then((r) => r.json()).then(setData);
+    fetch("/api/admin/dashboard")
+      .then((r) => r.json())
+      .then(setData)
+      .finally(() => setLoading(false));
   }, []);
 
   const metrics = data?.metrics;
@@ -17,11 +22,19 @@ export default function AdminDashboard() {
     <AdminLayout>
       <h1 className="font-display text-2xl font-bold text-primary">Dashboard</h1>
 
-      {!data?.success && data && (
+      {loading && (
+        <>
+          <AdminMetricsSkeleton />
+          <AdminPanelSkeleton lines={4} />
+          <AdminPanelSkeleton lines={5} />
+        </>
+      )}
+
+      {!loading && !data?.success && (
         <p className="mt-4 text-destructive">Unable to load dashboard. Ensure you are logged in as admin.</p>
       )}
 
-      {metrics && (
+      {!loading && metrics && (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { label: "Total Orders", value: metrics.totalOrders },
@@ -37,7 +50,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {data?.lowStock?.length > 0 && (
+      {!loading && data?.lowStock?.length > 0 && (
         <div className="mt-8 rounded-2xl border bg-card p-5">
           <h2 className="font-display font-bold text-destructive">Low Stock Alerts</h2>
           <ul className="mt-3 space-y-2 text-sm">
@@ -48,7 +61,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {data?.recentOrders?.length > 0 && (
+      {!loading && data?.recentOrders?.length > 0 && (
         <div className="mt-8 rounded-2xl border bg-card p-5">
           <h2 className="font-display font-bold">Recent Orders</h2>
           <div className="mt-3 overflow-x-auto">

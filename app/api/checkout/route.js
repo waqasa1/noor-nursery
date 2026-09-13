@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { getSession } from "@/lib/auth/session";
 import { createOrder } from "@/lib/orders/create";
-import { getAvailablePaymentMethods } from "@/lib/payments";
+import { getAvailablePaymentMethods, getAvailablePaymentMethodsAsync } from "@/lib/payments";
 import { rateLimit, getClientIp } from "@/lib/auth/rate-limit";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
@@ -34,6 +34,7 @@ const checkoutSchema = z.object({
   }),
   shippingAddress: addressSchema,
   paymentMethod: z.enum(["cod", "bank_transfer", "jazzcash", "easypaisa", "payfast"]),
+  promoCode: z.string().optional(),
   customerNote: z.string().max(500).optional(),
   agreeToTerms: z.literal(true),
 });
@@ -52,7 +53,7 @@ export async function POST(request) {
       return jsonError("Validation failed", 400, parsed.error.flatten().fieldErrors);
     }
 
-    const available = getAvailablePaymentMethods().map((m) => m.id);
+    const available = (await getAvailablePaymentMethodsAsync()).map((m) => m.id);
     if (!available.includes(parsed.data.paymentMethod)) {
       return jsonError("Selected payment method is not available", 400);
     }
@@ -78,4 +79,9 @@ export async function POST(request) {
   } catch (error) {
     return handleApiError(error);
   }
+}
+
+export async function GET() {
+  const paymentMethods = await getAvailablePaymentMethodsAsync();
+  return jsonSuccess({ paymentMethods });
 }

@@ -2,7 +2,11 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import Order from "@/models/Order";
 import { requireAdmin } from "@/lib/auth/session";
-import { sendOrderStatusUpdate, sendPaymentReceivedEmail } from "@/lib/email";
+import {
+  sendOrderStatusUpdate,
+  sendPaymentReceivedEmail,
+  sendOrderConfirmationEmail,
+} from "@/lib/email";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
 const updateSchema = z.object({
@@ -10,6 +14,7 @@ const updateSchema = z.object({
   paymentStatus: z.string().optional(),
   internalNote: z.string().optional(),
   resendEmail: z.boolean().optional(),
+  resendConfirmation: z.boolean().optional(),
 });
 
 export async function GET(_request, { params }) {
@@ -48,6 +53,10 @@ export async function PATCH(request, { params }) {
     if (parsed.data.resendEmail) {
       const statusMsg = `Your order status is now: ${order.orderStatus.replace("_", " ")}`;
       sendOrderStatusUpdate(order.toObject(), statusMsg).catch(() => {});
+    }
+
+    if (parsed.data.resendConfirmation) {
+      sendOrderConfirmationEmail(order.toObject()).catch(() => {});
     }
 
     if (parsed.data.paymentStatus === "paid" && prevPaymentStatus !== "paid") {

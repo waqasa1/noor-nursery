@@ -10,6 +10,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import { CATEGORIES, IMAGES } from "./data";
+import { buildPlantDoctorWhatsAppUrl } from "@/lib/whatsapp";
 
 export function Hero() {
   return (
@@ -56,7 +57,9 @@ export function Hero() {
               <Sprout className="h-5 w-5" /> Shop 300+ Plants Now
             </a>
             <a
-              href="#faq"
+              href={buildPlantDoctorWhatsAppUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full border-2 border-secondary bg-card px-7 py-3.5 font-semibold text-secondary transition hover:bg-surface-low"
             >
               <MessageCircle className="h-5 w-5" /> WhatsApp Plant Doctor
@@ -149,7 +152,14 @@ export function Hero() {
   );
 }
 
-export function Categories() {
+export function Categories({ categories = [] }) {
+  const list = categories.length ? categories : CATEGORIES.map((c) => ({
+    slug: c.name.toLowerCase().replace(/\s+/g, "-"),
+    nameEn: c.name,
+    nameUr: c.urdu,
+    image: c.image,
+  }));
+
   return (
     <section id="categories" className="mx-auto max-w-7xl px-4 py-14">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -162,7 +172,7 @@ export function Categories() {
           </h2>
         </div>
         <a
-          href="#plants"
+          href="/categories"
           className="inline-flex items-center gap-1.5 text-sm font-bold text-secondary hover:text-primary"
         >
           View All Categories →
@@ -170,24 +180,24 @@ export function Categories() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
-        {CATEGORIES.map((c) => (
+        {list.map((c) => (
           <a
-            key={c.name}
-            href="#plants"
+            key={c.slug || c.nameEn}
+            href={c.slug ? `/categories/${c.slug}` : "#plants"}
             className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
             <div className="aspect-square overflow-hidden">
               <img
-                src={c.image}
-                alt={c.name}
+                src={c.image || "/placeholder.jpg"}
+                alt={c.nameEn}
                 loading="lazy"
                 className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
               />
             </div>
             <div className="p-3 text-center">
-              <p className="text-sm font-bold text-foreground">{c.name}</p>
+              <p className="text-sm font-bold text-foreground">{c.nameEn}</p>
               <p className="text-urdu text-xs text-muted-foreground" dir="rtl" lang="ur">
-                {c.urdu}
+                {c.nameUr}
               </p>
             </div>
           </a>

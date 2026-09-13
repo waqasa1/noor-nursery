@@ -1,16 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { StoreLayout } from "@/components/layout/StoreLayout";
 import { formatPKR } from "@/lib/utils/currency";
 import { IMAGES } from "@/components/nursery/data";
-import { Leaf, Package, Search } from "lucide-react";
+import { Leaf, MessageCircle, Package, Search } from "lucide-react";
+import { buildOrderWhatsAppUrl } from "@/lib/whatsapp";
 
-export default function TrackOrderPage() {
+function TrackOrderContent() {
+  const searchParams = useSearchParams();
   const [form, setForm] = useState({ orderNumber: "", email: "" });
   const [order, setOrder] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const order = searchParams.get("order");
+    if (order) setForm((f) => ({ ...f, orderNumber: order }));
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,6 +131,18 @@ export default function TrackOrderPage() {
                     <span className="font-semibold text-foreground">Total Amount</span>
                     <span className="font-bold text-primary">{formatPKR(order.total)}</span>
                   </div>
+                  <a
+                    href={buildOrderWhatsAppUrl({
+                      orderNumber: order.orderNumber,
+                      total: order.total,
+                      paymentMethod: order.paymentMethod,
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border-2 border-secondary px-4 py-2.5 text-sm font-bold text-secondary transition hover:bg-surface-low"
+                  >
+                    <MessageCircle className="h-4 w-4" /> Ask about this order on WhatsApp
+                  </a>
                   <div className="mt-4">
                     <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Items</h4>
                     <ul className="space-y-3">
@@ -144,5 +164,13 @@ export default function TrackOrderPage() {
         </div>
       </div>
     </StoreLayout>
+  );
+}
+
+export default function TrackOrderPage() {
+  return (
+    <Suspense fallback={null}>
+      <TrackOrderContent />
+    </Suspense>
   );
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Heart, Menu, MessageCircle, Phone, Search, ShoppingBag, Truck, User, X, Zap } from "lucide-react";
 import { IMAGES } from "./data";
+import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
 
 export function TopBar() {
   return (
@@ -19,12 +20,17 @@ export function TopBar() {
           <span className="hidden font-semibold text-gold md:inline">| Free Shipping over PKR 2,500</span>
         </p>
         <div className="flex items-center gap-4">
-          <a href="tel:+923492849062" className="flex items-center gap-1.5 hover:text-leaf">
-            <Phone className="h-3.5 w-3.5" /> +92 349 2849062
+          <a href={`tel:+${formatStorePhone().replace(/\D/g, "")}`} className="flex items-center gap-1.5 hover:text-leaf">
+            <Phone className="h-3.5 w-3.5" /> {formatStorePhone()}
           </a>
-          <Link href="/contact" className="hidden items-center gap-1.5 hover:text-leaf sm:flex">
-            <MessageCircle className="h-3.5 w-3.5" /> Contact Us
-          </Link>
+          <a
+            href={buildWhatsAppUrl(generalSupportMessage())}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden items-center gap-1.5 hover:text-leaf sm:flex"
+          >
+            <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
+          </a>
         </div>
       </div>
     </div>

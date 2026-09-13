@@ -4,7 +4,9 @@ import { connectDB, isDBConfigured } from "@/lib/db";
 import Order from "@/models/Order";
 import { formatPKR } from "@/lib/utils/currency";
 import { bankTransferProvider } from "@/lib/payments/bank-transfer.provider";
-import { CheckCircle2, Truck, ShoppingBag } from "lucide-react";
+import { CheckCircle2, Truck, ShoppingBag, MessageCircle } from "lucide-react";
+import { buildOrderWhatsAppUrl } from "@/lib/whatsapp";
+import { getEnv } from "@/lib/env";
 
 export const metadata = { robots: { index: false } };
 
@@ -69,10 +71,23 @@ export default async function OrderSuccessPage({ params, searchParams }) {
               </div>
             )}
             
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
               <Link href="/track-order" className="flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-sm font-bold text-primary-foreground transition hover:bg-forest hover:shadow-lg">
                 <Truck className="h-4 w-4" /> Track Order
               </Link>
+              <a
+                href={buildOrderWhatsAppUrl({
+                  orderNumber,
+                  total: order?.total,
+                  paymentMethod: order?.paymentMethod,
+                  baseUrl: getEnv().NEXT_PUBLIC_APP_URL,
+                })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-full border-2 border-secondary px-8 py-4 text-sm font-bold text-secondary transition hover:bg-surface-low"
+              >
+                <MessageCircle className="h-4 w-4" /> Questions on WhatsApp
+              </a>
               <Link href="/shop" className="flex items-center justify-center gap-2 rounded-full border px-8 py-4 text-sm font-bold text-foreground transition hover:border-secondary hover:text-secondary hover:shadow-md">
                 <ShoppingBag className="h-4 w-4" /> Continue Shopping
               </Link>

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, ShoppingCart, Sun, Droplets } from "lucide-react";
+import { CheckCircle2, ShoppingCart, Sun, Droplets, MessageCircle } from "lucide-react";
+import { buildProductWhatsAppUrl } from "@/lib/whatsapp";
 import { useCartStore } from "@/store/cart";
 import { formatPKR } from "@/lib/utils/currency";
 import { CatalogProductCard } from "@/components/catalog/ProductCard";
@@ -119,15 +120,33 @@ export function ProductDetail({ product, related }) {
             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={handleAdd}
-            disabled={outOfStock}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-50"
-          >
-            <ShoppingCart className="h-5 w-5" />
-            {outOfStock ? "Out of Stock" : "Add to Cart"}
-          </button>
+          <div className="mt-6 flex gap-3">
+            <button
+              type="button"
+              onClick={handleAdd}
+              disabled={outOfStock}
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-50"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {outOfStock ? "Out of Stock" : "Add to Cart"}
+            </button>
+            <a
+              href={buildProductWhatsAppUrl({
+                nameEn: product.nameEn,
+                nameUr: product.nameUr,
+                slug: product.slug,
+                sizeLabel: variant?.sizeLabelEn,
+                price: variant?.price,
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-2xl border-2 border-secondary px-5 py-4 text-secondary transition hover:bg-surface-low"
+              aria-label={`Ask on WhatsApp about ${product.nameEn}`}
+            >
+              <MessageCircle className="h-5 w-5" />
+              <span className="hidden sm:inline text-sm font-bold">WhatsApp</span>
+            </a>
+          </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             {product.sunlight && (

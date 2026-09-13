@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import Order from "@/models/Order";
+import { rateLimit, getClientIp } from "@/lib/auth/rate-limit";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
 const schema = z.object({
@@ -13,6 +14,12 @@ const schema = z.object({
 
 export async function POST(request) {
   try {
+    const ip = getClientIp(request);
+    const limit = rateLimit(`track:${ip}`, { maxAttempts: 20, windowMs: 15 * 60 * 1000 });
+    if (!limit.allowed) {
+      return jsonError("Too many lookup attempts. Please wait.", 429);
+    }
+
     const body = await request.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AdminLayout } from "@/components/layout/AdminLayout";
+import { AdminOrderDetailSkeleton } from "@/components/admin/AdminSkeleton";
 import { formatPKR } from "@/lib/utils/currency";
 
 const ORDER_STATUSES = ["pending", "awaiting_payment", "payment_review", "paid", "processing", "packed", "shipped", "delivered", "cancelled"];
@@ -11,16 +12,28 @@ const PAYMENT_STATUSES = ["unpaid", "pending", "paid", "failed", "refunded"];
 export default function AdminOrderDetailPage() {
   const params = useParams();
   const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [updates, setUpdates] = useState({ orderStatus: "", paymentStatus: "", internalNote: "" });
 
-  const load = () => fetch(`/api/admin/orders/${params.id}`).then((r) => r.json()).then((d) => {
-    if (d.order) {
-      setOrder(d.order);
-      setUpdates({ orderStatus: d.order.orderStatus, paymentStatus: d.order.paymentStatus, internalNote: d.order.internalNote || "" });
-    }
-  });
+  const load = () =>
+    fetch(`/api/admin/orders/${params.id}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.order) {
+          setOrder(d.order);
+          setUpdates({
+            orderStatus: d.order.orderStatus,
+            paymentStatus: d.order.paymentStatus,
+            internalNote: d.order.internalNote || "",
+          });
+        }
+      })
+      .finally(() => setLoading(false));
 
-  useEffect(() => { load(); }, [params.id]);
+  useEffect(() => {
+    setLoading(true);
+    load();
+  }, [params.id]);
 
   const save = async () => {
     await fetch(`/api/admin/orders/${params.id}`, {
@@ -31,7 +44,13 @@ export default function AdminOrderDetailPage() {
     load();
   };
 
-  if (!order) return <AdminLayout><p>Loading...</p></AdminLayout>;
+  if (loading || !order) {
+    return (
+      <AdminLayout>
+        <AdminOrderDetailSkeleton />
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -57,6 +76,34 @@ export default function AdminOrderDetailPage() {
             </select>
             <textarea placeholder="Internal note" value={updates.internalNote} onChange={(e) => setUpdates({ ...updates, internalNote: e.target.value })} className="w-full rounded-xl border px-3 py-2 text-sm" rows={3} />
             <button type="button" onClick={save} className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">Save</button>
+            <button
+              type="button"
+              onClick={async () => {
+                await fetch(`/api/admin/orders/${params.id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ resendEmail: true }),
+                });
+                alert("Status email sent");
+              }}
+              className="block w-full rounded-full border px-4 py-2 text-sm font-bold"
+            >
+              Resend Status Email
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                await fetch(`/api/admin/orders/${params.id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ resendConfirmation: true }),
+                });
+                alert("Confirmation email sent");
+              }}
+              className="block w-full rounded-full border px-4 py-2 text-sm font-bold"
+            >
+              Resend Confirmation Email
+            </button>
           </div>
         </div>
       </div>

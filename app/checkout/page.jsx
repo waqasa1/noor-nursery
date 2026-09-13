@@ -8,21 +8,16 @@ import { useCartStore } from "@/store/cart";
 import { formatPKR } from "@/lib/utils/currency";
 import { CreditCard, Truck, AlertCircle } from "lucide-react";
 
-const PAYMENT_METHODS = [
-  { id: "cod", labelEn: "Cash on Delivery", labelUr: "کیش آن ڈیلیوری" },
-  { id: "bank_transfer", labelEn: "Bank Transfer", labelUr: "بینک ٹرانسفر" },
-  { id: "jazzcash", labelEn: "JazzCash", labelUr: "JazzCash" },
-  { id: "easypaisa", labelEn: "EasyPaisa", labelUr: "EasyPaisa" },
-  { id: "payfast", labelEn: "PayFast", labelUr: "PayFast" },
-];
-
 export default function CheckoutPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const { items, getSubtotal, clearCart } = useCartStore();
-  const [availableMethods, setAvailableMethods] = useState(["cod", "bank_transfer"]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
   const [validatedItems, setValidatedItems] = useState([]);
-  const [totals, setTotals] = useState({ subtotal: 0, deliveryFee: 0, total: 0 });
+  const [totals, setTotals] = useState({ subtotal: 0, deliveryFee: 0, discount: 0, total: 0 });
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState(null);
+  const [promoError, setPromoError] = useState("");
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -44,6 +39,14 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setIsMounted(true);
+    fetch("/api/checkout")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.paymentMethods?.length) {
+          setPaymentMethods(data.paymentMethods);
+          setForm((f) => ({ ...f, paymentMethod: data.paymentMethods[0].id }));
+        }
+      });
   }, []);
 
   useEffect(() => {
@@ -51,14 +54,41 @@ export default function CheckoutPage() {
     fetch("/api/cart/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })), city: form.city }),
+      body: JSON.stringify({
+        items: items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })),
+        city: form.city,
+        promoCode: appliedPromo || undefined,
+      }),
     })
       .then((r) => r.json())
       .then((data) => {
         if (data.items) setValidatedItems(data.items);
         if (data.totals) setTotals(data.totals);
       });
-  }, [items, form.city, isMounted]);
+  }, [items, form.city, appliedPromo, isMounted]);
+
+  const applyPromo = async () => {
+    setPromoError("");
+    const res = await fetch("/api/cart/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })),
+        city: form.city,
+        promoCode,
+      }),
+    });
+    const data = await res.json();
+    if (data.promo?.error) {
+      setPromoError(data.promo.error);
+      setAppliedPromo(null);
+      return;
+    }
+    if (data.promo?.code) {
+      setAppliedPromo(data.promo.code);
+      setPromoError("");
+    }
+  };
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
 
@@ -86,6 +116,7 @@ export default function CheckoutPage() {
           deliveryInstructions: form.deliveryInstructions,
         },
         paymentMethod: form.paymentMethod,
+        promoCode: appliedPromo || undefined,
         customerNote: form.customerNote,
         agreeToTerms: form.agreeToTerms,
       }),
@@ -221,7 +252,7 @@ export default function CheckoutPage() {
             <section className="rounded-3xl border bg-card p-6 shadow-sm sm:p-8">
               <h2 className="font-display text-xl font-bold text-foreground">3. Payment Method</h2>
               <div className="mt-6 space-y-3" role="radiogroup" aria-label="Payment method">
-                {PAYMENT_METHODS.map((m) => (
+                {paymentMethods.map((m) => (
                   <label
                     key={m.id}
                     className={`flex cursor-pointer items-center gap-4 rounded-2xl border p-4 transition-all ${
@@ -273,6 +304,31 @@ export default function CheckoutPage() {
                   ))}
                 </ul>
                 
+                <div className="mt-6 space-y-3">
+                  <label className="block text-sm font-medium text-foreground">Promo Code</label>
+                  <div className="flex gap-2">
+                    <input
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                      placeholder="NOOR20"
+                      className="flex-1 rounded-xl border bg-surface-low px-3 py-2 text-sm uppercase"
+                    />
+                    <button
+                      type="button"
+                      onClick={applyPromo}
+                      className="rounded-xl bg-secondary px-4 py-2 text-sm font-bold text-secondary-foreground"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  {appliedPromo && (
+                    <p className="text-xs font-medium text-leaf">Code {appliedPromo} applied</p>
+                  )}
+                  {promoError && (
+                    <p className="text-xs text-destructive">{promoError}</p>
+                  )}
+                </div>
+
                 <div className="mt-6 space-y-3 text-sm">
                   <div className="flex justify-between text-muted-foreground">
                     <span>Subtotal</span>
@@ -282,6 +338,12 @@ export default function CheckoutPage() {
                     <span>Shipping</span>
                     <span className="font-medium text-foreground">{formatPKR(totals.deliveryFee || 0)}</span>
                   </div>
+                  {totals.discount > 0 && (
+                    <div className="flex justify-between text-leaf">
+                      <span>Discount</span>
+                      <span className="font-medium">−{formatPKR(totals.discount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between pt-4 font-display text-xl font-bold text-primary">
                     <span>Total</span>
                     <span>{formatPKR(totals.total || getSubtotal())}</span>

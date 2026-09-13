@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HelpCircle, X } from "lucide-react";
 import { HELP_FAQ } from "@/config/help-faq";
+import { buildPlantDoctorWhatsAppUrl, buildWhatsAppUrl, generalSupportMessage } from "@/lib/whatsapp";
 
 export function HelpPanel() {
   const [open, setOpen] = useState(false);
@@ -143,12 +144,26 @@ export function HelpPanel() {
               )}
             </div>
 
-            <footer className="border-t px-4 py-3 text-center text-xs text-muted-foreground">
-              Preset answers — not live chat.{" "}
-              <a href="/contact" className="font-medium text-secondary hover:underline">
-                Contact us
-              </a>{" "}
-              for direct support.
+            <footer className="border-t px-4 py-3 space-y-3">
+              <a
+                href={buildPlantDoctorWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-leaf px-4 py-2.5 text-sm font-bold text-leaf-foreground transition hover:bg-secondary hover:text-secondary-foreground"
+              >
+                Talk to us on WhatsApp
+              </a>
+              <p className="text-center text-xs text-muted-foreground">
+                Preset answers — not live chat.{" "}
+                <a href={buildWhatsAppUrl(generalSupportMessage())} target="_blank" rel="noopener noreferrer" className="font-medium text-secondary hover:underline">
+                  WhatsApp
+                </a>{" "}
+                or{" "}
+                <a href="/contact" className="font-medium text-secondary hover:underline">
+                  contact form
+                </a>
+                .
+              </p>
             </footer>
           </div>
         </div>

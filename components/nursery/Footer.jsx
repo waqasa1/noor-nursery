@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Camera, Globe, MessageCircle, PlayCircle, ShieldCheck, Facebook, Instagram, Phone } from "lucide-react";
 import { IMAGES } from "./data";
+import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
 
 export function Footer() {
   return (
@@ -32,8 +33,17 @@ export function Footer() {
             <a href="https://www.instagram.com/noornursery_official/" target="_blank" rel="noopener noreferrer" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Instagram">
               <Instagram className="h-4 w-4" />
             </a>
-            <a href="tel:+923492849062" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Phone">
+            <a href={`tel:+${formatStorePhone().replace(/\D/g, "")}`} className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Phone">
               <Phone className="h-4 w-4" />
+            </a>
+            <a
+              href={buildWhatsAppUrl(generalSupportMessage())}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground"
+              aria-label="WhatsApp"
+            >
+              <MessageCircle className="h-4 w-4" />
             </a>
           </div>
         </div>

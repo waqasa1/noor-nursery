@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { connectDB, isDBConfigured } from "@/lib/db";
 import { validateCartItems, buildCartSummary } from "@/lib/cart/validation";
-import { calculateDeliveryFee } from "@/lib/delivery";
+import { calculateDeliveryFeeAsync } from "@/lib/delivery";
+import { validatePromoCode } from "@/lib/promo";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
 const schema = z.object({
@@ -13,6 +14,7 @@ const schema = z.object({
     })
   ),
   city: z.string().optional(),
+  promoCode: z.string().optional(),
 });
 
 export async function POST(request) {
@@ -30,10 +32,23 @@ export async function POST(request) {
     await connectDB();
     const { valid, errors, validatedItems } = await validateCartItems(parsed.data.items);
     const subtotal = buildCartSummary(validatedItems).subtotal;
-    const deliveryFee = calculateDeliveryFee(parsed.data.city, subtotal);
-    const totals = buildCartSummary(validatedItems, deliveryFee);
+    const deliveryFee = await calculateDeliveryFeeAsync(parsed.data.city, subtotal);
 
-    return jsonSuccess({ valid, errors, items: validatedItems, totals });
+    let discount = 0;
+    let promo = null;
+    if (parsed.data.promoCode) {
+      const promoResult = await validatePromoCode(parsed.data.promoCode, subtotal);
+      if (promoResult.valid) {
+        discount = promoResult.discount;
+        promo = { code: promoResult.promoCode, label: promoResult.label, discount };
+      } else {
+        promo = { error: promoResult.error };
+      }
+    }
+
+    const totals = buildCartSummary(validatedItems, deliveryFee, discount);
+
+    return jsonSuccess({ valid, errors, items: validatedItems, totals, promo });
   } catch (error) {
     return handleApiError(error);
   }
