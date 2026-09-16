@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Camera, Globe, MessageCircle, PlayCircle, ShieldCheck, Facebook, Instagram, Phone } from "lucide-react";
 import { IMAGES } from "./data";
+import { BRAND } from "@/lib/brand";
 import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
 
 export function Footer() {
@@ -18,13 +19,15 @@ export function Footer() {
             />
             <div>
               <p className="font-display text-lg font-bold">NOOR NURSERY</p>
-              <p className="text-[11px] text-primary-foreground/70">Pakistan&apos;s Living Heritage</p>
+              <p className="text-[11px] text-primary-foreground/70">{BRAND.tagline}</p>
             </div>
           </div>
-          <p className="mt-4 text-sm leading-relaxed text-primary-foreground/75">
-            Nurturing homes and gardens across Pakistan since 2012. We deliver healthy, hardened
-            plants acclimatized for Karachi coastal air, Punjab plains, and Northern hill climates
-            directly to your doorstep with guaranteed live arrival.
+          <p className="mt-4 text-sm font-medium leading-relaxed text-leaf">
+            {BRAND.sloganSecondary}
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-primary-foreground/75">
+            Nurturing homes and gardens across Pakistan since 2012. Healthy, acclimatized plants
+            delivered to your doorstep with guaranteed live arrival.
           </p>
           <div className="mt-6 flex items-center gap-4">
             <a href="https://www.facebook.com/Noor.Nursery.24hr" target="_blank" rel="noopener noreferrer" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Facebook">

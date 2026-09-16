@@ -1,10 +1,16 @@
 import { PolicyPage } from "@/components/content/PolicyPage";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "About Us — Noor Nursery", description: "Pakistan's trusted online nursery since 2012." };
+export const metadata = {
+  title: "About Us — Noor Nursery",
+  description: `${BRAND.sloganPrimary} Pakistan's trusted online nursery since 2012.`,
+};
 
 export default function AboutPage() {
   return (
     <PolicyPage title="About Noor Nursery" titleUr="نور نرسری کے بارے میں">
+      <p className="font-medium text-secondary">{BRAND.sloganPrimary}</p>
+      <p className="font-medium text-secondary">{BRAND.sloganSecondary}</p>
       <p>Nurturing homes and gardens across Pakistan since 2012. Noor Nursery delivers healthy, hardened plants acclimatized for Karachi coastal air, Punjab plains, and Northern hill climates.</p>
       <p dir="rtl" lang="ur" className="text-urdu">2012 سے پاکستان بھر میں گھروں اور باغات کو سرسبز بناتے ہوئے۔</p>
       <h2>Our Mission</h2>

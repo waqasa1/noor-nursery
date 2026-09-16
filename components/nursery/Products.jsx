@@ -14,7 +14,7 @@ function ProductCard({ product, onAdd }) {
   const comparePrice = variant?.compareAtPrice || Math.round(minPrice * 1.15);
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition hover:shadow-xl">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
       <Link href={`/products/${product.slug}`} className="relative aspect-square overflow-hidden bg-surface-low">
         <img
           src={product.featuredImage || "/placeholder.jpg"}

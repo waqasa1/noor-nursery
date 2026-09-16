@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Heart, Menu, MessageCircle, Phone, Search, ShoppingBag, Truck, User, X, Zap } from "lucide-react";
 import { IMAGES } from "./data";
+import { BRAND } from "@/lib/brand";
 import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
 
 export function TopBar() {
@@ -134,7 +135,7 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
               NOOR NURSERY
             </p>
             <p className="text-[11px] font-medium text-muted-foreground">
-              Pakistan&apos;s Living Heritage
+              {BRAND.tagline}
             </p>
           </div>
         </Link>

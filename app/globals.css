@@ -52,11 +52,13 @@
   --color-surface-mid: var(--surface-mid);
   --color-surface-var: var(--surface-var);
   --color-outline-var: var(--outline-var);
+  --color-earth: var(--earth);
+  --color-earth-foreground: var(--earth-foreground);
 }
 
 :root {
   --radius: 0.875rem;
-  --background: oklch(0.974 0.028 144);
+  --background: oklch(0.975 0.018 88);
   --foreground: oklch(0.24 0.045 158);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.24 0.045 158);
@@ -86,6 +88,8 @@
   --surface-mid: oklch(0.92 0.04 143);
   --surface-var: oklch(0.905 0.035 143);
   --outline-var: oklch(0.83 0.02 145);
+  --earth: oklch(0.48 0.06 55);
+  --earth-foreground: oklch(0.975 0.018 88);
 }
 
 @layer base {
@@ -111,5 +115,47 @@
 @layer utilities {
   .text-urdu {
     font-family: "Noto Nastaliq Urdu", "Plus Jakarta Sans", serif;
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.8s ease-out both;
+  }
+
+  .animate-fade-up-delay-1 {
+    animation: fade-up 0.8s ease-out 0.15s both;
+  }
+
+  .animate-fade-up-delay-2 {
+    animation: fade-up 0.8s ease-out 0.3s both;
+  }
+
+  .animate-fade-up-delay-3 {
+    animation: fade-up 0.8s ease-out 0.45s both;
+  }
+
+  .animate-hero-zoom {
+    animation: hero-zoom 1.2s ease-out both;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-zoom {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }

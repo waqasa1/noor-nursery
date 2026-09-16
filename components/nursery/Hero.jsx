@@ -3,116 +3,103 @@
 import {
   BadgeCheck,
   Banknote,
-  Leaf,
   MessageCircle,
   Package,
   Sprout,
   ThumbsUp,
 } from "lucide-react";
 import { CATEGORIES, IMAGES } from "./data";
+import { BRAND } from "@/lib/brand";
 import { buildPlantDoctorWhatsAppUrl } from "@/lib/whatsapp";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden">
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 lg:grid-cols-2 lg:py-20">
-        <div>
-          <p className="inline-flex items-center gap-2 rounded-full border border-leaf bg-surface-low px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-secondary">
-            <BadgeCheck className="h-4 w-4" /> Pakistan&apos;s Trusted Nursery Since 2012
-          </p>
-          <h1 className="mt-5 text-4xl font-bold leading-[1.1] tracking-tight text-primary sm:text-5xl lg:text-6xl">
-            Lush Green Spaces for Pakistani Homes.
-          </h1>
-          <p className="text-urdu mt-4 text-xl text-secondary" dir="rtl" lang="ur">
-            پاکستان کی سب سے بڑی آن لائن نرسری
-          </p>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Cultivate your sanctuary with over{" "}
-            <strong className="font-semibold text-foreground">300+ acclimated plants</strong> grown in
-            our specialized Multan Road Lahore nurseries. Guaranteed pest-free, rooted in rich
-            compost, and shipped in shock-resistant crates directly to Lahore, Karachi, Islamabad,
-            Peshawar &amp; nationwide.
-          </p>
+    <section className="relative min-h-[88vh] overflow-hidden">
+      <div className="absolute inset-0">
+        <img
+          src={IMAGES.hero}
+          alt="A sunlit terrace filled with lush indoor plants including palms, monstera, and hanging greenery"
+          className="animate-hero-zoom h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/92 via-primary/75 to-primary/35" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent" />
+      </div>
 
-          <div className="mt-7 grid max-w-md grid-cols-3 gap-3">
-            {[
-              { value: "300+", label: "Live Species (اقسام)" },
-              { value: "48-Hr", label: "Arrival Guarantee" },
-              { value: "42,000+", label: "Pakistani Gardens" },
-            ].map((s) => (
-              <div key={s.label} className="rounded-2xl border bg-card p-3 text-center shadow-sm">
-                <p className="font-display text-xl font-bold text-secondary sm:text-2xl">{s.value}</p>
-                <p className="mt-0.5 text-[11px] font-medium leading-tight text-muted-foreground">
-                  {s.label}
-                </p>
-              </div>
-            ))}
-          </div>
+      <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 py-16 lg:py-24">
+        <p className="animate-fade-up inline-flex max-w-fit items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-leaf backdrop-blur-sm">
+          <BadgeCheck className="h-4 w-4" />
+          {BRAND.sloganPrimary}
+        </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href="#plants"
-              className="inline-flex items-center gap-2 rounded-full bg-secondary px-7 py-3.5 font-semibold text-secondary-foreground shadow-lg transition hover:bg-primary"
-            >
-              <Sprout className="h-5 w-5" /> Shop 300+ Plants Now
-            </a>
-            <a
-              href={buildPlantDoctorWhatsAppUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-secondary bg-card px-7 py-3.5 font-semibold text-secondary transition hover:bg-surface-low"
-            >
-              <MessageCircle className="h-5 w-5" /> WhatsApp Plant Doctor
-            </a>
-          </div>
+        <h1 className="animate-fade-up-delay-1 mt-6 max-w-3xl text-4xl font-bold leading-[1.08] tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl xl:text-7xl">
+          Bring Nature Into Your Life.
+        </h1>
 
-          <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-xs font-medium text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <Leaf className="h-4 w-4 text-secondary" /> Acclimatized Foliage — Tailored for Punjab
-              heat &amp; Sindh coastal air
-            </span>
-            <span className="flex items-center gap-1.5">
-              <BadgeCheck className="h-4 w-4 text-secondary" /> 100% Organic
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Package className="h-4 w-4 text-secondary" /> Cushioned Transit Boxes
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Banknote className="h-4 w-4 text-secondary" /> Cash On Delivery (COD)
-            </span>
-          </div>
+        <p className="animate-fade-up-delay-2 mt-5 max-w-xl text-lg font-medium text-leaf sm:text-xl">
+          {BRAND.sloganSecondary}
+        </p>
+
+        <p className="animate-fade-up-delay-2 mt-4 max-w-xl text-base leading-relaxed text-primary-foreground/85 sm:text-lg">
+          Discover beautiful, healthy plants carefully selected for your home, garden, and
+          workspace — acclimatized for Pakistan and delivered with care nationwide.
+        </p>
+
+        <p className="text-urdu animate-fade-up-delay-2 mt-3 text-lg text-primary-foreground/75" dir="rtl" lang="ur">
+          پاکستان کی سب سے بڑی آن لائن نرسری
+        </p>
+
+        <div className="animate-fade-up-delay-3 mt-8 flex flex-wrap gap-3">
+          <a
+            href="#plants"
+            className="inline-flex items-center gap-2 rounded-full bg-leaf px-7 py-3.5 font-semibold text-leaf-foreground shadow-lg transition hover:bg-gold hover:text-gold-foreground"
+          >
+            <Sprout className="h-5 w-5" />
+            Explore Our Collection
+          </a>
+          <a
+            href="/shop"
+            className="inline-flex items-center gap-2 rounded-full border-2 border-primary-foreground/30 bg-primary-foreground/10 px-7 py-3.5 font-semibold text-primary-foreground backdrop-blur-sm transition hover:bg-primary-foreground/20"
+          >
+            Discover Your Perfect Plant
+          </a>
+          <a
+            href={buildPlantDoctorWhatsAppUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border-2 border-primary-foreground/20 px-7 py-3.5 font-semibold text-primary-foreground/90 transition hover:bg-primary-foreground/10"
+          >
+            <MessageCircle className="h-5 w-5" />
+            WhatsApp Plant Doctor
+          </a>
         </div>
 
-        <div className="relative">
-          <div className="overflow-hidden rounded-3xl border-4 border-card shadow-2xl">
-            <img
-              src={IMAGES.hero}
-              alt="A sunlit Pakistani modern living room terrace filled with lush indoor plants including an Areca palm, large Monstera deliciosa, and hanging spider plants in terracotta pots"
-              className="aspect-[4/3] w-full object-cover"
-            />
-          </div>
-          <div className="absolute -bottom-5 left-6 flex items-center gap-3 rounded-2xl border bg-card px-5 py-3.5 shadow-xl">
-            <span className="grid h-11 w-11 place-items-center rounded-full bg-leaf">
-              <BadgeCheck className="h-6 w-6 text-leaf-foreground" />
-            </span>
-            <div>
-              <p className="font-display text-sm font-bold text-foreground">
-                48-Hour Live Plant Guarantee
+        <div className="animate-fade-up-delay-3 mt-10 grid max-w-lg grid-cols-3 gap-3">
+          {[
+            { value: "300+", label: "Live Species" },
+            { value: "48-Hr", label: "Arrival Guarantee" },
+            { value: "2012", label: "Trusted Since" },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className="rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10 px-3 py-3 text-center backdrop-blur-sm"
+            >
+              <p className="font-display text-xl font-bold text-leaf sm:text-2xl">{s.value}</p>
+              <p className="mt-0.5 text-[11px] font-medium leading-tight text-primary-foreground/70">
+                {s.label}
               </p>
-              <p className="text-xs text-muted-foreground">Free replacement if wilted</p>
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      <div className="border-y bg-surface-low">
+      <div className="relative border-t border-primary-foreground/10 bg-primary/95 backdrop-blur-sm">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-6 lg:grid-cols-4">
           {[
             {
               icon: Package,
-              title: "Transit Safe Packing",
+              title: "Secure Packaging",
               urdu: "پودوں کی بحفاظت ترسیل",
-              sub: "Custom shockproof containers",
+              sub: "Shockproof transit containers",
             },
             {
               icon: ThumbsUp,
@@ -122,7 +109,7 @@ export function Hero() {
             },
             {
               icon: Sprout,
-              title: "Horticulturist Care",
+              title: "Plant Care Support",
               urdu: "ماہرین زراعت کی رہنمائی",
               sub: "Free post-purchase guidance",
             },
@@ -134,15 +121,15 @@ export function Hero() {
             },
           ].map((f) => (
             <div key={f.title} className="flex items-start gap-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-leaf/20">
                 <f.icon className="h-5 w-5 text-leaf" />
               </span>
               <div>
-                <p className="text-sm font-bold text-foreground">{f.title}</p>
-                <p className="text-urdu text-xs text-secondary" dir="rtl" lang="ur">
+                <p className="text-sm font-bold text-primary-foreground">{f.title}</p>
+                <p className="text-urdu text-xs text-leaf/80" dir="rtl" lang="ur">
                   {f.urdu}
                 </p>
-                <p className="text-xs text-muted-foreground">{f.sub}</p>
+                <p className="text-xs text-primary-foreground/65">{f.sub}</p>
               </div>
             </div>
           ))}
@@ -153,55 +140,66 @@ export function Hero() {
 }
 
 export function Categories({ categories = [] }) {
-  const list = categories.length ? categories : CATEGORIES.map((c) => ({
-    slug: c.name.toLowerCase().replace(/\s+/g, "-"),
-    nameEn: c.name,
-    nameUr: c.urdu,
-    image: c.image,
-  }));
+  const list = categories.length
+    ? categories
+    : CATEGORIES.map((c) => ({
+        slug: c.name.toLowerCase().replace(/\s+/g, "-"),
+        nameEn: c.name,
+        nameUr: c.urdu,
+        image: c.image,
+      }));
 
   return (
-    <section id="categories" className="mx-auto max-w-7xl px-4 py-14">
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-secondary">
-            Shop by Category / <span lang="ur">پودوں کے زمرے</span>
-          </p>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Hand-picked varieties classified for easy home, terrace &amp; lawn cultivation
-          </h2>
-        </div>
-        <a
-          href="/categories"
-          className="inline-flex items-center gap-1.5 text-sm font-bold text-secondary hover:text-primary"
-        >
-          View All Categories →
-        </a>
+    <section id="categories" className="mx-auto max-w-7xl px-4 py-16">
+      <div className="mb-10 max-w-2xl">
+        <p className="text-xs font-bold uppercase tracking-widest text-secondary">
+          Shop by Category
+        </p>
+        <h2 className="mt-2 text-3xl font-bold tracking-tight text-primary sm:text-4xl">
+          Find the perfect plants for every space
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Hand-picked varieties for home, terrace, and lawn — browse with confidence.
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
-        {list.map((c) => (
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        {list.slice(0, 5).map((c) => (
           <a
             key={c.slug || c.nameEn}
             href={c.slug ? `/categories/${c.slug}` : "#plants"}
-            className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            className="group relative aspect-[3/4] overflow-hidden rounded-3xl shadow-md transition duration-500 hover:-translate-y-1 hover:shadow-xl"
           >
-            <div className="aspect-square overflow-hidden">
-              <img
-                src={c.image || "/placeholder.jpg"}
-                alt={c.nameEn}
-                loading="lazy"
-                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-              />
-            </div>
-            <div className="p-3 text-center">
-              <p className="text-sm font-bold text-foreground">{c.nameEn}</p>
-              <p className="text-urdu text-xs text-muted-foreground" dir="rtl" lang="ur">
+            <img
+              src={c.image || "/placeholder.jpg"}
+              alt={c.nameEn}
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent transition duration-500 group-hover:from-primary/95" />
+            <div className="absolute inset-x-0 bottom-0 p-4">
+              <p className="font-display text-base font-bold text-primary-foreground sm:text-lg">
+                {c.nameEn}
+              </p>
+              <p
+                className="text-urdu mt-0.5 text-xs text-primary-foreground/75 opacity-0 transition duration-300 group-hover:opacity-100"
+                dir="rtl"
+                lang="ur"
+              >
                 {c.nameUr}
               </p>
             </div>
           </a>
         ))}
+      </div>
+
+      <div className="mt-8 text-center">
+        <a
+          href="/categories"
+          className="inline-flex items-center gap-1.5 text-sm font-bold text-secondary transition hover:text-primary"
+        >
+          View All Categories →
+        </a>
       </div>
     </section>
   );

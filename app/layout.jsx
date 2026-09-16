@@ -12,7 +12,7 @@ export const metadata = {
     template: "%s | Noor Nursery",
   },
   description:
-    "Pakistan's trusted online nursery since 2012. Shop 300+ acclimatized indoor plants, fruit trees, herbs and seeds with 48-hour live arrival guarantee, COD and nationwide delivery.",
+    "Noor Nursery, the name of customer trust. Quality you can trust, service you deserve! Shop 300+ acclimatized plants with 48-hour live arrival guarantee, COD and nationwide delivery.",
   authors: [{ name: "Noor Nursery" }],
   openGraph: {
     type: "website",

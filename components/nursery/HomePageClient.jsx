@@ -6,7 +6,15 @@ import { CheckCircle2 } from "lucide-react";
 import { FlashDeal, Header, TopBar } from "@/components/nursery/Header";
 import { Categories, Hero } from "@/components/nursery/Hero";
 import { Products } from "@/components/nursery/Products";
-import { Faq, Testimonials, Trust } from "@/components/nursery/Sections";
+import {
+  BrandStory,
+  Faq,
+  FeaturedPlant,
+  FinalCTA,
+  PlantCareFinder,
+  Testimonials,
+  Trust,
+} from "@/components/nursery/Sections";
 import { Footer } from "@/components/nursery/Footer";
 import { HelpPanel } from "@/components/help/HelpPanel";
 import { useCartStore } from "@/store/cart";
@@ -61,23 +69,13 @@ export function HomePageClient({ products = [], categories = [] }) {
         <Hero />
         <Categories categories={categories} />
         <Products products={products} onAdd={addToCart} />
+        <FeaturedPlant />
         <Trust />
+        <PlantCareFinder />
         <Testimonials />
+        <BrandStory />
         <Faq />
-        <section className="bg-primary py-12 text-center text-primary-foreground">
-          <div className="mx-auto max-w-2xl px-4">
-            <h2 className="font-display text-2xl font-bold">Browse Our Full Catalog</h2>
-            <p className="text-urdu mt-2 text-primary-foreground/80" dir="rtl" lang="ur">
-              مکمل کیٹalog دیکھیں
-            </p>
-            <Link
-              href="/shop"
-              className="mt-6 inline-block rounded-full bg-leaf px-8 py-3 text-sm font-bold text-leaf-foreground transition hover:bg-gold hover:text-gold-foreground"
-            >
-              Shop All Plants
-            </Link>
-          </div>
-        </section>
+        <FinalCTA />
       </main>
       <Footer />
       <HelpPanel />
