@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { StoreLayout } from "@/components/layout/StoreLayout";
 import { ProductDetail } from "./ProductDetail";
 import { getProductBySlug, getRelatedProducts } from "@/lib/data/products";
+import { serializeProduct, serializeProducts } from "@/lib/utils/serialize";
 import { productJsonLd, breadcrumbJsonLd } from "@/lib/seo/structured-data";
 import { JsonLdScript } from "@/lib/seo/JsonLdScript";
 import { getEnv } from "@/lib/env";
@@ -42,7 +43,7 @@ export default async function ProductPage({ params }) {
           { name: product.nameEn },
         ])}
       />
-      <ProductDetail product={JSON.parse(JSON.stringify(product))} related={JSON.parse(JSON.stringify(related))} />
+      <ProductDetail product={serializeProduct(product)} related={serializeProducts(related)} />
     </StoreLayout>
   );
 }

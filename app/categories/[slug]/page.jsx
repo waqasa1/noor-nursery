@@ -5,6 +5,7 @@ import { CatalogProductCard } from "@/components/catalog/ProductCard";
 import { getCategoryBySlug, getProducts } from "@/lib/data/products";
 import { breadcrumbJsonLd } from "@/lib/seo/structured-data";
 import { JsonLdScript } from "@/lib/seo/JsonLdScript";
+import { serializeProducts } from "@/lib/utils/serialize";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -22,6 +23,7 @@ export default async function CategoryPage({ params }) {
   if (!category) notFound();
 
   const { products } = await getProducts({ category: slug, limit: 24 });
+  const plainProducts = serializeProducts(products);
 
   return (
     <StoreLayout>
@@ -42,11 +44,11 @@ export default async function CategoryPage({ params }) {
         )}
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {products.map((p) => (
+          {plainProducts.map((p) => (
             <CatalogProductCard key={p._id} product={p} />
           ))}
         </div>
-        {products.length === 0 && (
+        {plainProducts.length === 0 && (
           <p className="mt-10 text-center text-muted-foreground">No products in this category yet.</p>
         )}
       </div>

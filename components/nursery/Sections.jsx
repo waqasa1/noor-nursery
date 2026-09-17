@@ -94,7 +94,7 @@ export function PlantCareFinder() {
           {options.map((o) => (
             <Link
               key={o.label}
-              href={o.href}
+              href="/faq#plant-finder"
               className="group rounded-2xl border bg-card p-6 shadow-sm transition hover:-translate-y-1 hover:border-secondary hover:shadow-lg"
             >
               <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-surface-low transition group-hover:bg-secondary group-hover:text-secondary-foreground">
@@ -104,6 +104,14 @@ export function PlantCareFinder() {
               <p className="mt-1 text-xs text-muted-foreground">{o.desc}</p>
             </Link>
           ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Link
+            href="/faq#plant-finder"
+            className="inline-flex rounded-full bg-secondary px-8 py-3 text-sm font-bold text-secondary-foreground transition hover:bg-primary hover:text-primary-foreground"
+          >
+            Take the Full Plant Finder Quiz →
+          </Link>
         </div>
       </div>
     </section>
