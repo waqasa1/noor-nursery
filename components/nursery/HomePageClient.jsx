@@ -46,7 +46,7 @@ export function HomePageClient({ products = [], categories = [] }) {
         sizeLabelEn: variant.sizeLabelEn,
         sizeLabelUr: variant.sizeLabelUr,
         unitPrice: variant.price,
-        image: variant.image || product.featuredImage || product.images?.[0] || "/placeholder.jpg",
+        image: variant.image || product.featuredImage || product.images?.[0] || "/placeholder-plant.jpg",
         maxStock: variant.stock,
         quantity: 1,
       });

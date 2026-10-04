@@ -22,9 +22,9 @@ export const HELP_FAQ = [
     questionEn: "Which payment methods are available?",
     questionUr: "ادائیگی کے کون سے طریقے دستیاب ہیں؟",
     answerEn:
-      "We accept Cash on Delivery, Bank Transfer, JazzCash, EasyPaisa, and PayFast (card payments) where configured.",
+      "We accept Cash on Delivery and EasyPaisa. For EasyPaisa, send the order total from your own app and submit the TrxID — we ship only after verifying the transfer in our account.",
     answerUr:
-      "ہم کیش آن ڈیلیوری، بینک ٹرانسفر، JazzCash، EasyPaisa، اور PayFast (کارڈ) قبول کرتے ہیں۔",
+      "ہم کیش آن ڈیلیوری اور EasyPaisa قبول کرتے ہیں۔ EasyPaisa پر اپنی ایپ سے رقم بھیج کر TrxID جمع کرائیں، ہماری تصدیک کے بعد آرڈر بھیجا جاتا ہے۔",
   },
   {
     id: "cod",

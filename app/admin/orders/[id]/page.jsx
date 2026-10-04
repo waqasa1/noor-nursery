@@ -13,7 +13,12 @@ export default function AdminOrderDetailPage() {
   const params = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [updates, setUpdates] = useState({ orderStatus: "", paymentStatus: "", internalNote: "" });
+  const [updates, setUpdates] = useState({
+    orderStatus: "",
+    paymentStatus: "",
+    paymentReference: "",
+    internalNote: "",
+  });
 
   const load = () =>
     fetch(`/api/admin/orders/${params.id}`)
@@ -24,6 +29,7 @@ export default function AdminOrderDetailPage() {
           setUpdates({
             orderStatus: d.order.orderStatus,
             paymentStatus: d.order.paymentStatus,
+            paymentReference: d.order.paymentReference || "",
             internalNote: d.order.internalNote || "",
           });
         }
@@ -105,6 +111,98 @@ export default function AdminOrderDetailPage() {
               Resend Confirmation Email
             </button>
           </div>
+        </div>
+
+        <div className="rounded-2xl border bg-card p-5 lg:col-span-2">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-semibold">Payment</h2>
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-bold ${
+                order.paymentStatus === "paid"
+                  ? "bg-leaf/25 text-leaf-foreground"
+                  : "bg-gold/25 text-gold-foreground"
+              }`}
+            >
+              {order.paymentMethod.replace("_", " ")} · {order.paymentStatus}
+            </span>
+          </div>
+
+          {order.paymentMethod === "easypaisa" && (
+            <div className="mt-4 space-y-4">
+              <div className="rounded-xl border bg-surface-low p-4 text-sm">
+                <p className="font-semibold text-foreground">
+                  Verify in your own EasyPaisa app before shipping
+                </p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+                  <li>Amount expected: <span className="font-bold text-foreground">{formatPKR(order.total)}</span></li>
+                  <li>
+                    TrxID submitted by customer:{" "}
+                    <span className="font-mono font-bold text-foreground">
+                      {updates.paymentReference || "— not submitted —"}
+                    </span>
+                  </li>
+                  {order.paymentGatewayResponse?.submittedAt && (
+                    <li>
+                      Submitted {new Date(order.paymentGatewayResponse.submittedAt).toLocaleString()}
+                      {order.paymentGatewayResponse.reusedTrxId ? " · ⚠ TrxID reused on another order" : ""}
+                    </li>
+                  )}
+                  <li>
+                    Search that TrxID / amount in your EasyPaisa transaction history — trust your own wallet,
+                    never a screenshot.
+                  </li>
+                </ul>
+              </div>
+
+              <label className="block text-sm font-medium text-foreground">
+                Transaction ID (TrxID)
+                <input
+                  value={updates.paymentReference}
+                  onChange={(e) => setUpdates({ ...updates, paymentReference: e.target.value.toUpperCase() })}
+                  placeholder="Paste or type the TrxID you verified"
+                  className="field-input mt-2 w-full"
+                />
+              </label>
+
+              {order.paymentStatus !== "paid" ? (
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!window.confirm(`Confirm you received ${formatPKR(order.total)} in your EasyPaisa account for ${order.orderNumber}. The customer will be emailed "Payment received" and the order cannot be cancelled.`)) return;
+                      await fetch(`/api/admin/orders/${params.id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ paymentStatus: "paid", paymentReference: updates.paymentReference }),
+                      });
+                      load();
+                    }}
+                    className="rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground"
+                  >
+                    Mark Payment Received
+                  </button>
+                  <button
+                    type="button"
+                    onClick={save}
+                    className="rounded-full border px-5 py-2.5 text-sm font-bold"
+                  >
+                    Save TrxID Only
+                  </button>
+                </div>
+              ) : (
+                <p className="rounded-xl bg-leaf/15 p-3 text-sm font-semibold text-leaf-foreground">
+                  ✓ Payment verified — customer has been notified.
+                </p>
+              )}
+            </div>
+          )}
+
+          {order.paymentMethod !== "easypaisa" && (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Current status: <span className="font-semibold text-foreground">{order.paymentStatus}</span>
+              {order.paymentReference ? ` · reference ${order.paymentReference}` : ""}
+            </p>
+          )}
         </div>
       </div>
       <div className="mt-6 rounded-2xl border bg-card p-5">

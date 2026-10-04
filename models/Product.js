@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 const variantSchema = new mongoose.Schema(
   {
-    size: { type: String, enum: ["small", "medium", "large"], required: true },
+    size: { type: String, enum: ["small", "medium", "large", "xlarge", "xxlarge"], required: true },
     sizeLabelEn: { type: String, required: true },
     sizeLabelUr: { type: String, default: "" },
-    sku: { type: String, required: true },
+    sku: { type: String, default: "" },
     price: { type: Number, required: true, min: 0 },
     compareAtPrice: { type: Number, min: 0 },
     stock: { type: Number, required: true, min: 0, default: 0 },

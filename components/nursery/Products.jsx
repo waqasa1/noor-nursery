@@ -2,22 +2,42 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Flower2, MessageCircle, ShoppingCart, Sun } from "lucide-react";
 import { formatPKR } from "@/lib/utils/currency";
 import { buildBulkOrderWhatsAppUrl, buildProductWhatsAppUrl } from "@/lib/whatsapp";
+import { SizeSelect, defaultSizeId } from "@/components/catalog/SizeSelect";
 
 function ProductCard({ product, onAdd }) {
-  const activeVariants = product.variants?.filter((v) => v.isActive && v.stock > 0) || product.variants || [];
-  const [size, setSize] = useState(0);
-  const variant = activeVariants[size] || product.variants?.[0];
-  const minPrice = Math.min(...(product.variants?.map((v) => v.price) || [0]));
-  const comparePrice = variant?.compareAtPrice || Math.round(minPrice * 1.15);
+  const router = useRouter();
+  const allVariants = product.variants || [];
+  const activeVariants = allVariants.filter((v) => v.isActive && v.stock > 0);
+  const options = activeVariants.length ? activeVariants : allVariants;
+  const [selectedId, setSelectedId] = useState(() => defaultSizeId(options));
+  const variant = options.find((v) => v._id === selectedId) || options[0];
+
+  const minPrice = allVariants.length ? Math.min(...allVariants.map((v) => v.price)) : 0;
+  const comparePrice = variant?.compareAtPrice > variant?.price ? variant.compareAtPrice : null;
+
+  const handleCardClick = (e) => {
+    // the whole card opens the detail page — except buttons, links and selects
+    if (e.target.closest("a, button, select, input, label, textarea")) return;
+    router.push(`/products/${product.slug}`);
+  };
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <Link href={`/products/${product.slug}`} className="relative aspect-square overflow-hidden bg-surface-low">
+    <article
+      onClick={handleCardClick}
+      className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+    >
+      <Link
+        href={`/products/${product.slug}`}
+        className="relative aspect-square overflow-hidden bg-surface-low"
+        tabIndex={-1}
+        aria-hidden="true"
+      >
         <img
-          src={product.featuredImage || "/placeholder.jpg"}
+          src={product.featuredImage || product.images?.[0] || "/placeholder-plant.jpg"}
           alt={product.nameEn}
           loading="lazy"
           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
@@ -42,11 +62,9 @@ function ProductCard({ product, onAdd }) {
 
       <div className="flex flex-1 flex-col p-4">
         <div className="flex items-baseline justify-between gap-2">
-          <Link href={`/products/${product.slug}`}>
-            <h3 className="font-display text-base font-bold leading-tight text-foreground hover:text-secondary">
-              {product.nameEn}
-            </h3>
-          </Link>
+          <h3 className="font-display text-base font-bold leading-tight text-foreground transition group-hover:text-secondary">
+            {product.nameEn}
+          </h3>
           <span className="text-urdu shrink-0 text-sm text-secondary" dir="rtl" lang="ur">
             {product.nameUr}
           </span>
@@ -59,36 +77,20 @@ function ProductCard({ product, onAdd }) {
           </p>
         )}
 
-        {activeVariants.length > 1 && (
-          <>
-            <p className="mt-3 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-              Select Plant Height / <span lang="ur">سائز</span>:
-            </p>
-            <div className="mt-1.5 grid grid-cols-3 gap-1.5">
-              {activeVariants.map((s, i) => (
-                <button
-                  key={s._id}
-                  type="button"
-                  onClick={() => setSize(i)}
-                  className={`rounded-lg border px-1 py-1.5 text-[11px] font-semibold transition ${
-                    size === i
-                      ? "border-secondary bg-secondary text-secondary-foreground"
-                      : "border-border bg-card text-foreground hover:border-secondary"
-                  }`}
-                >
-                  {s.sizeLabelEn}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-
         <div className="mt-auto pt-4">
-          <div className="flex items-end gap-2">
+          <SizeSelect
+            variants={options}
+            selectedId={variant?._id}
+            onChange={setSelectedId}
+            selectId={`size-home-${product._id}`}
+            compact
+          />
+
+          <div className="mt-3 flex items-baseline gap-2">
             <span className="font-display text-xl font-bold text-primary">
-              {formatPKR(variant?.price || minPrice)}
+              {formatPKR(variant?.price ?? minPrice)}
             </span>
-            {comparePrice > (variant?.price || minPrice) && (
+            {comparePrice && (
               <span className="text-sm text-muted-foreground line-through">
                 {formatPKR(comparePrice)}
               </span>
@@ -98,9 +100,14 @@ function ProductCard({ product, onAdd }) {
           <div className="mt-3 flex gap-2">
             <button
               type="button"
-              onClick={() => onAdd?.(product, product.variants.findIndex((v) => v._id === variant._id))}
+              onClick={() =>
+                onAdd?.(
+                  product,
+                  allVariants.findIndex((v) => v._id === variant?._id)
+                )
+              }
               disabled={!variant || variant.stock <= 0}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-50"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-forest disabled:cursor-not-allowed disabled:opacity-50"
             >
               <ShoppingCart className="h-4 w-4" /> Add to Cart
             </button>
@@ -138,7 +145,7 @@ export function Products({ products = [], onAdd }) {
             Browse our full catalog while we load featured products.
           </p>
           <Link
-            href="/shop"
+            href="/shop?type=plants"
             className="mt-6 inline-block rounded-full bg-primary px-8 py-3 text-sm font-bold text-primary-foreground"
           >
             Shop All Plants

@@ -1,6 +1,7 @@
 import "./globals.css";
 import { organizationJsonLd } from "@/lib/seo/structured-data";
 import { JsonLdScript } from "@/lib/seo/JsonLdScript";
+import { RouteProgress } from "@/components/layout/RouteProgress";
 import { getEnv } from "@/lib/env";
 
 const env = getEnv();
@@ -51,6 +52,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <JsonLdScript data={organizationJsonLd()} />
+        <RouteProgress />
         {children}
       </body>
     </html>

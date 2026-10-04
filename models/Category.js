@@ -7,6 +7,7 @@ const categorySchema = new mongoose.Schema(
     descriptionEn: { type: String, default: "" },
     descriptionUr: { type: String, default: "" },
     slug: { type: String, required: true, unique: true, lowercase: true },
+    type: { type: String, enum: ["plant", "accessory"], default: "plant" },
     image: { type: String, default: "" },
     isActive: { type: Boolean, default: true },
     sortOrder: { type: Number, default: 0 },

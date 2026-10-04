@@ -6,6 +6,7 @@ import {
   getDeliveryConfig,
   getStoreInfo,
   getBankConfig,
+  getEasypaisaConfig,
   getPromoCodes,
 } from "@/lib/settings";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
@@ -28,6 +29,10 @@ const updateSchema = z.object({
     bankName: z.string().optional(),
     branch: z.string().optional(),
   }).optional(),
+  easypaisa: z.object({
+    accountTitle: z.string().max(80).optional(),
+    accountNumber: z.string().max(30).optional(),
+  }).optional(),
   promo_codes: z.record(z.object({
     code: z.string(),
     type: z.enum(["percent", "fixed"]),
@@ -41,14 +46,15 @@ const updateSchema = z.object({
 export async function GET() {
   try {
     await requireAdmin();
-    const [delivery, store, bank, promo_codes, raw] = await Promise.all([
+    const [delivery, store, bank, easypaisa, promo_codes, raw] = await Promise.all([
       getDeliveryConfig(),
       getStoreInfo(),
       getBankConfig(),
+      getEasypaisaConfig(),
       getPromoCodes(),
       getAllSettings(),
     ]);
-    return jsonSuccess({ delivery, store, bank, promo_codes, raw });
+    return jsonSuccess({ delivery, store, bank, easypaisa, promo_codes, raw });
   } catch (error) {
     return handleApiError(error);
   }
@@ -67,6 +73,7 @@ export async function PUT(request) {
     if (parsed.data.delivery) updates.push(setSetting("delivery", parsed.data.delivery));
     if (parsed.data.store) updates.push(setSetting("store", parsed.data.store));
     if (parsed.data.bank) updates.push(setSetting("bank", parsed.data.bank));
+    if (parsed.data.easypaisa) updates.push(setSetting("easypaisa", parsed.data.easypaisa));
     if (parsed.data.promo_codes) updates.push(setSetting("promo_codes", parsed.data.promo_codes));
 
     await Promise.all(updates);

@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { VariantEditor } from "@/components/admin/VariantEditor";
 import { AdminFormSkeleton, AdminPageHeaderSkeleton } from "@/components/admin/AdminSkeleton";
+
+const TEXT_FIELDS = [
+  { id: "nameEn", label: "Name (English)", required: true },
+  { id: "nameUr", label: "Name (Urdu)", required: true, urdu: true },
+];
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -12,6 +18,8 @@ export default function EditProductPage() {
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -21,20 +29,30 @@ export default function EditProductPage() {
     ])
       .then(([productData, catData]) => {
         if (productData.product) setForm(productData.product);
+        else setError(productData.message || "Product not found");
         setCategories(catData.categories || []);
       })
       .finally(() => setLoading(false));
   }, [params.id]);
 
-  const updateVariant = (index, field, value) => {
-    const variants = [...form.variants];
-    variants[index] = { ...variants[index], [field]: value };
-    setForm({ ...form, variants });
-  };
+  const grouped = useMemo(() => {
+    const byType = { plant: [], accessory: [] };
+    categories.forEach((c) => {
+      const key = c.type === "accessory" ? "accessory" : "plant";
+      byType[key].push(c);
+    });
+    return byType;
+  }, [categories]);
+
+  const categoryId = form?.categoryId?._id || form?.categoryId || "";
+  const productType = form?.categoryId?.type === "accessory" ? "accessory" : "plant";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await fetch(`/api/admin/products/${params.id}`, {
+    setSaving(true);
+    setError("");
+
+    const res = await fetch(`/api/admin/products/${params.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -44,13 +62,21 @@ export default function EditProductPage() {
         descriptionEn: form.descriptionEn,
         featuredImage: form.featuredImage,
         images: form.images,
-        categoryId: form.categoryId?._id || form.categoryId,
+        categoryId,
         variants: form.variants,
         isActive: form.isActive,
         featured: form.featured,
       }),
     });
-    router.push("/admin/products");
+    const data = await res.json();
+    setSaving(false);
+
+    if (!data.success) {
+      const fieldErrors = data.errors && Object.values(data.errors).flat();
+      setError(fieldErrors?.[0] || data.message || "Failed to save");
+      return;
+    }
+    router.push(productType === "accessory" ? "/admin/accessories" : "/admin/products");
   };
 
   if (loading || !form) {
@@ -58,85 +84,147 @@ export default function EditProductPage() {
       <AdminLayout>
         <AdminPageHeaderSkeleton />
         <AdminFormSkeleton fields={8} />
+        {error && <p className="field-error mt-4">{error}</p>}
       </AdminLayout>
     );
   }
 
   return (
     <AdminLayout>
-      <h1 className="font-display text-2xl font-bold text-primary">Edit: {form.nameEn}</h1>
-      <form onSubmit={handleSubmit} className="mt-6 max-w-3xl space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-sm font-medium">Name (English)</label>
-            <input value={form.nameEn} onChange={(e) => setForm({ ...form, nameEn: e.target.value })} className="mt-1 w-full rounded-xl border px-4 py-2 text-sm" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Name (Urdu)</label>
-            <input value={form.nameUr} onChange={(e) => setForm({ ...form, nameUr: e.target.value })} className="mt-1 w-full rounded-xl border px-4 py-2 text-sm" dir="rtl" />
-          </div>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <label className="block text-sm font-medium">Short Description</label>
-          <textarea value={form.shortDescriptionEn || ""} onChange={(e) => setForm({ ...form, shortDescriptionEn: e.target.value })} className="mt-1 w-full rounded-xl border px-4 py-2 text-sm" rows={2} />
+          <h1 className="font-display text-2xl font-bold text-primary">Edit: {form.nameEn}</h1>
+          <p className="text-sm text-muted-foreground">
+            {productType === "accessory" ? "Accessory" : "Plant"} · /{form.slug}
+          </p>
         </div>
-        <div>
-          <label className="block text-sm font-medium">Category</label>
-          <select
-            value={form.categoryId?._id || form.categoryId || ""}
-            onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-            className="mt-1 w-full rounded-xl border px-4 py-2 text-sm"
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => router.push(productType === "accessory" ? "/admin/accessories" : "/admin/products")}
+            className="rounded-full border-2 border-foreground/25 bg-white px-4 py-2 text-sm font-bold text-foreground transition hover:bg-surface-low"
           >
-            <option value="">Select category</option>
-            {categories.map((c) => <option key={c._id} value={c._id}>{c.nameEn}</option>)}
-          </select>
+            Back to list
+          </button>
         </div>
-        <ImageUpload
-          label="Featured Image"
-          value={form.featuredImage || ""}
-          onChange={(url) => setForm({ ...form, featuredImage: url })}
-          folder="noor-nursery/products"
-        />
-        <div>
-          <label className="block text-sm font-medium">Additional Images (comma-separated URLs)</label>
-          <input
-            value={(form.images || []).join(", ")}
-            onChange={(e) => setForm({ ...form, images: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
-            className="mt-1 w-full rounded-xl border px-4 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <h3 className="font-semibold">Variants</h3>
-          {form.variants?.map((v, i) => (
-            <div key={v._id || v.size} className="mt-3 space-y-2 rounded-xl border p-3">
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-                <input placeholder="SKU" value={v.sku} onChange={(e) => updateVariant(i, "sku", e.target.value)} className="rounded border px-2 py-1 text-sm" />
-                <input type="number" placeholder="Price" value={v.price} onChange={(e) => updateVariant(i, "price", Number(e.target.value))} className="rounded border px-2 py-1 text-sm" />
-                <input type="number" placeholder="Stock" value={v.stock} onChange={(e) => updateVariant(i, "stock", Number(e.target.value))} className="rounded border px-2 py-1 text-sm" />
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" checked={v.isActive} onChange={(e) => updateVariant(i, "isActive", e.target.checked)} />
-                  Active
+      </div>
+
+      <form onSubmit={handleSubmit} className="mt-6 max-w-3xl space-y-5">
+        <section className="field-card space-y-4">
+          <h2 className="field-label-normal">Details</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {TEXT_FIELDS.map((f) => (
+              <div key={f.id}>
+                <label className="field-label" htmlFor={f.id}>
+                  {f.label}
+                  {f.required && " *"}
                 </label>
-                <span className="self-center text-sm capitalize">{v.size}</span>
+                <input
+                  id={f.id}
+                  className="field-input"
+                  dir={f.urdu ? "rtl" : "ltr"}
+                  lang={f.urdu ? "ur" : "en"}
+                  value={form[f.id] || ""}
+                  onChange={(e) => setForm({ ...form, [f.id]: e.target.value })}
+                  required={f.required}
+                />
               </div>
-              <ImageUpload
-                label={`${v.sizeLabelEn} image (optional)`}
-                value={v.image || ""}
-                onChange={(url) => updateVariant(i, "image", url)}
-                folder="noor-nursery/products/variants"
+            ))}
+            <div className="sm:col-span-2">
+              <label className="field-label" htmlFor="shortDescriptionEn">Short Description</label>
+              <textarea
+                id="shortDescriptionEn"
+                className="field-textarea"
+                rows={2}
+                value={form.shortDescriptionEn || ""}
+                onChange={(e) => setForm({ ...form, shortDescriptionEn: e.target.value })}
               />
             </div>
-          ))}
-        </div>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" checked={form.isActive} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} />
-          Active / Published
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
-          Featured
-        </label>
-        <button type="submit" className="rounded-full bg-primary px-6 py-2.5 font-bold text-primary-foreground">Save Changes</button>
+            <div className="sm:col-span-2">
+              <label className="field-label" htmlFor="descriptionEn">Full Description</label>
+              <textarea
+                id="descriptionEn"
+                className="field-textarea"
+                rows={4}
+                value={form.descriptionEn || ""}
+                onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })}
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="field-card">
+          <h2 className="field-label-normal">Category &amp; picture</h2>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="field-label" htmlFor="categoryId">Category</label>
+              <select
+                id="categoryId"
+                className="field-select"
+                value={categoryId}
+                onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+              >
+                <option value="">Select category</option>
+                {grouped.plant.length > 0 && (
+                  <optgroup label="Plant categories">
+                    {grouped.plant.map((c) => (
+                      <option key={c._id} value={c._id}>{c.nameEn}</option>
+                    ))}
+                  </optgroup>
+                )}
+                {grouped.accessory.length > 0 && (
+                  <optgroup label="Accessory categories">
+                    {grouped.accessory.map((c) => (
+                      <option key={c._id} value={c._id}>{c.nameEn}</option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+            </div>
+            <div>
+              <ImageUpload
+                label="Featured picture"
+                value={form.featuredImage || ""}
+                onChange={(url) => setForm({ ...form, featuredImage: url })}
+                folder="noor-nursery/products"
+              />
+            </div>
+          </div>
+        </section>
+
+        <VariantEditor
+          variants={form.variants || []}
+          onChange={(variants) => setForm({ ...form, variants })}
+        />
+
+        <section className="field-card flex flex-wrap gap-4">
+          <label className="field-check">
+            <input
+              type="checkbox"
+              checked={form.isActive}
+              onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+            />
+            Active / Published
+          </label>
+          <label className="field-check">
+            <input
+              type="checkbox"
+              checked={form.featured}
+              onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+            />
+            Featured on homepage
+          </label>
+        </section>
+
+        {error && <p className="field-error">{error}</p>}
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="rounded-full bg-primary px-8 py-3 font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-60"
+        >
+          {saving ? "Saving…" : "Save Changes"}
+        </button>
       </form>
     </AdminLayout>
   );

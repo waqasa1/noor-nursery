@@ -2,7 +2,9 @@ import { getFeaturedProducts, getCategories } from "@/lib/data/products";
 import { HomePageClient } from "@/components/nursery/HomePageClient";
 import { serializeCategory, serializeProduct } from "@/lib/utils/serialize";
 
-export const dynamic = "force-dynamic";
+// Homepage regenerates in the background every 60s instead of blocking each
+// request on the DB (featured products / categories rarely change).
+export const revalidate = 60;
 
 export default async function Page() {
   let products = [];

@@ -3,7 +3,8 @@ import { StoreLayout } from "@/components/layout/StoreLayout";
 import { connectDB, isDBConfigured } from "@/lib/db";
 import Order from "@/models/Order";
 import { formatPKR } from "@/lib/utils/currency";
-import { bankTransferProvider } from "@/lib/payments/bank-transfer.provider";
+import { getEasypaisaConfig } from "@/lib/settings";
+import { EasyPaisaPaymentPanel } from "@/components/store/EasyPaisaPaymentPanel";
 import { CheckCircle2, Truck, ShoppingBag, MessageCircle } from "lucide-react";
 import { buildOrderWhatsAppUrl } from "@/lib/whatsapp";
 import { getEnv } from "@/lib/env";
@@ -12,15 +13,14 @@ export const metadata = { robots: { index: false } };
 
 export default async function OrderSuccessPage({ params, searchParams }) {
   const { orderNumber } = await params;
-  const sp = await searchParams;
   let order = null;
-  let bankDetails = null;
+  let easypaisa = null;
 
   if (isDBConfigured()) {
     await connectDB();
     order = await Order.findOne({ orderNumber }).lean();
-    if (order?.paymentMethod === "bank_transfer") {
-      bankDetails = bankTransferProvider.getBankDetails();
+    if (order?.paymentMethod === "easypaisa") {
+      easypaisa = await getEasypaisaConfig();
     }
   }
 
@@ -32,9 +32,17 @@ export default async function OrderSuccessPage({ params, searchParams }) {
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-leaf text-leaf-foreground shadow-lg">
               <CheckCircle2 className="h-10 w-10" />
             </div>
-            <h1 className="mt-6 font-display text-4xl font-bold tracking-tight sm:text-5xl">Order Confirmed!</h1>
+            <h1 className="mt-6 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+              {order?.paymentMethod === "easypaisa" && order?.paymentStatus !== "paid"
+                ? "Order Received!"
+                : "Order Confirmed!"}
+            </h1>
             <p className="text-urdu mt-3 text-xl text-primary-foreground/90" dir="rtl" lang="ur">آپ کا آرڈر موصول ہو گیا</p>
-            <p className="mt-6 text-lg text-primary-foreground/80">Thank you for your purchase. Your order number is:</p>
+            <p className="mt-6 text-lg text-primary-foreground/80">
+              {order?.paymentMethod === "easypaisa" && order?.paymentStatus !== "paid"
+                ? "Almost there — send the EasyPaisa payment below to confirm your order. Your order number is:"
+                : "Thank you for your purchase. Your order number is:"}
+            </p>
             <p className="mt-2 text-3xl font-bold tracking-wider">{orderNumber}</p>
           </div>
           
@@ -45,30 +53,17 @@ export default async function OrderSuccessPage({ params, searchParams }) {
                 <span className="font-display text-2xl font-bold text-primary">{formatPKR(order.total)}</span>
               </div>
             )}
-            
-            {sp?.payment === "bank_transfer" && bankDetails?.accountNumber && (
-              <div className="mt-8 rounded-2xl bg-surface-low p-6 sm:p-8">
-                <h3 className="font-display text-lg font-bold text-foreground">Bank Transfer Instructions</h3>
-                <p className="mt-2 text-sm text-muted-foreground">Please transfer the total amount to the following account to process your order.</p>
-                <div className="mt-6 space-y-4 rounded-xl border bg-card p-5">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Account Title</span>
-                    <span className="font-medium text-foreground">{bankDetails.accountTitle}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Account Number</span>
-                    <span className="font-mono font-medium text-foreground">{bankDetails.accountNumber}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Bank Name</span>
-                    <span className="font-medium text-foreground">{bankDetails.bankName}</span>
-                  </div>
-                  <div className="flex justify-between border-t pt-4">
-                    <span className="text-sm font-bold text-foreground">Reference</span>
-                    <span className="font-bold text-primary">{orderNumber}</span>
-                  </div>
-                </div>
-              </div>
+
+            {order?.paymentMethod === "easypaisa" && easypaisa && (
+              <EasyPaisaPaymentPanel
+                orderNumber={orderNumber}
+                amount={order.total}
+                accountTitle={easypaisa.accountTitle}
+                accountNumber={easypaisa.accountNumber}
+                paymentStatus={order.paymentStatus}
+                paymentReference={order.paymentReference}
+                orderStatus={order.orderStatus}
+              />
             )}
             
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">

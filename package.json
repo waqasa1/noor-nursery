@@ -10,7 +10,9 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "node --env-file=.env.local scripts/seed.mjs"
+    "seed": "node --env-file=.env.local scripts/seed.mjs",
+    "seed:catalog": "node --env-file=.env.local scripts/catalog/seed.mjs",
+    "catalog:build": "python3 scripts/catalog/build.py"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -33,6 +35,8 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.8",
     "tailwindcss": "^4.1.11"
   }
 }

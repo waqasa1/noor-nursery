@@ -50,7 +50,7 @@ export function Hero() {
 
         <div className="animate-fade-up-delay-3 mt-8 flex flex-wrap gap-3">
           <a
-            href="#plants"
+            href="/shop"
             className="inline-flex items-center gap-2 rounded-full bg-leaf px-7 py-3.5 font-semibold text-leaf-foreground shadow-lg transition hover:bg-gold hover:text-gold-foreground"
           >
             <Sprout className="h-5 w-5" />

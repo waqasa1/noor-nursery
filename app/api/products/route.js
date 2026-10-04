@@ -12,8 +12,9 @@ export async function GET(request) {
     await connectDB();
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-    const limit = Math.min(48, parseInt(searchParams.get("limit") || "12", 10));
+    const limit = Math.min(96, parseInt(searchParams.get("limit") || "12", 10));
     const category = searchParams.get("category");
+    const type = searchParams.get("type");
     const search = searchParams.get("search");
     const featured = searchParams.get("featured");
     const sort = searchParams.get("sort") || "newest";
@@ -28,7 +29,18 @@ export async function GET(request) {
       if (cat) filter.categoryId = cat._id;
     }
 
+    if (type === "accessories" || type === "plants") {
+      const wanted = type === "accessories" ? "accessory" : "plant";
+      const cats = await Category.find({ type: wanted, isActive: true }).lean();
+      filter.categoryId = { $in: cats.map((c) => c._id) };
+    }
+
     if (featured === "true") filter.featured = true;
+
+    // Filter in the query (not after .limit()) so pages stay full.
+    if (available === "true") {
+      filter.variants = { $elemMatch: { isActive: true, stock: { $gt: 0 } } };
+    }
 
     if (search) {
       filter.$text = { $search: search };
@@ -46,12 +58,6 @@ export async function GET(request) {
       .skip(skip)
       .limit(limit)
       .lean();
-
-    if (available === "true") {
-      products = products.filter((p) =>
-        p.variants?.some((v) => v.isActive && v.stock > 0)
-      );
-    }
 
     if (minPrice || maxPrice) {
       const min = parseFloat(minPrice) || 0;

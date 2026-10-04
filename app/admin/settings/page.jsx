@@ -29,6 +29,7 @@ export default function AdminSettingsPage() {
         delivery: settings.delivery,
         store: settings.store,
         bank: settings.bank,
+        easypaisa: settings.easypaisa,
         promo_codes: settings.promo_codes,
       }),
     });
@@ -77,8 +78,40 @@ export default function AdminSettingsPage() {
           </div>
         </section>
 
+        <section className="rounded-2xl border-2 border-secondary/40 bg-card p-5">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-semibold">EasyPaisa Account (checkout)</h2>
+            <span className="rounded-full bg-leaf/25 px-2.5 py-1 text-[11px] font-bold text-leaf-foreground">
+              Active method
+            </span>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Customers pay by sending money to this account, then submit their TrxID. Leave both fields empty to
+            hide EasyPaisa and show only Cash on Delivery.
+          </p>
+          <div className="mt-4 space-y-3">
+            {[
+              { id: "accountTitle", label: "Account Title (name on the EasyPaisa account)" },
+              { id: "accountNumber", label: "EasyPaisa Number" },
+            ].map((f) => (
+              <div key={f.id}>
+                <label className="block text-xs font-medium">{f.label}</label>
+                <input
+                  value={settings.easypaisa?.[f.id] || ""}
+                  onChange={(e) => update("easypaisa", f.id, e.target.value)}
+                  placeholder={f.id === "accountNumber" ? "03XX-XXXXXXX" : "Noor Nursery"}
+                  className="field-input mt-1 w-full"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Bank Details</h2>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Kept for records — bank transfer is no longer offered at checkout.
+          </p>
           <div className="mt-4 space-y-3">
             {[
               { id: "accountTitle", label: "Account Title" },

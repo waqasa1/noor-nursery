@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 import { StoreLayout } from "@/components/layout/StoreLayout";
 import { formatPKR } from "@/lib/utils/currency";
 import { IMAGES } from "@/components/nursery/data";
@@ -9,16 +8,17 @@ import { Leaf, MessageCircle, Package, Search } from "lucide-react";
 import { buildOrderWhatsAppUrl } from "@/lib/whatsapp";
 
 function TrackOrderContent() {
-  const searchParams = useSearchParams();
   const [form, setForm] = useState({ orderNumber: "", email: "" });
   const [order, setOrder] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const order = searchParams.get("order");
-    if (order) setForm((f) => ({ ...f, orderNumber: order }));
-  }, [searchParams]);
+    // Read ?order= from the URL directly. useSearchParams() suspends this page
+    // behind a null Suspense fallback, which rendered a blank screen.
+    const prefill = new URLSearchParams(window.location.search).get("order");
+    if (prefill) setForm((f) => ({ ...f, orderNumber: prefill }));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -125,6 +125,16 @@ function TrackOrderContent() {
                       Payment: {order.paymentStatus}
                     </span>
                   </div>
+                  {order.paymentMethod === "easypaisa" && order.paymentStatus !== "paid" && (
+                    <a
+                      href={`/order-success/${order.orderNumber}`}
+                      className="mt-4 inline-flex rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground transition hover:bg-forest"
+                    >
+                      {order.paymentReference
+                        ? "View / correct your EasyPaisa TrxID"
+                        : "Send EasyPaisa payment & submit TrxID"}
+                    </a>
+                  )}
                 </div>
                 <div className="p-6">
                   <div className="flex justify-between border-b pb-4">
@@ -168,9 +178,5 @@ function TrackOrderContent() {
 }
 
 export default function TrackOrderPage() {
-  return (
-    <Suspense fallback={null}>
-      <TrackOrderContent />
-    </Suspense>
-  );
+  return <TrackOrderContent />;
 }

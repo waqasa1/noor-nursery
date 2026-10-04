@@ -227,6 +227,11 @@ export default function CheckoutPage() {
   };
 
   const displayItems = isMounted ? items : [];
+  const easypaisaMethod = paymentMethods.find((m) => m.id === "easypaisa");
+  const easypaisaAccount = {
+    accountTitle: easypaisaMethod?.accountTitle || "",
+    accountNumber: easypaisaMethod?.accountNumber || "",
+  };
 
   if (isMounted && displayItems.length === 0) {
     return (
@@ -347,6 +352,7 @@ export default function CheckoutPage() {
                       type="radio"
                       name="paymentMethod"
                       value={m.id}
+                      autoComplete="off"
                       checked={form.paymentMethod === m.id}
                       onChange={() => update("paymentMethod", m.id)}
                       className="hidden"
@@ -362,6 +368,31 @@ export default function CheckoutPage() {
                 <p className="mt-4 rounded-xl bg-surface-low p-4 text-sm text-muted-foreground">
                   Pay the courier in cash when your plants arrive. We may call or WhatsApp to confirm before dispatch.
                 </p>
+              )}
+              {form.paymentMethod === "easypaisa" && (
+                <div className="mt-4 rounded-2xl border border-secondary/40 bg-surface-low p-4 sm:p-5">
+                  <p className="text-sm font-bold text-foreground">Send money first — we ship after verifying it</p>
+                  <div className="mt-3 space-y-2 rounded-xl border bg-card p-4 text-sm">
+                    <div className="flex justify-between gap-4">
+                      <span className="text-muted-foreground">Account Title</span>
+                      <span className="font-semibold text-foreground">{easypaisaAccount.accountTitle}</span>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <span className="text-muted-foreground">EasyPaisa Number</span>
+                      <span className="font-mono font-semibold text-foreground">{easypaisaAccount.accountNumber}</span>
+                    </div>
+                    <div className="flex justify-between gap-4 border-t pt-2">
+                      <span className="text-muted-foreground">Amount to send</span>
+                      <span className="font-bold text-primary">{formatPKR(totals.total || getSubtotal())}</span>
+                    </div>
+                  </div>
+                  <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-xs leading-relaxed text-muted-foreground">
+                    <li>Place your order below — nothing is charged on this page.</li>
+                    <li>Open your EasyPaisa app → <strong className="text-foreground">Send Money</strong> → send the exact amount above to the number shown.</li>
+                    <li>Copy the <strong className="text-foreground">TrxID</strong> from the confirmation SMS and paste it on the order confirmation page.</li>
+                    <li>We check the transfer in our own EasyPaisa account, mark your order <strong className="text-foreground">Payment received</strong> and ship it.</li>
+                  </ol>
+                </div>
               )}
               <FieldError message={fieldErrors.paymentMethod} />
             </section>
@@ -467,7 +498,11 @@ export default function CheckoutPage() {
                   aria-live="polite"
                   className="mt-6 w-full rounded-full bg-primary py-4 font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-70"
                 >
-                  {submitting ? "Placing order…" : form.paymentMethod === "cod" ? "Place COD Order" : "Place Order Now"}
+                  {submitting
+                    ? "Placing order…"
+                    : form.paymentMethod === "cod"
+                      ? "Place COD Order"
+                      : "Place Order & Get EasyPaisa Details"}
                 </button>
               </div>
             </div>

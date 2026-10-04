@@ -75,7 +75,7 @@ export function PlantCareFinder() {
     {
       icon: Sun,
       label: "Bright Light",
-      href: "/shop?category=outdoor-plants",
+      href: "/shop?category=fruit-plants",
       desc: "Balconies & open gardens",
     },
   ];

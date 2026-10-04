@@ -50,7 +50,7 @@ export function PlantFinder() {
   const fetchResults = useCallback(async (finalAnswers) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/products?limit=100&available=true");
+      const res = await fetch("/api/products?limit=100&available=true&type=plants");
       const data = await res.json();
       const matched = matchProducts(data.products || [], finalAnswers);
       setResults(matched);

@@ -237,7 +237,7 @@ export const FAQS = [
 ];
 
 export const NAV_LINKS = [
-  "All Plants (300+ Varieties)",
+  "All Products (300+ Varieties)",
   "Indoor Plants",
   "Outdoor & Flowering",
   "Hybrid Fruit Trees",

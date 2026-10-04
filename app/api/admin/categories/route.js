@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import Category from "@/models/Category";
+import Product from "@/models/Product";
 import { requireAdmin } from "@/lib/auth/session";
 import { slugify } from "@/lib/utils/slug";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
@@ -9,6 +10,7 @@ const categorySchema = z.object({
   nameEn: z.string().min(1),
   nameUr: z.string().min(1),
   slug: z.string().optional(),
+  type: z.enum(["plant", "accessory"]).optional(),
   descriptionEn: z.string().optional(),
   descriptionUr: z.string().optional(),
   image: z.string().optional(),
@@ -18,12 +20,25 @@ const categorySchema = z.object({
   seoDescription: z.string().optional(),
 });
 
-export async function GET() {
+export async function GET(request) {
   try {
     await requireAdmin();
     await connectDB();
-    const categories = await Category.find().sort({ sortOrder: 1 }).lean();
-    return jsonSuccess({ categories });
+    const type = new URL(request.url).searchParams.get("type");
+    const filter = type ? { type } : {};
+    const [categories, counts] = await Promise.all([
+      Category.find(filter).sort({ sortOrder: 1, nameEn: 1 }).lean(),
+      Product.aggregate([
+        { $group: { _id: "$categoryId", count: { $sum: 1 } } },
+      ]),
+    ]);
+    const countMap = Object.fromEntries(counts.map((c) => [String(c._id), c.count]));
+    return jsonSuccess({
+      categories: categories.map((c) => ({
+        ...c,
+        productCount: countMap[String(c._id)] || 0,
+      })),
+    });
   } catch (error) {
     return handleApiError(error);
   }

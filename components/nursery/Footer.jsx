@@ -57,11 +57,12 @@ export function Footer() {
           </h4>
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/80">
             {[
-              { href: "/shop", label: "All Plants" },
+              { href: "/shop", label: "All Products" },
               { href: "/shop?category=indoor-plants", label: "Indoor Plants" },
               { href: "/shop?category=flowering-plants", label: "Flowering Plants" },
+              { href: "/shop?type=plants", label: "All Plants" },
               { href: "/categories", label: "All Categories" },
-              { href: "/shop?featured=true", label: "Featured Plants" },
+              { href: "/shop?featured=true&type=plants", label: "Featured Plants" },
             ].map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className="hover:text-leaf">
@@ -81,7 +82,7 @@ export function Footer() {
               { href: "/shipping-policy", label: "48-Hour Live Plant Guarantee" },
               { href: "/shipping-policy", label: "Express Courier Packaging" },
               { href: "/shipping-policy", label: "Delivery Information" },
-              { href: "/faq", label: "Plant Care FAQ" },
+              { href: "/faq", label: "Plant Care Guide" },
               { href: "/track-order", label: "Track Your Order" },
             ].map((l) => (
               <li key={l.label}>
@@ -119,7 +120,7 @@ export function Footer() {
             <ShieldCheck className="h-4 w-4 text-leaf" />
             Safe Payments Across Pakistan:
             <span className="font-normal text-primary-foreground/70">
-              Cash on Delivery (COD) • JazzCash • EasyPaisa • Bank Transfer • PayFast
+              Cash on Delivery (COD) • EasyPaisa
             </span>
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-forest pt-4 text-xs text-primary-foreground/60">

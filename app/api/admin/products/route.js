@@ -1,20 +1,22 @@
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import Product from "@/models/Product";
+import Category from "@/models/Category";
 import { requireAdmin } from "@/lib/auth/session";
 import { slugify } from "@/lib/utils/slug";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
 const variantSchema = z.object({
-  size: z.enum(["small", "medium", "large"]),
-  sizeLabelEn: z.string(),
+  size: z.enum(["small", "medium", "large", "xlarge", "xxlarge"]),
+  sizeLabelEn: z.string().min(1),
   sizeLabelUr: z.string().optional(),
-  sku: z.string(),
+  sku: z.string().optional().default(""),
   price: z.number().min(0),
   compareAtPrice: z.number().min(0).optional(),
   stock: z.number().int().min(0),
   lowStockThreshold: z.number().int().min(0).optional(),
   isActive: z.boolean().optional(),
+  image: z.string().optional(),
 });
 
 const productSchema = z.object({
@@ -50,16 +52,22 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "20", 10);
+    const limit = Math.min(200, parseInt(searchParams.get("limit") || "60", 10));
     const search = searchParams.get("search");
+    const type = searchParams.get("type");
 
     const filter = {};
     if (search) filter.$text = { $search: search };
 
+    if (type === "plant" || type === "accessory") {
+      const cats = await Category.find({ type }).select("_id").lean();
+      filter.categoryId = { $in: cats.map((c) => c._id) };
+    }
+
     const [products, total] = await Promise.all([
       Product.find(filter)
-        .populate("categoryId", "nameEn slug")
-        .sort({ createdAt: -1 })
+        .populate("categoryId", "nameEn slug type")
+        .sort({ nameEn: 1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .lean(),

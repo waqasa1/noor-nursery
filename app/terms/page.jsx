@@ -11,7 +11,7 @@ export default function TermsPage() {
       <h2>Pricing</h2>
       <p>Prices are in PKR and include applicable taxes unless stated otherwise. Delivery fees are calculated at checkout.</p>
       <h2>Payment</h2>
-      <p>We accept COD, bank transfer, JazzCash, EasyPaisa, and PayFast where available.</p>
+      <p>We accept Cash on Delivery and EasyPaisa (manual transfer, verified before dispatch).</p>
       <h2>Liability</h2>
       <p>Our liability is limited to the order value. We are not responsible for plant care after delivery.</p>
     </PolicyPage>

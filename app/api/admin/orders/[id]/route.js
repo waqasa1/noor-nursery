@@ -12,6 +12,7 @@ import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 const updateSchema = z.object({
   orderStatus: z.string().optional(),
   paymentStatus: z.string().optional(),
+  paymentReference: z.string().max(64).optional(),
   internalNote: z.string().optional(),
   resendEmail: z.boolean().optional(),
   resendConfirmation: z.boolean().optional(),
@@ -47,7 +48,20 @@ export async function PATCH(request, { params }) {
     const prevPaymentStatus = order.paymentStatus;
     if (parsed.data.orderStatus) order.orderStatus = parsed.data.orderStatus;
     if (parsed.data.paymentStatus) order.paymentStatus = parsed.data.paymentStatus;
+    if (parsed.data.paymentReference !== undefined) {
+      order.paymentReference = parsed.data.paymentReference.trim();
+    }
     if (parsed.data.internalNote !== undefined) order.internalNote = parsed.data.internalNote;
+
+    // Verifying an EasyPaisa transfer moves the order out of the payment states.
+    if (
+      parsed.data.paymentStatus === "paid" &&
+      prevPaymentStatus !== "paid" &&
+      ["awaiting_payment", "payment_review", "pending"].includes(order.orderStatus)
+    ) {
+      order.orderStatus = "paid";
+    }
+
     await order.save();
 
     if (parsed.data.resendEmail) {

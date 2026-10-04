@@ -1,39 +1,117 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { CheckCircle2, Leaf } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Leaf,
+  Search,
+  X,
+} from "lucide-react";
 import { CatalogProductCard } from "@/components/catalog/ProductCard";
 import { useCartStore } from "@/store/cart";
 import { IMAGES } from "@/components/nursery/data";
 
+const SORTS = [
+  { id: "newest", label: "Newest first" },
+  { id: "featured", label: "Featured" },
+  { id: "price_asc", label: "Price: low to high" },
+  { id: "price_desc", label: "Price: high to low" },
+];
+
+const PAGE_SIZE = 12;
+const WINDOW = 5;
+
+/** Sliding window of page numbers: page 5 of 18 → 3 4 5 6 7 */
+export function pageWindow(current, total, size = WINDOW) {
+  if (total <= size) return Array.from({ length: total }, (_, i) => i + 1);
+  const half = Math.floor(size / 2);
+  let start = Math.max(1, current - half);
+  let end = start + size - 1;
+  if (end > total) {
+    end = total;
+    start = Math.max(1, end - size + 1);
+  }
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+}
+
 export function ShopContent() {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({ page: 1, pages: 1 });
+  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [searchInput, setSearchInput] = useState("");
   const [toast, setToast] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
   const category = searchParams.get("category") || "";
+  const type = searchParams.get("type") || "";
   const search = searchParams.get("search") || "";
   const featured = searchParams.get("featured") || "";
   const sort = searchParams.get("sort") || "newest";
-  const page = searchParams.get("page") || "1";
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10) || 1);
+
+  const buildUrl = useCallback(
+    (patch = {}) => {
+      const values = {
+        category,
+        type,
+        search,
+        featured,
+        sort,
+        page: "1",
+        ...patch,
+      };
+      const params = new URLSearchParams();
+      Object.entries(values).forEach(([key, value]) => {
+        if (!value) return;
+        if (key === "sort" && value === "newest") return;
+        if (key === "page" && String(value) === "1") return;
+        params.set(key, String(value));
+      });
+      const qs = params.toString();
+      return `${pathname}${qs ? `?${qs}` : ""}`;
+    },
+    [pathname, category, type, search, featured, sort]
+  );
+
+  useEffect(() => {
+    setSearchInput(search);
+  }, [search]);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
-    const params = new URLSearchParams({ page, limit: "12", sort });
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(PAGE_SIZE),
+      sort,
+    });
     if (category) params.set("category", category);
+    if (type) params.set("type", type);
     if (search) params.set("search", search);
     if (featured) params.set("featured", featured);
 
-    const res = await fetch(`/api/products?${params}`);
-    const data = await res.json();
-    setProducts(data.products || []);
-    setPagination(data.pagination || { page: 1, pages: 1 });
-    setLoading(false);
-  }, [category, search, featured, sort, page]);
+    try {
+      const res = await fetch(`/api/products?${params}`);
+      const data = await res.json();
+      setProducts(data.products || []);
+      setPagination({
+        page: data.pagination?.page || page,
+        pages: data.pagination?.pages || 1,
+        total: data.pagination?.total ?? (data.products || []).length,
+      });
+    } catch {
+      setProducts([]);
+      setPagination({ page: 1, pages: 1, total: 0 });
+    } finally {
+      setLoading(false);
+    }
+  }, [category, type, search, featured, sort, page]);
 
   useEffect(() => {
     fetchProducts();
@@ -45,100 +123,189 @@ export function ShopContent() {
     setTimeout(() => setToast(false), 2600);
   };
 
+  const submitSearch = (e) => {
+    e.preventDefault();
+    router.push(buildUrl({ search: searchInput.trim(), page: "1" }));
+  };
+
+  const isAccessory = type === "accessories";
+  const noun = isAccessory ? "accessories" : "products";
+
+  const heading = search
+    ? `Search: ${search}`
+    : type === "accessories"
+      ? "All Accessories"
+      : type === "plants"
+        ? "All Plants"
+        : category
+          ? category.replace(/-/g, " ")
+          : "All Products";
+
+  const activeFilters = [
+    search && { key: "search", label: `“${search}”`, clear: { search: "" } },
+    category && { key: "category", label: category.replace(/-/g, " "), clear: { category: "" } },
+    type && { key: "type", label: type === "accessories" ? "accessories" : "plants", clear: { type: "" } },
+  ].filter(Boolean);
+
+  const showingFrom = (pagination.page - 1) * PAGE_SIZE + 1;
+  const showingTo = Math.min(pagination.page * PAGE_SIZE, pagination.total);
+
   return (
-    <section className="bg-background pb-14">
-      {/* Decorative Header */}
-      <div className="relative h-64 w-full bg-primary lg:h-80">
+    <section className="bg-background pb-16">
+      {/* Hero */}
+      <div className="relative h-52 w-full overflow-hidden bg-primary lg:h-64">
         <div className="absolute inset-0 z-0 opacity-30">
-          <img src={IMAGES.fruitTrees} alt="Plants background" className="h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-primary/70 mix-blend-multiply"></div>
+          <img src={IMAGES.fruitTrees} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-primary/70 mix-blend-multiply" />
         </div>
-        <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-leaf text-leaf-foreground shadow-lg">
-            <Leaf className="h-7 w-7" />
-          </div>
-          <h1 className="font-display text-4xl font-bold tracking-tight text-primary-foreground sm:text-5xl">
-            {search ? `Search: ${search}` : category ? `Category: ${category.replace(/-/g, ' ')}` : "Shop All Plants"}
+        <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-4">
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-leaf">
+            <Leaf className="h-4 w-4" /> Noor Nursery
+          </p>
+          <h1 className="mt-2 max-w-2xl font-display text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl lg:text-5xl">
+            {heading}
           </h1>
-          <p className="text-urdu mt-3 text-xl text-primary-foreground/90" dir="rtl" lang="ur">
-            پودے اور نرسری مصنوعات
+          <p className="text-urdu mt-2 text-left text-lg text-primary-foreground/85" dir="rtl" lang="ur">
+            {isAccessory ? "گارڈننگ اوزار اور سامان" : "پودے اور نرسری مصنوعات"}
           </p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 pt-10">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-6">
-          <p className="text-sm font-medium text-muted-foreground">
-            {products.length} {products.length === 1 ? 'Product' : 'Products'} Found
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: "newest", label: "Newest" },
-              { id: "featured", label: "Featured" },
-              { id: "price_asc", label: "Price: Low to High" },
-              { id: "price_desc", label: "Price: High to Low" },
-            ].map((s) => (
-              <a
-                key={s.id}
-                href={`/shop?${new URLSearchParams({ ...(category && { category }), ...(search && { search }), sort: s.id }).toString()}`}
-                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                  sort === s.id
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-card hover:border-secondary"
-                }`}
+      <div className="mx-auto max-w-7xl px-4">
+        {/* Toolbar: search + filters + sort */}
+        <div className="-mt-8 relative z-20 rounded-2xl border border-foreground/10 bg-card p-4 shadow-[0_10px_30px_-18px_rgba(0,0,0,0.35)] sm:p-5">
+          <form onSubmit={submitSearch} className="flex flex-col gap-2 sm:flex-row">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="search"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder={`Search ${noun}, sizes, categories…`}
+                aria-label="Search products"
+                className="w-full rounded-full border-2 border-foreground/15 bg-white py-3 pl-11 pr-10 text-sm font-semibold text-foreground outline-none transition placeholder:font-medium placeholder:text-muted-foreground focus:border-secondary"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => router.push(buildUrl({ search: "", page: "1" }))}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground transition hover:bg-surface-low hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition hover:bg-forest"
+            >
+              Search
+            </button>
+          </form>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-foreground/10 pt-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-sm text-muted-foreground">
+                <span className="font-display text-base font-bold text-foreground">
+                  {loading ? "…" : pagination.total}
+                </span>{" "}
+                {noun} found
+                {!loading && pagination.total > 0 && (
+                  <span className="hidden sm:inline">
+                    {" "}
+                    · showing {showingFrom}–{showingTo}
+                  </span>
+                )}
+              </p>
+              {activeFilters.map((f) => (
+                <button
+                  key={f.key}
+                  type="button"
+                  onClick={() => router.push(buildUrl({ ...f.clear, page: "1" }))}
+                  className="flex items-center gap-1.5 rounded-full border-2 border-secondary/40 bg-white px-2.5 py-1 text-xs font-bold text-secondary transition hover:bg-secondary hover:text-secondary-foreground"
+                >
+                  {f.label}
+                  <X className="h-3 w-3" />
+                </button>
+              ))}
+            </div>
+
+            <label className="flex items-center gap-2">
+              <span className="text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
+                Sort by
+              </span>
+              <select
+                value={sort}
+                onChange={(e) => router.push(buildUrl({ sort: e.target.value, page: "1" }))}
+                className="cursor-pointer rounded-full border-2 border-foreground/15 bg-white px-4 py-2 text-sm font-bold text-foreground outline-none transition hover:border-secondary focus:border-secondary"
               >
-                {s.label}
-              </a>
-            ))}
+                {SORTS.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         </div>
 
+        {/* Results */}
         {loading ? (
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-[400px] animate-pulse rounded-3xl bg-surface-mid" />
+              <div key={i} className="h-[430px] animate-pulse rounded-2xl bg-surface-mid" />
             ))}
           </div>
         ) : products.length === 0 ? (
           <div className="mt-10 flex flex-col items-center justify-center rounded-3xl border bg-card py-20 text-center shadow-sm">
-            <p className="text-xl font-display font-bold text-foreground">No plants found</p>
-            <p className="mt-2 text-muted-foreground max-w-md">
-              Try a different search term or browse our categories to find what you're looking for.
+            <p className="font-display text-xl font-bold text-foreground">
+              {isAccessory ? "No accessories found" : "No products found"}
             </p>
-            <a href="/categories" className="mt-8 rounded-full bg-primary px-8 py-4 font-bold text-primary-foreground transition hover:bg-forest">
-              View Categories
-            </a>
+            <p className="mt-2 max-w-md text-muted-foreground">
+              Try a different search term, or browse the categories to find what you need.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => router.push(buildUrl({ search: "", page: "1" }))}
+                  className="rounded-full border-2 border-foreground/20 px-5 py-2.5 text-sm font-bold text-foreground transition hover:bg-surface-low"
+                >
+                  Clear search
+                </button>
+              )}
+              <a
+                href="/categories"
+                className="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-forest"
+              >
+                View Categories
+              </a>
+            </div>
           </div>
         ) : (
           <>
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {products.map((p) => (
                 <CatalogProductCard key={p._id} product={p} onAddToCart={handleAdd} />
               ))}
             </div>
-            {pagination.pages > 1 && (
-              <div className="mt-12 flex justify-center gap-2">
-                {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((p) => (
-                  <a
-                    key={p}
-                    href={`/shop?${new URLSearchParams({ ...(category && { category }), ...(search && { search }), sort, page: String(p) }).toString()}`}
-                    className={`grid h-12 w-12 place-items-center rounded-full font-bold transition-all ${
-                      pagination.page === p 
-                        ? "bg-primary text-primary-foreground shadow-md" 
-                        : "border bg-card hover:border-primary/30"
-                    }`}
-                  >
-                    {p}
-                  </a>
-                ))}
-              </div>
-            )}
+
+            <Pagination
+              current={pagination.page}
+              total={pagination.pages}
+              href={(p) => buildUrl({ page: String(p) })}
+            />
           </>
         )}
       </div>
 
       {toast && (
-        <div role="status" aria-live="polite" className="fixed bottom-24 right-6 z-50 flex items-center gap-3 rounded-2xl bg-primary px-5 py-4 text-primary-foreground shadow-2xl">
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-24 right-6 z-50 flex items-center gap-3 rounded-2xl bg-primary px-5 py-4 text-primary-foreground shadow-2xl"
+        >
           <CheckCircle2 className="h-6 w-6 text-leaf" />
           <div>
             <p className="font-display text-sm font-bold">Added to Cart!</p>
@@ -147,5 +314,70 @@ export function ShopContent() {
         </div>
       )}
     </section>
+  );
+}
+
+function Pagination({ current, total, href }) {
+  if (!total || total <= 1) return null;
+  const pages = pageWindow(current, total);
+
+  const arrow = (target, disabled, Icon, label) =>
+    disabled ? (
+      <span
+        aria-hidden="true"
+        className="grid h-11 w-11 place-items-center rounded-full border-2 border-foreground/10 bg-white text-foreground/30"
+      >
+        <Icon className="h-4 w-4" />
+      </span>
+    ) : (
+      <a
+        href={href(target)}
+        aria-label={label}
+        className="grid h-11 w-11 place-items-center rounded-full border-2 border-foreground/15 bg-white text-foreground transition hover:border-secondary hover:text-secondary"
+      >
+        <Icon className="h-4 w-4" />
+      </a>
+    );
+
+  return (
+    <nav className="mt-12 flex flex-col items-center gap-3" aria-label="Pagination">
+      <div className="flex flex-wrap items-center justify-center gap-1.5">
+        {arrow(current - 1, current <= 1, ChevronLeft, "Previous page")}
+
+        {pages[0] > 1 && (
+          <span className="grid h-11 min-w-11 place-items-center px-1 text-sm font-bold text-muted-foreground">
+            …
+          </span>
+        )}
+
+        {pages.map((p) => (
+          <a
+            key={p}
+            href={href(p)}
+            aria-current={p === current ? "page" : undefined}
+            aria-label={`Page ${p}`}
+            className={`grid h-11 min-w-11 place-items-center rounded-full px-3 text-sm font-bold transition ${
+              p === current
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "border-2 border-foreground/15 bg-white text-foreground hover:border-secondary hover:text-secondary"
+            }`}
+          >
+            {p}
+          </a>
+        ))}
+
+        {total > pages[pages.length - 1] && (
+          <span className="grid h-11 min-w-11 place-items-center px-1 text-sm font-bold text-muted-foreground">
+            …
+          </span>
+        )}
+
+        {arrow(current + 1, current >= total, ChevronRight, "Next page")}
+      </div>
+
+      <p className="text-xs font-medium text-muted-foreground">
+        Page {current} of {total}
+      </p>
+    </nav>
   );
 }
