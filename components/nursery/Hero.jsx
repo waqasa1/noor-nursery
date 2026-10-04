@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   BadgeCheck,
   Banknote,
@@ -194,12 +195,12 @@ export function Categories({ categories = [] }) {
       </div>
 
       <div className="mt-8 text-center">
-        <a
+        <Link
           href="/categories"
           className="inline-flex items-center gap-1.5 text-sm font-bold text-secondary transition hover:text-primary"
         >
           View All Categories →
-        </a>
+        </Link>
       </div>
     </section>
   );

@@ -170,7 +170,7 @@ export function EasyPaisaPaymentPanel({
             </p>
           )}
           <p className="text-[11px] text-muted-foreground">
-            Don't have the SMS yet?{" "}
+            Don&apos;t have the SMS yet?{" "}
             <a
               href={buildWhatsAppUrl(`Hi Noor Nursery! I just submitted the EasyPaisa TrxID for order ${orderNumber}.`)}
               target="_blank"

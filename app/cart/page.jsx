@@ -37,7 +37,7 @@ export default function CartPage() {
               <ShoppingBag className="h-12 w-12" />
             </div>
             <h2 className="font-display text-2xl font-bold text-foreground">Your cart is empty</h2>
-            <p className="mt-2 text-muted-foreground max-w-sm">Looks like you haven't added any plants to your cart yet.</p>
+            <p className="mt-2 text-muted-foreground max-w-sm">Looks like you haven&apos;t added any plants to your cart yet.</p>
             <Link href="/shop" className="mt-8 flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-sm font-bold text-primary-foreground transition hover:bg-forest hover:shadow-lg">
               Browse Our Plants <ArrowRight className="h-4 w-4" />
             </Link>

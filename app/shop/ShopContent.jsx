@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   CheckCircle2,
@@ -275,12 +276,12 @@ export function ShopContent() {
                   Clear search
                 </button>
               )}
-              <a
+              <Link
                 href="/categories"
                 className="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-forest"
               >
                 View Categories
-              </a>
+              </Link>
             </div>
           </div>
         ) : (

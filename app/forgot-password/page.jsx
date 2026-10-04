@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
               Forgot your password?
             </h2>
             <p className="mt-4 text-lg text-primary-foreground/80">
-              Don't worry, it happens to the best of us. We'll help you get back to your plants in no time.
+              Don&apos;t worry, it happens to the best of us. We&apos;ll help you get back to your plants in no time.
             </p>
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function ForgotPasswordPage() {
           <div className="w-full max-w-md">
             <div className="mb-10 text-center lg:text-left">
               <h1 className="font-display text-3xl font-bold tracking-tight text-primary lg:text-4xl">Reset Password</h1>
-              <p className="mt-2 text-sm text-muted-foreground">Enter your email address and we'll send you a link to reset your password.</p>
+              <p className="mt-2 text-sm text-muted-foreground">Enter your email address and we&apos;ll send you a link to reset your password.</p>
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-5">
