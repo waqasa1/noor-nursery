@@ -13,6 +13,8 @@ export const metadata = { robots: { index: false } };
 
 export default async function OrderSuccessPage({ params, searchParams }) {
   const { orderNumber } = await params;
+  const query = (await searchParams) || {};
+  const paymentQuery = query.payment;
   let order = null;
   let easypaisa = null;
 
@@ -24,6 +26,16 @@ export default async function OrderSuccessPage({ params, searchParams }) {
     }
   }
 
+  const awaitingManualPay =
+    order?.paymentMethod === "easypaisa" && order?.paymentStatus !== "paid";
+  const jazzcashFailed =
+    order?.paymentMethod === "jazzcash" &&
+    (paymentQuery === "failed" || order?.paymentStatus === "failed");
+  const jazzcashPending =
+    order?.paymentMethod === "jazzcash" &&
+    order?.paymentStatus === "pending" &&
+    paymentQuery !== "success";
+
   return (
     <StoreLayout showFlashDeal={false}>
       <div className="mx-auto max-w-3xl px-4 py-16 lg:py-24">
@@ -33,15 +45,21 @@ export default async function OrderSuccessPage({ params, searchParams }) {
               <CheckCircle2 className="h-10 w-10" />
             </div>
             <h1 className="mt-6 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-              {order?.paymentMethod === "easypaisa" && order?.paymentStatus !== "paid"
+              {awaitingManualPay || jazzcashPending
                 ? "Order Received!"
-                : "Order Confirmed!"}
+                : jazzcashFailed
+                  ? "Payment Incomplete"
+                  : "Order Confirmed!"}
             </h1>
             <p className="text-urdu mt-3 text-xl text-primary-foreground/90" dir="rtl" lang="ur">آپ کا آرڈر موصول ہو گیا</p>
             <p className="mt-6 text-lg text-primary-foreground/80">
-              {order?.paymentMethod === "easypaisa" && order?.paymentStatus !== "paid"
+              {awaitingManualPay
                 ? "Almost there — send the EasyPaisa payment below to confirm your order. Your order number is:"
-                : "Thank you for your purchase. Your order number is:"}
+                : jazzcashFailed
+                  ? "JazzCash did not confirm payment. You can try again from checkout or contact us. Your order number is:"
+                  : jazzcashPending
+                    ? "We are waiting for JazzCash to confirm your payment. Your order number is:"
+                    : "Thank you for your purchase. Your order number is:"}
             </p>
             <p className="mt-2 text-3xl font-bold tracking-wider">{orderNumber}</p>
           </div>

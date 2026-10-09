@@ -47,19 +47,22 @@ BANK_BRANCH=Lahore Main
 JAZZCASH_MERCHANT_ID=
 JAZZCASH_PASSWORD=
 JAZZCASH_INTEGRITY_SALT=
-JAZZCASH_RETURN_URL=https://yourdomain.com/api/payments/jazzcash/return
+JAZZCASH_RETURN_URL=https://noor-nursery.vercel.app/api/jazzcash/return
+JAZZCASH_ENV=sandbox
 ```
+
+**Mode:** HTTP POST — Page Redirect (not REST/SOAP). Customer is sent to JazzCash’s hosted form.
 
 **Flow:**
 
 1. Checkout calls `jazzcashProvider.initiate()` — returns form POST to JazzCash sandbox/production URL
 2. Customer completes payment on JazzCash
-3. JazzCash POSTs to `/api/payments/jazzcash/return`
+3. JazzCash POSTs to `/api/jazzcash/return`
 4. Server verifies `pp_SecureHash` before updating order
 
-**Callback URL:** Configure in JazzCash merchant portal to match `JAZZCASH_RETURN_URL`.
+**Callback URL:** Must match the Return URL you registered when generating credentials (and `JAZZCASH_RETURN_URL`).
 
-**Disable until configured:** Method hidden from checkout when credentials missing (`isPaymentConfigured('jazzcash')` returns false).
+**Disable until configured:** Method hidden from checkout when credentials missing (`jazzcashProvider.isConfigured()` returns false).
 
 ### 4. EasyPaisa
 

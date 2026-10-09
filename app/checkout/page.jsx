@@ -394,6 +394,11 @@ export default function CheckoutPage() {
                   </ol>
                 </div>
               )}
+              {form.paymentMethod === "jazzcash" && (
+                <p className="mt-4 rounded-xl bg-surface-low p-4 text-sm text-muted-foreground">
+                  You will be redirected to JazzCash to complete payment securely. After paying, you will return here and we will confirm your order automatically.
+                </p>
+              )}
               <FieldError message={fieldErrors.paymentMethod} />
             </section>
           </div>
@@ -502,7 +507,9 @@ export default function CheckoutPage() {
                     ? "Placing order…"
                     : form.paymentMethod === "cod"
                       ? "Place COD Order"
-                      : "Place Order & Get EasyPaisa Details"}
+                      : form.paymentMethod === "jazzcash"
+                        ? "Pay with JazzCash"
+                        : "Place Order & Get EasyPaisa Details"}
                 </button>
               </div>
             </div>

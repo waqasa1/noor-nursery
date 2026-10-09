@@ -22,7 +22,10 @@ export async function PUT(request, { params }) {
     await connectDB();
     const { id } = await params;
     const body = await request.json();
-    const product = await Product.findByIdAndUpdate(id, body, { new: true, runValidators: true });
+    const product = await Product.findByIdAndUpdate(id, body, {
+      returnDocument: "after",
+      runValidators: true,
+    });
     if (!product) return jsonError("Product not found", 404);
     return jsonSuccess({ product });
   } catch (error) {

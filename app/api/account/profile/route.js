@@ -36,7 +36,7 @@ export async function PATCH(request) {
     const user = await User.findByIdAndUpdate(
       session.userId,
       { $set: parsed.data },
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     ).select("name email phone addresses");
 
     return jsonSuccess({ user });

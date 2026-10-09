@@ -53,7 +53,7 @@ export async function PUT(request, { params }) {
     }
 
     const category = await Category.findByIdAndUpdate(id, update, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     });
     if (!category) return jsonError("Category not found", 404);
