@@ -41,3 +41,7 @@ next-env.d.ts
 # Misc
 .turbo
 *.pem
+
+# Python (catalog scripts)
+__pycache__/
+*.pyc

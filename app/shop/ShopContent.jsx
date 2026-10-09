@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   CheckCircle2,
   ChevronLeft,
@@ -14,6 +14,7 @@ import {
 import { CatalogProductCard } from "@/components/catalog/ProductCard";
 import { useCartStore } from "@/store/cart";
 import { IMAGES } from "@/components/nursery/data";
+import { shopHeading, isAccessoryView, SHOP_PAGE_SIZE } from "./params";
 
 const SORTS = [
   { id: "newest", label: "Newest first" },
@@ -22,7 +23,7 @@ const SORTS = [
   { id: "price_desc", label: "Price: high to low" },
 ];
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = SHOP_PAGE_SIZE;
 const WINDOW = 5;
 
 /** Sliding window of page numbers: page 5 of 18 → 3 4 5 6 7 */
@@ -38,24 +39,15 @@ export function pageWindow(current, total, size = WINDOW) {
   return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 }
 
-export function ShopContent() {
+export function ShopContent({ params, products, pagination }) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
-  const [searchInput, setSearchInput] = useState("");
+  const [searchInput, setSearchInput] = useState(() => params.search || "");
   const [toast, setToast] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
-  const category = searchParams.get("category") || "";
-  const type = searchParams.get("type") || "";
-  const search = searchParams.get("search") || "";
-  const featured = searchParams.get("featured") || "";
-  const sort = searchParams.get("sort") || "newest";
-  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10) || 1);
+  const { category, type, search, featured, sort } = params;
 
   const buildUrl = useCallback(
     (patch = {}) => {
@@ -85,39 +77,6 @@ export function ShopContent() {
     setSearchInput(search);
   }, [search]);
 
-  const fetchProducts = useCallback(async () => {
-    setLoading(true);
-    const params = new URLSearchParams({
-      page: String(page),
-      limit: String(PAGE_SIZE),
-      sort,
-    });
-    if (category) params.set("category", category);
-    if (type) params.set("type", type);
-    if (search) params.set("search", search);
-    if (featured) params.set("featured", featured);
-
-    try {
-      const res = await fetch(`/api/products?${params}`);
-      const data = await res.json();
-      setProducts(data.products || []);
-      setPagination({
-        page: data.pagination?.page || page,
-        pages: data.pagination?.pages || 1,
-        total: data.pagination?.total ?? (data.products || []).length,
-      });
-    } catch {
-      setProducts([]);
-      setPagination({ page: 1, pages: 1, total: 0 });
-    } finally {
-      setLoading(false);
-    }
-  }, [category, type, search, featured, sort, page]);
-
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
   const handleAdd = (item) => {
     addItem(item);
     setToast(true);
@@ -129,18 +88,10 @@ export function ShopContent() {
     router.push(buildUrl({ search: searchInput.trim(), page: "1" }));
   };
 
-  const isAccessory = type === "accessories";
+  const isAccessory = isAccessoryView(params);
   const noun = isAccessory ? "accessories" : "products";
 
-  const heading = search
-    ? `Search: ${search}`
-    : type === "accessories"
-      ? "All Accessories"
-      : type === "plants"
-        ? "All Plants"
-        : category
-          ? category.replace(/-/g, " ")
-          : "All Products";
+  const heading = shopHeading(params);
 
   const activeFilters = [
     search && { key: "search", label: `“${search}”`, clear: { search: "" } },
@@ -209,10 +160,10 @@ export function ShopContent() {
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-sm text-muted-foreground">
                 <span className="font-display text-base font-bold text-foreground">
-                  {loading ? "…" : pagination.total}
+                  {pagination.total}
                 </span>{" "}
                 {noun} found
-                {!loading && pagination.total > 0 && (
+                {pagination.total > 0 && (
                   <span className="hidden sm:inline">
                     {" "}
                     · showing {showingFrom}–{showingTo}
@@ -252,13 +203,7 @@ export function ShopContent() {
         </div>
 
         {/* Results */}
-        {loading ? (
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-[430px] animate-pulse rounded-2xl bg-surface-mid" />
-            ))}
-          </div>
-        ) : products.length === 0 ? (
+        {products.length === 0 ? (
           <div className="mt-10 flex flex-col items-center justify-center rounded-3xl border bg-card py-20 text-center shadow-sm">
             <p className="font-display text-xl font-bold text-foreground">
               {isAccessory ? "No accessories found" : "No products found"}

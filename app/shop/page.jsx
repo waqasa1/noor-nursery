@@ -1,19 +1,50 @@
-import { Suspense } from "react";
 import { StoreLayout } from "@/components/layout/StoreLayout";
 import { ShopContent } from "./ShopContent";
+import { getProducts } from "@/lib/data/products";
+import { readShopParams, shopHeading, isAccessoryView, SHOP_PAGE_SIZE } from "./params";
 
-export const metadata = {
-  title: "Shop Plants — Noor Nursery",
-  description: "Browse 300+ acclimatized indoor plants, fruit trees, herbs and more. Small, Medium, and Large sizes available with nationwide delivery.",
-  robots: { index: true, follow: true },
-};
+/**
+ * Server-rendered catalog: the query string is read here, products are
+ * fetched from the DB, and the full grid ships in the HTML — crawlers get
+ * a real <h1> plus every product instead of the client-side skeleton.
+ */
+export async function generateMetadata({ searchParams }) {
+  const params = readShopParams(await searchParams);
+  const heading = shopHeading(params);
+  const noun = isAccessoryView(params) ? "accessories" : "plants";
 
-export default function ShopPage() {
+  return {
+    title: heading === "All Products" ? "Shop Plants — Noor Nursery" : `${heading} — Noor Nursery`,
+    description: `Browse ${heading.toLowerCase()} — ${noun} in Small, Medium and Large sizes with nationwide delivery across Pakistan.`,
+    robots: { index: true, follow: true },
+  };
+}
+
+export default async function ShopPage({ searchParams }) {
+  const params = readShopParams(await searchParams);
+
+  const { products, total, pages } = await getProducts({
+    page: params.page,
+    limit: SHOP_PAGE_SIZE,
+    category: params.category || undefined,
+    type: params.type || undefined,
+    search: params.search || undefined,
+    featured: params.featured === "true" ? true : undefined,
+    sort: params.sort,
+  });
+
+  // Lean docs still carry ObjectId instances, which React Flight refuses to
+  // pass into Client Components ("objects with toJSON methods"). The JSON
+  // round-trip yields the same plain shape the old /api/products fetch gave.
+  const plainProducts = JSON.parse(JSON.stringify(products || []));
+
   return (
     <StoreLayout>
-      <Suspense fallback={<div className="mx-auto max-w-7xl px-4 py-14 text-center">Loading plants...</div>}>
-        <ShopContent />
-      </Suspense>
+      <ShopContent
+        params={params}
+        products={plainProducts}
+        pagination={{ page: params.page, pages: pages ?? 1, total: total ?? 0 }}
+      />
     </StoreLayout>
   );
 }

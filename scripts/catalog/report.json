@@ -1,0 +1,1470 @@
+{
+  "generatedBy": "scripts/catalog/report.py",
+  "spreadsheetPlants": {
+    "file": "source/plants-details.xlsb",
+    "sheet": "Sheet4",
+    "totalSheetRows": 183,
+    "headerRows": [
+      [
+        "CATEOGRY | NAME | VARIETY | SMALL PKR | DESCRIPTION | MEDIUM PKR | DESCRIPTION | LARGE PKR | DESCRIPTION",
+        "Column1 | Column2 | Column3 | Column4 | Column5 | Column6 | Column7 | Column8 | Column9 | Column10 | Column11 | Column12 | Column13 | Column14"
+      ]
+    ],
+    "columns": [
+      "A: section/category",
+      "B: plant name",
+      "C: variety/detail",
+      "D: Small price",
+      "E: Small description",
+      "F: Medium price",
+      "G: Medium description",
+      "H: Large price",
+      "I: Large description"
+    ],
+    "productsParsed": 172,
+    "sections": [
+      "FLOWERING PLANT",
+      "decorating plant",
+      "indore plant",
+      "herbs and Medicenal plant",
+      "Trees"
+    ],
+    "issues": {
+      "droppedRows": [],
+      "productsWithNoPriceAtAll": [
+        {
+          "sheetRow": 63,
+          "section": "Fruit plants",
+          "name": "strawbery",
+          "variety": null,
+          "cells": {
+            "D: Small price": null,
+            "F: Medium price": null,
+            "H: Large price": null
+          }
+        },
+        {
+          "sheetRow": 97,
+          "section": "decorating plant",
+          "name": "3 step ficus",
+          "variety": null,
+          "cells": {
+            "D: Small price": null,
+            "F: Medium price": null,
+            "H: Large price": null
+          }
+        },
+        {
+          "sheetRow": 146,
+          "section": "Bail's and wine",
+          "name": "tazbi bail",
+          "variety": null,
+          "cells": {
+            "D: Small price": null,
+            "F: Medium price": null,
+            "H: Large price": null
+          }
+        },
+        {
+          "sheetRow": 163,
+          "section": "herbs and Medicenal plant",
+          "name": "stivia",
+          "variety": "stivia",
+          "cells": {
+            "D: Small price": null,
+            "F: Medium price": null,
+            "H: Large price": null
+          }
+        }
+      ],
+      "productsWithPartialPrice": [
+        {
+          "sheetRow": 16,
+          "section": "Fruit plants",
+          "name": "Bair",
+          "variety": "apple bair",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 17,
+          "section": "Fruit plants",
+          "name": "Bair",
+          "variety": "desi bair",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 18,
+          "section": "Fruit plants",
+          "name": "jack fruit",
+          "variety": "jack friut",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 19,
+          "section": "Fruit plants",
+          "name": "jaman",
+          "variety": "Grafted jaman",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 27,
+          "section": "Fruit plants",
+          "name": "japni fall/ hamlok",
+          "variety": "hamlok",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 28,
+          "section": "Fruit plants",
+          "name": "lokat",
+          "variety": "lokat",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 29,
+          "section": "Fruit plants",
+          "name": "pineapple",
+          "variety": "yelow pineapple",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 31,
+          "section": "Fruit plants",
+          "name": "khubani",
+          "variety": "khubani",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 32,
+          "section": "Fruit plants",
+          "name": "alobhukarah",
+          "variety": "alobhukarah",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 33,
+          "section": "Fruit plants",
+          "name": "alocha",
+          "variety": "alocha",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 34,
+          "section": "Fruit plants",
+          "name": "cherry",
+          "variety": "cherry",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 35,
+          "section": "Fruit plants",
+          "name": "lechee",
+          "variety": "lechee",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 37,
+          "section": "Fruit plants",
+          "name": "amla",
+          "variety": "banarasi amla",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 38,
+          "section": "Fruit plants",
+          "name": "zaitoon/ oliv",
+          "variety": "oliv",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 39,
+          "section": "Fruit plants",
+          "name": "dragon friut",
+          "variety": "red dragon friut",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 40,
+          "section": "Fruit plants",
+          "name": "dragon friut",
+          "variety": "yellow dragon friut",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 41,
+          "section": "Fruit plants",
+          "name": "lemon",
+          "variety": "kagzi lemon",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 42,
+          "section": "Fruit plants",
+          "name": "lemon",
+          "variety": "seed less lemon",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 43,
+          "section": "Fruit plants",
+          "name": "nashpati",
+          "variety": "Nashpati",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 44,
+          "section": "Fruit plants",
+          "name": "avocada",
+          "variety": "huss avocado",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 45,
+          "section": "Fruit plants",
+          "name": "avocada",
+          "variety": "reed avocado",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 46,
+          "section": "Fruit plants",
+          "name": "avocada",
+          "variety": "fuerte avocado",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 47,
+          "section": "Fruit plants",
+          "name": "angore",
+          "variety": "sunder khani",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 49,
+          "section": "Fruit plants",
+          "name": "anjeer",
+          "variety": "turkish injeer",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 50,
+          "section": "Fruit plants",
+          "name": "shatoot/mulberry",
+          "variety": "green mulberry",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 51,
+          "section": "Fruit plants",
+          "name": "shatoot/mulberry",
+          "variety": "black mulberry",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 52,
+          "section": "Fruit plants",
+          "name": "shatoot/mulberry",
+          "variety": "thigh mulberry",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 53,
+          "section": "Fruit plants",
+          "name": "aro",
+          "variety": "aro",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 55,
+          "section": "Fruit plants",
+          "name": "karonda",
+          "variety": "karonda",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 58,
+          "section": "Fruit plants",
+          "name": "falsa",
+          "variety": "falsa",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 59,
+          "section": "Fruit plants",
+          "name": "jumgle jalabi",
+          "variety": "jungle jalabi",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 60,
+          "section": "Fruit plants",
+          "name": "elichi",
+          "variety": "elichi",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 61,
+          "section": "Fruit plants",
+          "name": "papita",
+          "variety": "red lady papaya",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 65,
+          "section": "FLOWERING PLANT",
+          "name": "english rose",
+          "variety": "red,yellow,pink,purple,black tiger,double viregated,frozen,doble tee lidgt,bottonrose,white,",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 66,
+          "section": "FLOWERING PLANT",
+          "name": "desi rose",
+          "variety": "pink full fragness",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 67,
+          "section": "FLOWERING PLANT",
+          "name": "marwa",
+          "variety": "white colour flower 12month flowering highat 2 ft best for frangness perpose",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 68,
+          "section": "FLOWERING PLANT",
+          "name": "china rose single pattle",
+          "variety": "pink , yellow ,gray ,colours avilable",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 69,
+          "section": "FLOWERING PLANT",
+          "name": "jesmine / raatkirani",
+          "variety": "full frangness best for your home garding",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 70,
+          "section": "FLOWERING PLANT",
+          "name": "MOTIYA",
+          "variety": "white double petal fllowers brst for frangness purpose",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 71,
+          "section": "FLOWERING PLANT",
+          "name": "Raat ki rani",
+          "variety": "white small flowers and busy plant best for pregness purpose",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 72,
+          "section": "FLOWERING PLANT",
+          "name": "chamblali",
+          "variety": "white flowers and also use as a bail for frengness purpose",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 73,
+          "section": "FLOWERING PLANT",
+          "name": "alzohra",
+          "variety": "red,yellow,pink,white bunches of flowers plant",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 74,
+          "section": "FLOWERING PLANT",
+          "name": "lagistonia",
+          "variety": "colours avilable pink,white,red 12months flowing",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 76,
+          "section": "FLOWERING PLANT",
+          "name": "kannar",
+          "variety": "white,red,pink colour avilable",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 77,
+          "section": "FLOWERING PLANT",
+          "name": "thi champa",
+          "variety": "white colour flowering plants 12 months flowering",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 79,
+          "section": "FLOWERING PLANT",
+          "name": "nagchampa",
+          "variety": "colour white with yellow shade full frangness plants 12months flowing plant",
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 80,
+          "section": "FLOWERING PLANT",
+          "name": "laltain",
+          "variety": "yellow , white, pink,orange small and bunches of flowers",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 81,
+          "section": "FLOWERING PLANT",
+          "name": "gul e duadi",
+          "variety": "seasonal flowering plant",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 82,
+          "section": "FLOWERING PLANT",
+          "name": "amal tass",
+          "variety": "gyellow flowering plant",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 83,
+          "section": "FLOWERING PLANT",
+          "name": "casinodossa",
+          "variety": "pink flowering plant",
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 84,
+          "section": "FLOWERING PLANT",
+          "name": "din ka raja",
+          "variety": "flowering plant",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 85,
+          "section": "FLOWERING PLANT",
+          "name": "shahzadi",
+          "variety": "red flowering plant",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 86,
+          "section": "FLOWERING PLANT",
+          "name": "sada bahar",
+          "variety": "white pink flowering plant",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 89,
+          "section": "decorating plant",
+          "name": "khalifa",
+          "variety": "clorfull leaves plant",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 91,
+          "section": "decorating plant",
+          "name": "morepankh",
+          "variety": "green leaves and desing plant",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 92,
+          "section": "decorating plant",
+          "name": "spider plant/ cavra",
+          "variety": "big leave plant",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 95,
+          "section": "decorating plant",
+          "name": "snake plant",
+          "variety": "greenyeloow leave plant",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 96,
+          "section": "decorating plant",
+          "name": "bonsia ficus",
+          "variety": null,
+          "missingSizes": [
+            "small",
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 98,
+          "section": "decorating plant",
+          "name": "spirial",
+          "variety": null,
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 99,
+          "section": "decorating plant",
+          "name": "con ficus",
+          "variety": null,
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 100,
+          "section": "decorating plant",
+          "name": "greel ficus",
+          "variety": null,
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 103,
+          "section": "decorating plant",
+          "name": "margenata",
+          "variety": null,
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 105,
+          "section": "indore plant",
+          "name": "eglonima",
+          "variety": "Snow eglonima",
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 106,
+          "section": "indore plant",
+          "name": "eglonima",
+          "variety": "Tiger eglonima",
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 107,
+          "section": "indore plant",
+          "name": "eglonima",
+          "variety": "green eglonima",
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 108,
+          "section": "indore plant",
+          "name": "Diffene",
+          "variety": null,
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 109,
+          "section": "indore plant",
+          "name": "Money plant",
+          "variety": "green",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 110,
+          "section": "indore plant",
+          "name": "Money plant",
+          "variety": "yellow",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 111,
+          "section": "indore plant",
+          "name": "Money plant",
+          "variety": "green and yellow shaded",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 112,
+          "section": "indore plant",
+          "name": "Money plant",
+          "variety": "marble queen",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 113,
+          "section": "indore plant",
+          "name": "para graas",
+          "variety": "para grass",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 114,
+          "section": "indore plant",
+          "name": "furn",
+          "variety": "furn",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 115,
+          "section": "indore plant",
+          "name": "monestaria",
+          "variety": "cut leaves monestaria",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 116,
+          "section": "indore plant",
+          "name": "philorendildron",
+          "variety": "black philorendildron",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 117,
+          "section": "indore plant",
+          "name": "spider plant green",
+          "variety": "spider plant green",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 118,
+          "section": "indore plant",
+          "name": "spider plant white and green",
+          "variety": "spider plant green and white",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 120,
+          "section": "indore plant",
+          "name": "Palm",
+          "variety": "china palm",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 121,
+          "section": "indore plant",
+          "name": "Palm",
+          "variety": "can palm",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 123,
+          "section": "indore plant",
+          "name": "marry",
+          "variety": "best plant for indoor as a show",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 124,
+          "section": "indore plant",
+          "name": "pieace lili",
+          "variety": "green and flowering best for indoor and decorating purpase",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 125,
+          "section": "indore plant",
+          "name": "singonium",
+          "variety": "green and pink shaded plant",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 126,
+          "section": "indore plant",
+          "name": "zz plant",
+          "variety": "green zz plant",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 127,
+          "section": "indore plant",
+          "name": "rubber plant",
+          "variety": "green rubber plant",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 128,
+          "section": "indore plant",
+          "name": "rubber plant",
+          "variety": "black rubber plant",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 129,
+          "section": "indore plant",
+          "name": "rubber plant",
+          "variety": "fogi rubber plant",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 134,
+          "section": "Bail's and wine",
+          "name": "Almanda",
+          "variety": "yellow flower bail",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 139,
+          "section": "Bail's and wine",
+          "name": "turmpet vine",
+          "variety": "orange flowering bail its flowers look like bulb",
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 140,
+          "section": "Bail's and wine",
+          "name": "coin bail",
+          "variety": "round leave look different and enhance your home beauty",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 141,
+          "section": "Bail's and wine",
+          "name": "turtle vine",
+          "variety": "mouse like leave best use full for haning plant",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 142,
+          "section": "Bail's and wine",
+          "name": "glori vine",
+          "variety": "heart shape leave and purple flowering bail",
+          "missingSizes": [
+            "small",
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 143,
+          "section": "Bail's and wine",
+          "name": "chupkali bail",
+          "variety": "small leave and best use for hid your walls",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 144,
+          "section": "Bail's and wine",
+          "name": "sehra bail",
+          "variety": "beautifull flowering and fregness bail",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 145,
+          "section": "Bail's and wine",
+          "name": "pan ki bail",
+          "variety": "pan ki bail",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 147,
+          "section": "Bail's and wine",
+          "name": "ticma bail",
+          "variety": "orange floowering bail",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 149,
+          "section": "herbs and Medicenal plant",
+          "name": "Habiscus",
+          "variety": "white habiscus",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 150,
+          "section": "herbs and Medicenal plant",
+          "name": "Habiscus",
+          "variety": "red habiscus",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 151,
+          "section": "herbs and Medicenal plant",
+          "name": "Habiscus",
+          "variety": "pink flower bail",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 152,
+          "section": "herbs and Medicenal plant",
+          "name": "Habiscus",
+          "variety": "peach habiscus",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 153,
+          "section": "herbs and Medicenal plant",
+          "name": "Habiscus",
+          "variety": "pink and whie shaded habiscus",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 154,
+          "section": "herbs and Medicenal plant",
+          "name": "Habiscus",
+          "variety": "red and white shaded habiscus",
+          "missingSizes": [
+            "medium"
+          ]
+        },
+        {
+          "sheetRow": 155,
+          "section": "herbs and Medicenal plant",
+          "name": "patar chat",
+          "variety": "used for patri",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 156,
+          "section": "herbs and Medicenal plant",
+          "name": "aloe vera",
+          "variety": "aloe vera",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 157,
+          "section": "herbs and Medicenal plant",
+          "name": "Levender",
+          "variety": "Levender",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 158,
+          "section": "herbs and Medicenal plant",
+          "name": "rose marry",
+          "variety": "rose marry",
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 159,
+          "section": "herbs and Medicenal plant",
+          "name": "tulsi",
+          "variety": "tulsi",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 160,
+          "section": "herbs and Medicenal plant",
+          "name": "niazbo",
+          "variety": "niazbo",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 161,
+          "section": "herbs and Medicenal plant",
+          "name": "ajwain",
+          "variety": "ajwain",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 162,
+          "section": "herbs and Medicenal plant",
+          "name": "green tea",
+          "variety": "green tea",
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 165,
+          "section": "Trees",
+          "name": "casino dossa",
+          "variety": "pink flowering treee",
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 166,
+          "section": "Trees",
+          "name": "cassia yellow",
+          "variety": null,
+          "missingSizes": [
+            "small"
+          ]
+        },
+        {
+          "sheetRow": 167,
+          "section": "Trees",
+          "name": "jaccranda",
+          "variety": null,
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 168,
+          "section": "Trees",
+          "name": "pink tabbobiya",
+          "variety": null,
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 169,
+          "section": "Trees",
+          "name": "yelllow tabobia",
+          "variety": null,
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 170,
+          "section": "Trees",
+          "name": "neem",
+          "variety": null,
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 171,
+          "section": "Trees",
+          "name": "Pilkan",
+          "variety": null,
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 172,
+          "section": "Trees",
+          "name": "negleem",
+          "variety": null,
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 173,
+          "section": "Trees",
+          "name": "pepal",
+          "variety": null,
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 174,
+          "section": "Trees",
+          "name": "gonda",
+          "variety": null,
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 175,
+          "section": "Trees",
+          "name": "ulta shock",
+          "variety": null,
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 176,
+          "section": "Trees",
+          "name": "gul mohar",
+          "variety": null,
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 178,
+          "section": "Trees",
+          "name": "pan ki bail",
+          "variety": null,
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 179,
+          "section": "Trees",
+          "name": "bhugainbail multi color",
+          "variety": null,
+          "missingSizes": [
+            "medium",
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 182,
+          "section": "Trees",
+          "name": "n joy money plant",
+          "variety": null,
+          "missingSizes": [
+            "large"
+          ]
+        },
+        {
+          "sheetRow": 183,
+          "section": "Trees",
+          "name": "dreafted snake plant",
+          "variety": null,
+          "missingSizes": [
+            "small",
+            "large"
+          ]
+        }
+      ],
+      "priceCellUnparseable": [],
+      "priceCellZero": [],
+      "priceWithoutSizeDescription": []
+    },
+    "absentColumns": [
+      "image/photo",
+      "Urdu name",
+      "Urdu description",
+      "stock",
+      "SKU",
+      "light/watering/difficulty (taken from category defaults)"
+    ]
+  },
+  "spreadsheetAccessories": {
+    "file": "source/accessories-detail.xlsx",
+    "sheet": "Sheet1",
+    "totalSheetRows": 68,
+    "headerRows": [
+      [
+        "NAME",
+        "DISCRIBTION",
+        "QUNATITY",
+        "RATE/ PRICE"
+      ]
+    ],
+    "columns": [
+      "A: product name",
+      "B: description",
+      "C: qty/size",
+      "D: price"
+    ],
+    "productsParsed": 41,
+    "issues": {
+      "orphanRowsSkipped": [],
+      "productsWithNoPricedVariant": [],
+      "variantRowsQtyWithoutPrice": [],
+      "variantRowsPriceWithoutQty": [
+        {
+          "product": "soil insect killer",
+          "sheetRow": 30,
+          "description": "",
+          "price": 600
+        },
+        {
+          "product": "Plant booster",
+          "sheetRow": 37,
+          "description": "",
+          "price": 800
+        },
+        {
+          "product": "neem oil",
+          "sheetRow": 38,
+          "description": "",
+          "price": 500
+        },
+        {
+          "product": "color booster",
+          "sheetRow": 39,
+          "description": "",
+          "price": 500
+        },
+        {
+          "product": "cuter",
+          "sheetRow": 40,
+          "description": "",
+          "price": 1000
+        },
+        {
+          "product": "plant siser",
+          "sheetRow": 41,
+          "description": "",
+          "price": 3000
+        },
+        {
+          "product": "tool kit",
+          "sheetRow": 42,
+          "description": "",
+          "price": 2000
+        },
+        {
+          "product": "spead/ balcha",
+          "sheetRow": 43,
+          "description": "",
+          "price": 2000
+        },
+        {
+          "product": "eax",
+          "sheetRow": 44,
+          "description": "",
+          "price": 2500
+        },
+        {
+          "product": "Fog",
+          "sheetRow": 45,
+          "description": "",
+          "price": 2500
+        },
+        {
+          "product": "pipe shower",
+          "sheetRow": 50,
+          "description": "",
+          "price": 600
+        }
+      ],
+      "priceCellUnparseable": [],
+      "productsWithoutDescription": [
+        "Spray",
+        "Roots and bloom",
+        "Cocopeat",
+        "Vermi compost",
+        "Organic compost",
+        "leave compost",
+        "bone meal",
+        "blood meal",
+        "fish meal",
+        "neem cake",
+        "mustrad cake",
+        "coconut food",
+        "Mix poting soil",
+        "soil insect killer",
+        "DAP",
+        "NPK",
+        "Uria",
+        "grow more 20 20",
+        "rooting cuting powder",
+        "fungaside",
+        "Plant booster",
+        "neem oil",
+        "color booster",
+        "cuter",
+        "plant siser",
+        "tool kit",
+        "spead/ balcha",
+        "eax",
+        "Fog",
+        "water can",
+        "2 in 1 spray gun",
+        "spary gun",
+        "epsom salt",
+        "pipe shower",
+        "self watering pot",
+        "fiber pot",
+        "fiber waz",
+        "plastic pots",
+        "sand pots",
+        "wall pot"
+      ]
+    },
+    "absentColumns": [
+      "image/photo",
+      "Urdu name/description",
+      "stock",
+      "SKU"
+    ]
+  },
+  "catalog": {
+    "generatedAt": "2026-10-02T18:44:03+00:00",
+    "totals": {
+      "products": 213,
+      "plants": 172,
+      "accessories": 41,
+      "categories": 12,
+      "variants": 391
+    },
+    "byCategory": {
+      "fruit": 61,
+      "flowering": 22,
+      "decorating": 16,
+      "indoor": 25,
+      "vines": 14,
+      "herbs": 15,
+      "trees": 19,
+      "watering": 6,
+      "fertilizers": 20,
+      "pest": 3,
+      "tools": 5,
+      "pots": 7
+    },
+    "issues": {
+      "fakeNominalPrice500": [
+        "strawberry",
+        "3-step-ficus",
+        "tazbi-bail",
+        "stevia"
+      ],
+      "productsWithNoVariants": [],
+      "zeroPriceVariants": [],
+      "emptyDescriptionEn": [],
+      "emptyShortDescriptionEn": [],
+      "plantsWithoutHeightInfo": 11,
+      "accessoriesWithoutUrduSizeLabels": 41,
+      "imageIsPlaceholder": 213,
+      "imageFieldMissing": 0,
+      "missingUrduNameInUrduJson": [],
+      "categoriesMissingUrduName": [],
+      "categoriesMissingUrduDescription": []
+    },
+    "variantSizeDistribution": {
+      "small": 172,
+      "medium": 134,
+      "large": 79,
+      "xlarge": 4,
+      "xxlarge": 2
+    },
+    "notes": [
+      "seed.mjs hardcodes shortDescriptionUr='' and careInstructionsUr='' for every product.",
+      "seed.mjs writes descriptionUr as a template sentence, not a translated description.",
+      "seed.mjs sets seoTitle=nameEn and seoDescription=shortDescription/description (auto, unique per product).",
+      "plants get stock=20 and accessories get stock=20 regardless of reality (DEFAULT_STOCK).",
+      "accessory variants get sizeLabelUr='' and variant description='' by design in build.py."
+    ]
+  }
+}

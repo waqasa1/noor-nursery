@@ -85,14 +85,25 @@ export function ImageUpload({
               Cloudinary not configured — paste an image URL below.
             </p>
           )}
+          {/*
+            type="text", not "url": the native url constraint rejects relative
+            paths like /placeholder-plant.jpg and silently blocks the whole
+            form submit with a browser tooltip. Soft check below instead.
+          */}
           <input
-            type="url"
+            type="text"
+            inputMode="url"
             value={value}
             required={required}
-            placeholder="https://…"
+            placeholder="https://… or /placeholder-plant.jpg"
             onChange={(e) => onChange?.(e.target.value)}
             className="w-full rounded-xl border px-3 py-2 text-sm"
           />
+          {value && !/^(https?:\/\/|\/)/.test(value.trim()) && (
+            <p className="text-xs text-destructive">
+              Use a full https:// link or a path starting with /
+            </p>
+          )}
           {error && <p className="text-xs text-destructive">{error}</p>}
         </div>
       </div>

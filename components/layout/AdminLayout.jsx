@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { LogOut } from "lucide-react";
-import { Suspense } from "react";
+import { LogOut, Menu, X } from "lucide-react";
+import { Suspense, useEffect, useState } from "react";
 
 const NAV_GROUPS = [
   {
@@ -85,6 +85,13 @@ function SidebarNav() {
 
 export function AdminLayout({ children }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // any navigation (nav link, back button, redirect) closes the mobile drawer
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   const logout = async () => {
     try {
@@ -96,9 +103,37 @@ export function AdminLayout({ children }) {
   };
 
   return (
-    <div className="flex min-h-screen bg-surface-low">
-      <aside className="w-60 shrink-0 border-r bg-primary text-primary-foreground">
-        <div className="p-4">
+    <div className="flex min-h-screen flex-col bg-surface-low lg:flex-row">
+      {/* Mobile top bar — sidebar collapses into a drawer below lg */}
+      <header className="sticky top-0 z-40 flex items-center gap-3 border-b border-forest/40 bg-primary px-4 py-3 text-primary-foreground lg:hidden">
+        <button
+          type="button"
+          onClick={() => setMenuOpen((o) => !o)}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-forest/70 transition hover:bg-forest"
+        >
+          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+        <Link href="/admin" className="font-display text-lg font-bold">
+          Noor Admin
+        </Link>
+      </header>
+
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex w-60 shrink-0 flex-col border-r bg-primary text-primary-foreground transition-transform duration-200 lg:static lg:z-auto lg:translate-x-0 ${
+          menuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="hidden p-4 lg:block">
           <Link href="/admin" className="font-display text-lg font-bold">
             Noor Admin
           </Link>
@@ -106,7 +141,7 @@ export function AdminLayout({ children }) {
         <Suspense fallback={<div className="px-2 pb-4" />}>
           <SidebarNav />
         </Suspense>
-        <div className="flex flex-col gap-3 border-t border-forest p-4">
+        <div className="mt-auto flex flex-col gap-3 border-t border-forest p-4">
           <Link href="/" className="text-sm hover:text-leaf">
             ← Back to Store
           </Link>
@@ -120,7 +155,7 @@ export function AdminLayout({ children }) {
           </button>
         </div>
       </aside>
-      <main className="flex-1 overflow-auto p-6">{children}</main>
+      <main className="min-w-0 flex-1 p-4 sm:p-6">{children}</main>
     </div>
   );
 }
