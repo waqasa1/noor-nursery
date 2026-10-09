@@ -42,6 +42,9 @@ next-env.d.ts
 .turbo
 *.pem
 
+# JazzCash .NET reference sample (not part of the Next.js app)
+PR_V2.0/
+
 # Python (catalog scripts)
 __pycache__/
 *.pyc

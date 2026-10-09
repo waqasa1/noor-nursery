@@ -3,8 +3,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Epilogue", "Plus Jakarta Sans", ui-sans-serif, sans-serif;
+  --font-sans: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-epilogue), var(--font-plus-jakarta), ui-sans-serif, sans-serif;
 }
 
 /*
@@ -253,7 +253,7 @@
 
 @layer utilities {
   .text-urdu {
-    font-family: "Noto Nastaliq Urdu", "Plus Jakarta Sans", serif;
+    font-family: var(--font-noto-urdu), var(--font-plus-jakarta), serif;
   }
 
   .animate-fade-up {

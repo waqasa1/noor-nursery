@@ -210,6 +210,7 @@ export default function CheckoutPage() {
       const formEl = document.createElement("form");
       formEl.method = "POST";
       formEl.action = data.payment.formAction;
+      formEl.acceptCharset = "UTF-8";
       Object.entries(data.payment.formParams).forEach(([k, v]) => {
         const input = document.createElement("input");
         input.type = "hidden";

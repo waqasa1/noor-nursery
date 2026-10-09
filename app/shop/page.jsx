@@ -2,6 +2,10 @@ import { StoreLayout } from "@/components/layout/StoreLayout";
 import { ShopContent } from "./ShopContent";
 import { getProducts } from "@/lib/data/products";
 import { readShopParams, shopHeading, isAccessoryView, SHOP_PAGE_SIZE } from "./params";
+import { serializeProducts } from "@/lib/utils/serialize";
+
+/** Catalog pages are cached briefly — filters still work via searchParams. */
+export const revalidate = 60;
 
 /**
  * Server-rendered catalog: the query string is read here, products are
@@ -33,10 +37,7 @@ export default async function ShopPage({ searchParams }) {
     sort: params.sort,
   });
 
-  // Lean docs still carry ObjectId instances, which React Flight refuses to
-  // pass into Client Components ("objects with toJSON methods"). The JSON
-  // round-trip yields the same plain shape the old /api/products fetch gave.
-  const plainProducts = JSON.parse(JSON.stringify(products || []));
+  const plainProducts = serializeProducts(products);
 
   return (
     <StoreLayout>

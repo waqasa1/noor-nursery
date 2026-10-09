@@ -9,6 +9,8 @@ export const metadata = {
   description: "Browse indoor plants, fruit plants, flowering plants, herbs, pots, fertilizers and garden accessories.",
 };
 
+export const revalidate = 60;
+
 function CategoryCard({ cat, badge }) {
   return (
     <Link
@@ -54,7 +56,12 @@ function CategoryCard({ cat, badge }) {
 }
 
 export default async function CategoriesPage() {
-  const categories = await getCategories();
+  let categories = [];
+  try {
+    categories = await getCategories();
+  } catch (error) {
+    console.error("[categories] Failed to load:", error.message);
+  }
   const plants = categories.filter((c) => c.type !== "accessory");
   const accessories = categories.filter((c) => c.type === "accessory");
 

@@ -1,8 +1,30 @@
+import { Epilogue, Noto_Nastaliq_Urdu, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { organizationJsonLd } from "@/lib/seo/structured-data";
 import { JsonLdScript } from "@/lib/seo/JsonLdScript";
 import { RouteProgress } from "@/components/layout/RouteProgress";
 import { getEnv } from "@/lib/env";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-plus-jakarta",
+  display: "swap",
+});
+
+const epilogue = Epilogue({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-epilogue",
+  display: "swap",
+});
+
+const notoNastaliqUrdu = Noto_Nastaliq_Urdu({
+  subsets: ["arabic"],
+  weight: ["400", "600"],
+  variable: "--font-noto-urdu",
+  display: "swap",
+});
 
 const env = getEnv();
 
@@ -37,20 +59,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap"
-        />
-      </head>
-      <body>
+    <html
+      lang="en"
+      className={`${plusJakartaSans.variable} ${epilogue.variable} ${notoNastaliqUrdu.variable}`}
+    >
+      <body className={plusJakartaSans.className}>
         <JsonLdScript data={organizationJsonLd()} />
         <RouteProgress />
         {children}
