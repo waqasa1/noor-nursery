@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import { Epilogue, Noto_Nastaliq_Urdu, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { organizationJsonLd } from "@/lib/seo/structured-data";
 import { JsonLdScript } from "@/lib/seo/JsonLdScript";
 import { RouteProgress } from "@/components/layout/RouteProgress";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import { getEnv } from "@/lib/env";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -65,8 +67,10 @@ export default function RootLayout({ children }) {
     >
       <body className={plusJakartaSans.className}>
         <JsonLdScript data={organizationJsonLd()} />
-        <RouteProgress />
-        {children}
+        <Suspense fallback={null}>
+          <RouteProgress />
+        </Suspense>
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );

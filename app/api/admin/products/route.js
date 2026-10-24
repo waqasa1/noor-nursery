@@ -5,6 +5,7 @@ import Category from "@/models/Category";
 import { requireAdmin } from "@/lib/auth/session";
 import { slugify } from "@/lib/utils/slug";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
+import { revalidateCatalog } from "@/lib/cache/catalog";
 
 const variantSchema = z.object({
   size: z.enum(["small", "medium", "large", "xlarge", "xxlarge"]),
@@ -95,6 +96,7 @@ export async function POST(request) {
     if (existing) return jsonError("Slug already exists", 400);
 
     const product = await Product.create({ ...parsed.data, slug });
+    revalidateCatalog({ slug });
     return jsonSuccess({ product }, 201);
   } catch (error) {
     return handleApiError(error);

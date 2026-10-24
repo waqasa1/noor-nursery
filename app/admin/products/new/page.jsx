@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { VariantEditor, EMPTY_VARIANT } from "@/components/admin/VariantEditor";
+import { productKeys } from "@/lib/query/products";
 
 const TEXT_FIELDS = [
   { id: "nameEn", label: "Name (English)", placeholder: "e.g. Mango Hybrid Sindri", required: true },
@@ -14,6 +16,7 @@ const TEXT_FIELDS = [
 
 export default function NewProductPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [type, setType] = useState("plant");
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
@@ -73,6 +76,7 @@ export default function NewProductPage() {
       setError(fieldErrors?.[0] || data.message || "Failed to create product");
       return;
     }
+    await queryClient.invalidateQueries({ queryKey: productKeys.all });
     router.push(type === "accessory" ? "/admin/accessories" : "/admin/products");
   };
 

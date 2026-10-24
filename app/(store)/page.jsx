@@ -4,7 +4,8 @@ import { serializeCategory, serializeProduct } from "@/lib/utils/serialize";
 
 // Homepage regenerates in the background every 60s instead of blocking each
 // request on the DB (featured products / categories rarely change).
-export const revalidate = 60;
+/** Cached until admin/seed calls revalidateCatalog(). */
+export const revalidate = false;
 
 export default async function Page() {
   let products = [];

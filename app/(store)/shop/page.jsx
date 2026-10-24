@@ -4,7 +4,8 @@ import { readShopParams, shopHeading, isAccessoryView, SHOP_PAGE_SIZE } from "./
 import { serializeProducts } from "@/lib/utils/serialize";
 
 /** Catalog pages are cached briefly — filters still work via searchParams. */
-export const revalidate = 60;
+/** Cached until admin/seed calls revalidateCatalog(). */
+export const revalidate = false;
 
 /**
  * Server-rendered catalog: the query string is read here, products are

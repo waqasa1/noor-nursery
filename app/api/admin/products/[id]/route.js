@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/db";
 import Product from "@/models/Product";
 import { requireAdmin } from "@/lib/auth/session";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
+import { revalidateCatalog } from "@/lib/cache/catalog";
 
 export async function GET(_request, { params }) {
   try {
@@ -27,6 +28,7 @@ export async function PUT(request, { params }) {
       runValidators: true,
     });
     if (!product) return jsonError("Product not found", 404);
+    revalidateCatalog({ slug: product.slug });
     return jsonSuccess({ product });
   } catch (error) {
     return handleApiError(error);
@@ -38,7 +40,12 @@ export async function DELETE(_request, { params }) {
     await requireAdmin();
     await connectDB();
     const { id } = await params;
-    await Product.findByIdAndUpdate(id, { isActive: false });
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { isActive: false },
+      { returnDocument: "after" }
+    );
+    if (product) revalidateCatalog({ slug: product.slug });
     return jsonSuccess({ message: "Product archived" });
   } catch (error) {
     return handleApiError(error);

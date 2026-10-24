@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   ArrowRight,
@@ -24,6 +25,7 @@ import {
   matchProducts,
   summarizeAnswers,
 } from "@/lib/plants/plant-finder";
+import { fetchStoreProducts, productKeys } from "@/lib/query/products";
 
 const ICONS = {
   "sun-dim": SunDim,
@@ -37,7 +39,10 @@ const ICONS = {
   award: Award,
 };
 
+const FINDER_PARAMS = { limit: "100", available: "true", type: "plants" };
+
 export function PlantFinder() {
+  const queryClient = useQueryClient();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [results, setResults] = useState(null);
@@ -47,19 +52,23 @@ export function PlantFinder() {
   const isComplete = step >= PLANT_FINDER_STEPS.length;
   const progress = isComplete ? 100 : ((step + 1) / PLANT_FINDER_STEPS.length) * 100;
 
-  const fetchResults = useCallback(async (finalAnswers) => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/products?limit=100&available=true&type=plants");
-      const data = await res.json();
-      const matched = matchProducts(data.products || [], finalAnswers);
-      setResults(matched);
-    } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchResults = useCallback(
+    async (finalAnswers) => {
+      setLoading(true);
+      try {
+        const products = await queryClient.fetchQuery({
+          queryKey: productKeys.storeList(FINDER_PARAMS),
+          queryFn: () => fetchStoreProducts(FINDER_PARAMS),
+        });
+        setResults(matchProducts(products, finalAnswers));
+      } catch {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [queryClient]
+  );
 
   const selectOption = (optionId) => {
     const nextAnswers = { ...answers, [currentStep.id]: optionId };

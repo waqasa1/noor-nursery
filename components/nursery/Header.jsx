@@ -7,6 +7,7 @@ import { ChevronDown, Heart, Menu, MessageCircle, Phone, Search, ShoppingBag, Tr
 import { IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
 import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
+import { startRouteProgress } from "@/lib/navigation/route-progress";
 
 export function TopBar() {
   return (
@@ -248,6 +249,7 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      startRouteProgress(e.currentTarget);
       router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
       setMenuOpen(false);
     }
@@ -256,14 +258,14 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   return (
     <header className="sticky top-0 z-40 border-b bg-card/95 shadow-sm backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-4 sm:px-4 sm:py-3">
-        <Link href="/" className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <Link href="/" data-nav-brand className="flex shrink-0 items-center gap-2 sm:gap-3">
           <img
             src={IMAGES.logo}
             alt="Noor Nursery Official Insignia"
             className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-leaf sm:h-12 sm:w-12"
           />
           <div>
-            <p className="whitespace-nowrap font-display text-sm font-bold leading-tight tracking-tight text-primary sm:text-lg lg:text-xl">
+            <p className="nav-brand-title whitespace-nowrap font-display text-sm font-bold leading-tight tracking-tight text-primary sm:text-lg lg:text-xl">
               NOOR NURSERY
             </p>
             <p className="hidden whitespace-nowrap text-[11px] font-medium text-muted-foreground sm:block">

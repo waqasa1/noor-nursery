@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { VariantEditor } from "@/components/admin/VariantEditor";
 import { AdminFormSkeleton, AdminPageHeaderSkeleton } from "@/components/admin/AdminSkeleton";
+import { productKeys } from "@/lib/query/products";
 
 const TEXT_FIELDS = [
   { id: "nameEn", label: "Name (English)", required: true },
@@ -14,6 +16,7 @@ const TEXT_FIELDS = [
 export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
+  const queryClient = useQueryClient();
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -75,6 +78,7 @@ export default function EditProductPage() {
       setError(fieldErrors?.[0] || data.message || "Failed to save");
       return;
     }
+    await queryClient.invalidateQueries({ queryKey: productKeys.all });
     router.push(productType === "accessory" ? "/admin/accessories" : "/admin/products");
   };
 

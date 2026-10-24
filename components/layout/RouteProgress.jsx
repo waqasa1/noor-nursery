@@ -1,22 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 /**
- * Thin top progress bar for client-side navigation.
- * Starts on any internal link click, completes as soon as the URL changes
- * (pathname *or* query string) and always gives up after 20s so it can never
- * get stuck on screen.
+ * Top progress bar + subtle “still on this page” cues while the next route loads:
+ * - document.documentElement[data-navigating] → soft brand/header pulse
+ * - clicked <a>.is-nav-pending → breathing highlight on that link/card
  */
 export function RouteProgress() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [visible, setVisible] = useState(false);
   const barRef = useRef(null);
   const timersRef = useRef([]);
   const intervalRef = useRef(null);
   const runningRef = useRef(false);
   const startHrefRef = useRef("");
+  const pendingElRef = useRef(null);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((id) => clearTimeout(id));
@@ -25,6 +26,12 @@ export function RouteProgress() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+  }, []);
+
+  const clearPending = useCallback(() => {
+    pendingElRef.current?.classList.remove("is-nav-pending");
+    pendingElRef.current = null;
+    document.documentElement.removeAttribute("data-navigating");
   }, []);
 
   const setBar = useCallback((value, animate = true) => {
@@ -38,33 +45,49 @@ export function RouteProgress() {
     if (!runningRef.current) return;
     clearTimers();
     runningRef.current = false;
+    clearPending();
     setBar(1, true);
     timersRef.current.push(
       setTimeout(() => {
         setVisible(false);
       }, 350)
     );
-  }, [clearTimers, setBar]);
+  }, [clearPending, clearTimers, setBar]);
 
-  const start = useCallback(() => {
-    clearTimers();
-    runningRef.current = true;
-    startHrefRef.current = window.location.href;
-    setVisible(true);
-    setBar(0, false);
+  const start = useCallback(
+    (clickedAnchor) => {
+      clearTimers();
+      clearPending();
+      runningRef.current = true;
+      startHrefRef.current = window.location.href;
+      document.documentElement.setAttribute("data-navigating", "true");
 
-    requestAnimationFrame(() => {
-      if (!runningRef.current) return;
-      setBar(0.2, true);
-      timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.45), 250));
-      timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.68), 700));
-      timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.84), 1500));
-      timersRef.current.push(setTimeout(finish, 20000));
-      intervalRef.current = setInterval(() => {
-        if (window.location.href !== startHrefRef.current) finish();
-      }, 120);
-    });
-  }, [clearTimers, finish, setBar]);
+      if (clickedAnchor instanceof HTMLElement) {
+        const target =
+          clickedAnchor.closest("[data-nav-pulse]") ||
+          clickedAnchor.closest("article") ||
+          clickedAnchor;
+        target.classList.add("is-nav-pending");
+        pendingElRef.current = target;
+      }
+
+      setVisible(true);
+      setBar(0, false);
+
+      requestAnimationFrame(() => {
+        if (!runningRef.current) return;
+        setBar(0.2, true);
+        timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.45), 250));
+        timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.68), 700));
+        timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.84), 1500));
+        timersRef.current.push(setTimeout(finish, 20000));
+        intervalRef.current = setInterval(() => {
+          if (window.location.href !== startHrefRef.current) finish();
+        }, 120);
+      });
+    },
+    [clearPending, clearTimers, finish, setBar]
+  );
 
   useEffect(() => {
     const onClick = (event) => {
@@ -85,26 +108,35 @@ export function RouteProgress() {
       if (url.origin !== window.location.origin) return;
       if (url.pathname === window.location.pathname && url.search === window.location.search) return;
 
-      start();
+      start(anchor);
     };
 
-    const onPopState = () => start();
+    const onPopState = () => start(null);
+
+    /** For router.push() flows (product cards, search) that never hit an <a> click. */
+    const onProgrammatic = (event) => {
+      const el = event.detail?.element ?? null;
+      start(el);
+    };
 
     document.addEventListener("click", onClick, true);
     window.addEventListener("popstate", onPopState);
+    window.addEventListener("route-progress:start", onProgrammatic);
     return () => {
       document.removeEventListener("click", onClick, true);
       window.removeEventListener("popstate", onPopState);
+      window.removeEventListener("route-progress:start", onProgrammatic);
       clearTimers();
+      clearPending();
       runningRef.current = false;
     };
-  }, [clearTimers, start]);
+  }, [clearPending, clearTimers, start]);
 
-  // Backstop: path changed but the interval missed it (e.g. slow render).
+  // Finish when the destination route is committed (path or query).
   useEffect(() => {
     finish();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [pathname, searchParams]);
 
   return (
     <div
@@ -113,7 +145,10 @@ export function RouteProgress() {
         visible ? "opacity-100" : "opacity-0"
       }`}
     >
-      <div ref={barRef} className="h-full w-full origin-left scale-x-0 bg-secondary shadow-[0_0_8px_rgba(0,0,0,0.35)]" />
+      <div
+        ref={barRef}
+        className="h-full w-full origin-left scale-x-0 bg-secondary shadow-[0_0_8px_rgba(0,0,0,0.35)]"
+      />
     </div>
   );
 }

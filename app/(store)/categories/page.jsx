@@ -8,7 +8,8 @@ export const metadata = {
   description: "Browse indoor plants, fruit plants, flowering plants, herbs, pots, fertilizers and garden accessories.",
 };
 
-export const revalidate = 60;
+/** Cached until admin/seed calls revalidateCatalog(). */
+export const revalidate = false;
 
 function CategoryCard({ cat, badge }) {
   return (

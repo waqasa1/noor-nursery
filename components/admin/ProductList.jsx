@@ -1,26 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Package, Pencil, Search, Trash2 } from "lucide-react";
 import { AdminPageHeaderSkeleton, AdminTableSkeleton } from "@/components/admin/AdminSkeleton";
 import { formatPKR } from "@/lib/utils/currency";
+import { archiveAdminProduct, fetchAdminProducts, productKeys } from "@/lib/query/products";
 
 export function ProductList({ type, title, addHref, addLabel }) {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
   const [notice, setNotice] = useState("");
 
-  const load = () => {
-    setLoading(true);
-    fetch(`/api/admin/products?type=${type}&limit=200`)
-      .then((r) => r.json())
-      .then((d) => setProducts(d.products || []))
-      .finally(() => setLoading(false));
-  };
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: productKeys.adminList(type),
+    queryFn: () => fetchAdminProducts(type),
+  });
 
-  useEffect(load, [type]);
+  const archiveMutation = useMutation({
+    mutationFn: (product) => archiveAdminProduct(product._id),
+    onSuccess: (_data, product) => {
+      setNotice(`Archived "${product.nameEn}"`);
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
+    },
+    onError: (err) => {
+      window.alert(err.message || "Could not archive product");
+    },
+  });
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -34,19 +41,12 @@ export function ProductList({ type, title, addHref, addLabel }) {
     );
   }, [products, query]);
 
-  const archive = async (product) => {
+  const archive = (product) => {
     if (!window.confirm(`Archive "${product.nameEn}"? It will be hidden from the store.`)) return;
-    const res = await fetch(`/api/admin/products/${product._id}`, { method: "DELETE" });
-    const data = await res.json();
-    if (!data.success) {
-      window.alert(data.message || "Could not archive product");
-      return;
-    }
-    setNotice(`Archived "${product.nameEn}"`);
-    load();
+    archiveMutation.mutate(product);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <>
         <AdminPageHeaderSkeleton action />
@@ -97,7 +97,10 @@ export function ProductList({ type, title, addHref, addLabel }) {
             {products.length === 0 ? "No products yet." : "No products match that search."}
           </p>
           {products.length === 0 && (
-            <Link href={addHref} className="mt-4 inline-block rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground">
+            <Link
+              href={addHref}
+              className="mt-4 inline-block rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground"
+            >
               {addLabel}
             </Link>
           )}
@@ -122,7 +125,10 @@ export function ProductList({ type, title, addHref, addLabel }) {
                 const stock = variants.reduce((s, v) => s + (v.stock || 0), 0);
                 const price = variants.length ? Math.min(...variants.map((v) => v.price)) : 0;
                 return (
-                  <tr key={p._id} className="border-b border-foreground/10 align-top last:border-0 hover:bg-surface-low/60">
+                  <tr
+                    key={p._id}
+                    className="border-b border-foreground/10 align-top last:border-0 hover:bg-surface-low/60"
+                  >
                     <td className="p-3">
                       <div className="flex items-center gap-3">
                         <img
@@ -183,7 +189,8 @@ export function ProductList({ type, title, addHref, addLabel }) {
                         <button
                           type="button"
                           onClick={() => archive(p)}
-                          className="flex items-center gap-1 rounded-lg border-2 border-destructive/40 bg-white px-2.5 py-1.5 text-xs font-bold text-destructive transition hover:bg-destructive hover:text-destructive-foreground"
+                          disabled={archiveMutation.isPending}
+                          className="flex items-center gap-1 rounded-lg border-2 border-destructive/40 bg-white px-2.5 py-1.5 text-xs font-bold text-destructive transition hover:bg-destructive hover:text-destructive-foreground disabled:opacity-50"
                         >
                           <Trash2 className="h-3.5 w-3.5" /> Archive
                         </button>
