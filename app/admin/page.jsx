@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AdminLayout } from "@/components/layout/AdminLayout";
 import { AdminMetricsSkeleton, AdminPanelSkeleton } from "@/components/admin/AdminSkeleton";
 import { formatPKR } from "@/lib/utils/currency";
 
@@ -19,8 +18,8 @@ export default function AdminDashboard() {
   const metrics = data?.metrics;
 
   return (
-    <AdminLayout>
-      <h1 className="font-display text-2xl font-bold text-primary">Dashboard</h1>
+    <>
+    <h1 className="font-display text-2xl font-bold text-primary">Dashboard</h1>
 
       {loading && (
         <>
@@ -88,6 +87,7 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-    </AdminLayout>
+  
+    </>
   );
 }

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { AdminLayout } from "@/components/layout/AdminLayout";
 import { AdminOrderDetailSkeleton } from "@/components/admin/AdminSkeleton";
 import { formatPKR } from "@/lib/utils/currency";
 
@@ -52,15 +51,13 @@ export default function AdminOrderDetailPage() {
 
   if (loading || !order) {
     return (
-      <AdminLayout>
-        <AdminOrderDetailSkeleton />
-      </AdminLayout>
+      <AdminOrderDetailSkeleton />
     );
   }
 
   return (
-    <AdminLayout>
-      <h1 className="font-display text-2xl font-bold text-primary">{order.orderNumber}</h1>
+    <>
+    <h1 className="font-display text-2xl font-bold text-primary">{order.orderNumber}</h1>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Customer</h2>
@@ -213,6 +210,7 @@ export default function AdminOrderDetailPage() {
           ))}
         </ul>
       </div>
-    </AdminLayout>
+  
+    </>
   );
 }

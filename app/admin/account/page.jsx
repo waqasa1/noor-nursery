@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AdminLayout } from "@/components/layout/AdminLayout";
 
 export default function AdminAccountPage() {
   const [user, setUser] = useState(null);
@@ -50,8 +49,8 @@ export default function AdminAccountPage() {
   };
 
   return (
-    <AdminLayout>
-      <h1 className="font-display text-2xl font-bold text-primary">Admin Account</h1>
+    <>
+    <h1 className="font-display text-2xl font-bold text-primary">Admin Account</h1>
       <p className="mt-1 text-sm text-muted-foreground">Change your admin login password.</p>
 
       {user && (
@@ -107,6 +106,7 @@ export default function AdminAccountPage() {
           {submitting ? "Updating…" : "Update Password"}
         </button>
       </form>
-    </AdminLayout>
+  
+    </>
   );
 }

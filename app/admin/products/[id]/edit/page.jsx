@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { VariantEditor } from "@/components/admin/VariantEditor";
 import { AdminFormSkeleton, AdminPageHeaderSkeleton } from "@/components/admin/AdminSkeleton";
@@ -81,17 +80,17 @@ export default function EditProductPage() {
 
   if (loading || !form) {
     return (
-      <AdminLayout>
+      <>
         <AdminPageHeaderSkeleton />
         <AdminFormSkeleton fields={8} />
         {error && <p className="field-error mt-4">{error}</p>}
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <>
+    <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold text-primary">Edit: {form.nameEn}</h1>
           <p className="text-sm text-muted-foreground">
@@ -226,6 +225,7 @@ export default function EditProductPage() {
           {saving ? "Saving…" : "Save Changes"}
         </button>
       </form>
-    </AdminLayout>
+  
+    </>
   );
 }

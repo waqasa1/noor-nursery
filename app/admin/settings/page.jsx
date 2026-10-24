@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AdminLayout } from "@/components/layout/AdminLayout";
 import { AdminSettingsSkeleton } from "@/components/admin/AdminSkeleton";
 
 export default function AdminSettingsPage() {
@@ -43,9 +42,7 @@ export default function AdminSettingsPage() {
 
   if (loading || !settings) {
     return (
-      <AdminLayout>
-        <AdminSettingsSkeleton />
-      </AdminLayout>
+      <AdminSettingsSkeleton />
     );
   }
 
@@ -54,8 +51,8 @@ export default function AdminSettingsPage() {
   };
 
   return (
-    <AdminLayout>
-      <h1 className="font-display text-2xl font-bold text-primary">Store Settings</h1>
+    <>
+    <h1 className="font-display text-2xl font-bold text-primary">Store Settings</h1>
       <p className="mt-1 text-sm text-muted-foreground">Manage delivery fees, store info, bank details, and promo codes.</p>
 
       {message && <p className="mt-4 text-sm text-leaf">{message}</p>}
@@ -202,6 +199,7 @@ export default function AdminSettingsPage() {
       >
         Save Settings
       </button>
-    </AdminLayout>
+  
+    </>
   );
 }

@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
-import { FlashDeal, Header, TopBar } from "@/components/nursery/Header";
 import { Categories, Hero } from "@/components/nursery/Hero";
 import { Products } from "@/components/nursery/Products";
 import {
@@ -15,23 +14,12 @@ import {
   Testimonials,
   Trust,
 } from "@/components/nursery/Sections";
-import { Footer } from "@/components/nursery/Footer";
-import { HelpPanel } from "@/components/help/HelpPanel";
 import { useCartStore } from "@/store/cart";
-import { formatPKR } from "@/lib/utils/currency";
 
 export function HomePageClient({ products = [], categories = [] }) {
   const [toast, setToast] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const timer = useRef(null);
-
-  const itemCount = useCartStore((s) => s.getItemCount());
-  const subtotal = useCartStore((s) => s.getSubtotal());
   const addItem = useCartStore((s) => s.addItem);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const addToCart = useCallback(
     (product, variantIndex = 0) => {
@@ -57,28 +45,18 @@ export function HomePageClient({ products = [], categories = [] }) {
     [addItem]
   );
 
-  const displayCount = isMounted ? itemCount : 0;
-  const displayTotal = isMounted ? formatPKR(subtotal) : formatPKR(0);
-
   return (
-    <div className="min-h-screen bg-background">
-      <TopBar />
-      <Header cartCount={displayCount} cartTotal={displayTotal} />
-      <FlashDeal />
-      <main>
-        <Hero />
-        <Categories categories={categories} />
-        <Products products={products} onAdd={addToCart} />
-        <FeaturedPlant />
-        <Trust />
-        <PlantCareFinder />
-        <Testimonials />
-        <BrandStory />
-        <Faq />
-        <FinalCTA />
-      </main>
-      <Footer />
-      <HelpPanel />
+    <>
+      <Hero />
+      <Categories categories={categories} />
+      <Products products={products} onAdd={addToCart} />
+      <FeaturedPlant />
+      <Trust />
+      <PlantCareFinder />
+      <Testimonials />
+      <BrandStory />
+      <Faq />
+      <FinalCTA />
 
       {toast && (
         <div
@@ -91,11 +69,13 @@ export function HomePageClient({ products = [], categories = [] }) {
             <p className="font-display text-sm font-bold">Added to Cart!</p>
             <p className="text-xs text-primary-foreground/75">
               Item safely added to your nursery order.{" "}
-              <Link href="/cart" className="underline">View cart</Link>
+              <Link href="/cart" className="underline">
+                View cart
+              </Link>
             </p>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

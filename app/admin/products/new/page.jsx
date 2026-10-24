@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { VariantEditor, EMPTY_VARIANT } from "@/components/admin/VariantEditor";
 
@@ -78,8 +77,8 @@ export default function NewProductPage() {
   };
 
   return (
-    <AdminLayout>
-      <div className="flex items-center justify-between gap-3">
+    <>
+    <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold text-primary">
             New {type === "accessory" ? "Accessory" : "Plant"}
@@ -212,6 +211,7 @@ export default function NewProductPage() {
           {saving ? "Creating…" : `Create ${type === "accessory" ? "Accessory" : "Plant"}`}
         </button>
       </form>
-    </AdminLayout>
+  
+    </>
   );
 }

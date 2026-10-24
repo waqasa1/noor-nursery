@@ -56,7 +56,7 @@ function SidebarNav() {
   };
 
   return (
-    <nav className="px-2 pb-4" aria-label="Admin navigation">
+    <nav className="min-h-0 flex-1 overflow-y-auto px-2 pb-4" aria-label="Admin navigation">
       {NAV_GROUPS.map((group, gi) => (
         <div key={group.title || `group-${gi}`}>
           {group.title && (
@@ -129,19 +129,19 @@ export function AdminLayout({ children }) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-60 shrink-0 flex-col border-r bg-primary text-primary-foreground transition-transform duration-200 lg:static lg:z-auto lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex h-dvh w-60 shrink-0 flex-col border-r bg-primary text-primary-foreground transition-transform duration-200 lg:sticky lg:top-0 lg:z-auto lg:translate-x-0 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="hidden p-4 lg:block">
+        <div className="hidden shrink-0 p-4 lg:block">
           <Link href="/admin" className="font-display text-lg font-bold">
             Noor Admin
           </Link>
         </div>
-        <Suspense fallback={<div className="px-2 pb-4" />}>
+        <Suspense fallback={<div className="min-h-0 flex-1 px-2 pb-4" />}>
           <SidebarNav />
         </Suspense>
-        <div className="mt-auto flex flex-col gap-3 border-t border-forest p-4">
+        <div className="mt-auto flex shrink-0 flex-col gap-3 border-t border-forest p-4">
           <Link href="/" className="text-sm hover:text-leaf">
             ← Back to Store
           </Link>
