@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import Order from "@/models/Order";
 import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
+import { sendTidReceivedEmail } from "@/lib/email";
 
 const MANUAL_WALLET_METHODS = new Set(["jazzcash", "easypaisa"]);
 
@@ -72,6 +73,8 @@ export async function POST(request) {
       reusedTrxId: !!duplicate,
     };
     await order.save();
+
+    sendTidReceivedEmail(order.toObject()).catch(() => {});
 
     return jsonSuccess({
       paymentStatus: order.paymentStatus,

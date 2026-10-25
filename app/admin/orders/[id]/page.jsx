@@ -88,7 +88,8 @@ export default function AdminOrderDetailPage() {
         <div className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Update Status</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Order status tracks fulfillment. Payment status tracks whether money was received.
+            Order status = fulfillment. Payment status = money. Saving to processing, packed,
+            shipped, delivered, or cancelled emails the customer automatically.
           </p>
           <div className="mt-4 space-y-3">
             <label className="block text-sm font-medium text-foreground">

@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { getStoreInfo } from "@/lib/settings";
-import { sendEmail } from "@/lib/email/contact";
+import { getEnv } from "@/lib/env";
+import { sendEmail, getContactInbox } from "@/lib/email";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
 const schema = z.object({
@@ -27,7 +28,8 @@ export async function POST(request) {
     }
 
     const store = await getStoreInfo();
-    const to = store.email || "orders@noornursery.pk";
+    const env = getEnv();
+    const to = env.CONTACT_TO || env.EMAIL_REPLY_TO || store.email || getContactInbox();
 
     await sendEmail({
       to,

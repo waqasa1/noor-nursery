@@ -6,6 +6,8 @@ import {
   sendOrderStatusUpdate,
   sendPaymentReceivedEmail,
   sendOrderConfirmationEmail,
+  MILESTONE_STATUS_MESSAGES,
+  formatOrderStatus,
 } from "@/lib/email";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
@@ -46,6 +48,8 @@ export async function PATCH(request, { params }) {
     if (!order) return jsonError("Order not found", 404);
 
     const prevPaymentStatus = order.paymentStatus;
+    const prevOrderStatus = order.orderStatus;
+
     if (parsed.data.orderStatus) order.orderStatus = parsed.data.orderStatus;
     if (parsed.data.paymentStatus) order.paymentStatus = parsed.data.paymentStatus;
     if (parsed.data.paymentReference !== undefined) {
@@ -62,22 +66,47 @@ export async function PATCH(request, { params }) {
       order.orderStatus = "paid";
     }
 
+    const statusChanged =
+      Boolean(parsed.data.orderStatus) && order.orderStatus !== prevOrderStatus;
+    const milestoneMsg = MILESTONE_STATUS_MESSAGES[order.orderStatus];
+    const shouldAutoNotify =
+      statusChanged && Boolean(milestoneMsg) && !parsed.data.resendEmail;
+
+    // Avoid double email if Save also flips payment→paid and status lands on a milestone
+    // in the same request as payment received email.
+    const paymentJustPaid =
+      parsed.data.paymentStatus === "paid" && prevPaymentStatus !== "paid";
+
+    if (shouldAutoNotify) {
+      order.emailSent = { ...(order.emailSent || {}), statusUpdate: true };
+    }
+
     await order.save();
 
+    const lean = order.toObject();
+
     if (parsed.data.resendEmail) {
-      const statusMsg = `Your order status is now: ${order.orderStatus.replace("_", " ")}`;
-      sendOrderStatusUpdate(order.toObject(), statusMsg).catch(() => {});
+      const statusMsg =
+        MILESTONE_STATUS_MESSAGES[order.orderStatus] ||
+        `Your order status is now: ${formatOrderStatus(order.orderStatus)}.`;
+      sendOrderStatusUpdate(lean, statusMsg)
+        .then(() =>
+          Order.findByIdAndUpdate(order._id, { "emailSent.statusUpdate": true }).catch(() => {})
+        )
+        .catch(() => {});
+    } else if (shouldAutoNotify && !paymentJustPaid) {
+      sendOrderStatusUpdate(lean, milestoneMsg).catch(() => {});
     }
 
     if (parsed.data.resendConfirmation) {
-      sendOrderConfirmationEmail(order.toObject()).catch(() => {});
+      sendOrderConfirmationEmail(lean).catch(() => {});
     }
 
-    if (parsed.data.paymentStatus === "paid" && prevPaymentStatus !== "paid") {
-      sendPaymentReceivedEmail(order.toObject()).catch(() => {});
+    if (paymentJustPaid) {
+      sendPaymentReceivedEmail(lean).catch(() => {});
     }
 
-    return jsonSuccess({ order });
+    return jsonSuccess({ order: lean });
   } catch (error) {
     return handleApiError(error);
   }
