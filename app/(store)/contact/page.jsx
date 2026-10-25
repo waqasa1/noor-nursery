@@ -6,7 +6,7 @@ import { ContactForm } from "./ContactForm";
 
 export const metadata = {
   title: "Contact — Noor Nursery",
-  description: `Reach Noor Nursery for orders, plant care, and wholesale. Email ${BRAND.email} or WhatsApp us.`,
+  description: "Reach Noor Nursery for orders, plant care, and wholesale. Email or WhatsApp us.",
 };
 
 export default function ContactPage() {
