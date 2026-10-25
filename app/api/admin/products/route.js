@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import Product from "@/models/Product";
 import Category from "@/models/Category";
@@ -6,45 +5,7 @@ import { requireAdmin } from "@/lib/auth/session";
 import { slugify } from "@/lib/utils/slug";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 import { revalidateCatalog } from "@/lib/cache/catalog";
-
-const variantSchema = z.object({
-  size: z.enum(["small", "medium", "large", "xlarge", "xxlarge"]),
-  sizeLabelEn: z.string().min(1),
-  sizeLabelUr: z.string().optional(),
-  sku: z.string().optional().default(""),
-  price: z.number().min(0),
-  compareAtPrice: z.number().min(0).optional(),
-  stock: z.number().int().min(0),
-  lowStockThreshold: z.number().int().min(0).optional(),
-  isActive: z.boolean().optional(),
-  image: z.string().optional(),
-});
-
-const productSchema = z.object({
-  nameEn: z.string().min(1),
-  nameUr: z.string().min(1),
-  slug: z.string().optional(),
-  shortDescriptionEn: z.string().optional(),
-  shortDescriptionUr: z.string().optional(),
-  descriptionEn: z.string().optional(),
-  descriptionUr: z.string().optional(),
-  careInstructionsEn: z.string().optional(),
-  careInstructionsUr: z.string().optional(),
-  categoryId: z.string(),
-  images: z.array(z.string()).optional(),
-  featuredImage: z.string().optional(),
-  variants: z.array(variantSchema).min(1),
-  tags: z.array(z.string()).optional(),
-  sunlight: z.enum(["low", "medium", "bright", "direct"]).optional(),
-  watering: z.enum(["low", "medium", "high"]).optional(),
-  difficulty: z.enum(["easy", "moderate", "advanced"]).optional(),
-  suitability: z.enum(["indoor", "outdoor", "both"]).optional(),
-  heightInfo: z.string().optional(),
-  featured: z.boolean().optional(),
-  isActive: z.boolean().optional(),
-  seoTitle: z.string().optional(),
-  seoDescription: z.string().optional(),
-});
+import { productWriteSchema } from "@/lib/validation/product";
 
 export async function GET(request) {
   try {
@@ -85,7 +46,7 @@ export async function POST(request) {
   try {
     await requireAdmin();
     const body = await request.json();
-    const parsed = productSchema.safeParse(body);
+    const parsed = productWriteSchema.safeParse(body);
     if (!parsed.success) {
       return jsonError("Validation failed", 400, parsed.error.flatten().fieldErrors);
     }

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { hashPassword, normalizeEmail, validatePassword } from "@/lib/auth/password";
-import { rateLimit, getClientIp } from "@/lib/auth/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { jsonSuccessWithSession, jsonError, handleApiError } from "@/lib/api-response";
 import { sendWelcomeEmail } from "@/lib/email";
 
@@ -20,7 +20,7 @@ const signupSchema = z.object({
 export async function POST(request) {
   try {
     const ip = getClientIp(request);
-    const limit = rateLimit(`signup:${ip}`, { maxAttempts: 5 });
+    const limit = await rateLimitAsync(`signup:${ip}`, { maxAttempts: 5 });
     if (!limit.allowed) {
       return jsonError("Too many attempts. Please try again later.", 429);
     }

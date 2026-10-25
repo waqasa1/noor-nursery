@@ -31,7 +31,12 @@ export async function GET(request) {
     }
 
     const [orders, total] = await Promise.all([
-      Order.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
+      Order.find(filter)
+        .select("-accessToken -paymentGatewayResponse")
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
       Order.countDocuments(filter),
     ]);
 

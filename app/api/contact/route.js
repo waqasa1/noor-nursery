@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { rateLimit, getClientIp } from "@/lib/auth/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { getStoreInfo } from "@/lib/settings";
 import { sendEmail } from "@/lib/email/contact";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
@@ -15,7 +15,7 @@ const schema = z.object({
 export async function POST(request) {
   try {
     const ip = getClientIp(request);
-    const limit = rateLimit(`contact:${ip}`, { maxAttempts: 5, windowMs: 60 * 60 * 1000 });
+    const limit = await rateLimitAsync(`contact:${ip}`, { maxAttempts: 5, windowMs: 60 * 60 * 1000 });
     if (!limit.allowed) {
       return jsonError("Too many messages. Please try again later.", 429);
     }

@@ -21,6 +21,7 @@ function TrackOrderContent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     setError("");
     setOrder(null);
@@ -102,7 +103,7 @@ function TrackOrderContent() {
               <button 
                 type="submit" 
                 disabled={loading} 
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-70"
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 font-bold text-primary-foreground transition hover:bg-forest disabled:pointer-events-none disabled:opacity-70"
               >
                 {loading ? "Searching..." : <><Search className="h-4 w-4" /> Track Order</>}
               </button>
@@ -123,14 +124,16 @@ function TrackOrderContent() {
                       Payment: {order.paymentStatus}
                     </span>
                   </div>
-                  {order.paymentMethod === "easypaisa" && order.paymentStatus !== "paid" && (
+                  {(order.paymentMethod === "jazzcash" || order.paymentMethod === "easypaisa") &&
+                    order.paymentStatus !== "paid" &&
+                    order.accessToken && (
                     <a
-                      href={`/order-success/${order.orderNumber}`}
+                      href={`/order-success/${order.orderNumber}?t=${encodeURIComponent(order.accessToken)}`}
                       className="mt-4 inline-flex rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground transition hover:bg-forest"
                     >
                       {order.paymentReference
-                        ? "View / correct your EasyPaisa TrxID"
-                        : "Send EasyPaisa payment & submit TrxID"}
+                        ? "View / correct your JazzCash TID"
+                        : "Send JazzCash payment & submit TID"}
                     </a>
                   )}
                 </div>

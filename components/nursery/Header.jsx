@@ -7,7 +7,7 @@ import { ChevronDown, Heart, Menu, MessageCircle, Phone, Search, ShoppingBag, Tr
 import { IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
 import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
-import { startRouteProgress } from "@/lib/navigation/route-progress";
+import { isRouteNavigating, startRouteProgress } from "@/lib/navigation/route-progress";
 
 export function TopBar() {
   return (
@@ -248,11 +248,10 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      startRouteProgress(e.currentTarget);
-      router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-      setMenuOpen(false);
-    }
+    if (!searchQuery.trim() || isRouteNavigating()) return;
+    startRouteProgress(e.currentTarget);
+    router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+    setMenuOpen(false);
   };
 
   return (

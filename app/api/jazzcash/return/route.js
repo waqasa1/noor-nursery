@@ -1,42 +1,29 @@
 import { NextResponse } from "next/server";
-import { processPaymentCallback } from "@/lib/orders/create";
 import { getEnv } from "@/lib/env";
 
-function payloadFromRequest(request, formData) {
-  if (formData) {
-    return Object.fromEntries(formData.entries());
-  }
-  const { searchParams } = new URL(request.url);
-  return Object.fromEntries(searchParams.entries());
-}
+/**
+ * JazzCash merchant return URL — DISABLED.
+ * Automatic merchant portal callbacks are not used; customers pay via manual
+ * JazzCash Send Money and submit their TID/TrxID on the order page.
+ *
+ * Merchant callback code kept commented for reference:
+ *
+ * // import { processPaymentCallback } from "@/lib/orders/create";
+ * // import { connectDB, isDBConfigured } from "@/lib/db";
+ * // import Order from "@/models/Order";
+ * // import { orderSuccessPath } from "@/lib/orders/access";
+ * // const result = await processPaymentCallback("jazzcash", payload, idempotencyKey);
+ */
 
-async function handleReturn(request, formData = null) {
-  const payload = payloadFromRequest(request, formData);
+async function handleReturn() {
   const baseUrl = getEnv().NEXT_PUBLIC_APP_URL;
-  const txnRef = payload.pp_TxnRefNo || "unknown";
-  const billRef = payload.pp_BillReference || payload.ppmpf_1 || "unknown";
-  const idempotencyKey = `jazzcash-${txnRef}-${billRef}`;
-
-  const result = await processPaymentCallback("jazzcash", payload, idempotencyKey);
-
-  if (result.orderNumber) {
-    const status = result.success ? "success" : "failed";
-    return NextResponse.redirect(
-      `${baseUrl}/order-success/${result.orderNumber}?payment=${status}`,
-      303
-    );
-  }
-
-  return NextResponse.redirect(`${baseUrl}/track-order?payment=failed`, 303);
+  return NextResponse.redirect(`${baseUrl}/track-order?payment=manual`, 303);
 }
 
-/** JazzCash POSTs transaction result here after checkout. */
-export async function POST(request) {
-  const formData = await request.formData();
-  return handleReturn(request, formData);
+export async function GET() {
+  return handleReturn();
 }
 
-/** Some JazzCash flows may bounce back with query params. */
-export async function GET(request) {
-  return handleReturn(request);
+export async function POST() {
+  return handleReturn();
 }

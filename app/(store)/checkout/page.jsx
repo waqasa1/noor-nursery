@@ -162,6 +162,7 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
     setFieldErrors({});
     setSubmitError("");
 
@@ -225,15 +226,19 @@ export default function CheckoutPage() {
     }
 
     clearCart();
-    router.push(data.payment?.redirectUrl || `/order-success/${data.order.orderNumber}`);
+    const token = data.order?.accessToken;
+    const fallback = token
+      ? `/order-success/${data.order.orderNumber}?t=${encodeURIComponent(token)}`
+      : "/track-order";
+    router.push(data.payment?.redirectUrl || fallback);
     router.refresh();
   };
 
   const displayItems = isMounted ? items : [];
-  const easypaisaMethod = paymentMethods.find((m) => m.id === "easypaisa");
-  const easypaisaAccount = {
-    accountTitle: easypaisaMethod?.accountTitle || "",
-    accountNumber: easypaisaMethod?.accountNumber || "",
+  const jazzcashMethod = paymentMethods.find((m) => m.id === "jazzcash");
+  const jazzcashAccount = {
+    accountTitle: jazzcashMethod?.accountTitle || "",
+    accountNumber: jazzcashMethod?.accountNumber || "",
   };
 
   if (isMounted && displayItems.length === 0) {
@@ -367,17 +372,17 @@ export default function CheckoutPage() {
                   Pay the courier in cash when your plants arrive. We may call or WhatsApp to confirm before dispatch.
                 </p>
               )}
-              {form.paymentMethod === "easypaisa" && (
+              {form.paymentMethod === "jazzcash" && (
                 <div className="mt-4 rounded-2xl border border-secondary/40 bg-surface-low p-4 sm:p-5">
                   <p className="text-sm font-bold text-foreground">Send money first — we ship after verifying it</p>
                   <div className="mt-3 space-y-2 rounded-xl border bg-card p-4 text-sm">
                     <div className="flex justify-between gap-4">
                       <span className="text-muted-foreground">Account Title</span>
-                      <span className="font-semibold text-foreground">{easypaisaAccount.accountTitle}</span>
+                      <span className="font-semibold text-foreground">{jazzcashAccount.accountTitle}</span>
                     </div>
                     <div className="flex justify-between gap-4">
-                      <span className="text-muted-foreground">EasyPaisa Number</span>
-                      <span className="font-mono font-semibold text-foreground">{easypaisaAccount.accountNumber}</span>
+                      <span className="text-muted-foreground">JazzCash Number</span>
+                      <span className="font-mono font-semibold text-foreground">{jazzcashAccount.accountNumber}</span>
                     </div>
                     <div className="flex justify-between gap-4 border-t pt-2">
                       <span className="text-muted-foreground">Amount to send</span>
@@ -386,16 +391,21 @@ export default function CheckoutPage() {
                   </div>
                   <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-xs leading-relaxed text-muted-foreground">
                     <li>Place your order below — nothing is charged on this page.</li>
-                    <li>Open your EasyPaisa app → <strong className="text-foreground">Send Money</strong> → send the exact amount above to the number shown.</li>
-                    <li>Copy the <strong className="text-foreground">TrxID</strong> from the confirmation SMS and paste it on the order confirmation page.</li>
-                    <li>We check the transfer in our own EasyPaisa account, mark your order <strong className="text-foreground">Payment received</strong> and ship it.</li>
+                    <li>
+                      Open JazzCash (app or <strong className="text-foreground">*786#</strong>) →{" "}
+                      <strong className="text-foreground">Send Money</strong> → send the exact amount above to the
+                      number shown.
+                    </li>
+                    <li>
+                      Copy the <strong className="text-foreground">TID / TrxID</strong> from the confirmation SMS and
+                      paste it on the order confirmation page.
+                    </li>
+                    <li>
+                      We check the transfer in our JazzCash account, mark your order{" "}
+                      <strong className="text-foreground">Payment received</strong> and ship it.
+                    </li>
                   </ol>
                 </div>
-              )}
-              {form.paymentMethod === "jazzcash" && (
-                <p className="mt-4 rounded-xl bg-surface-low p-4 text-sm text-muted-foreground">
-                  You will be redirected to JazzCash to complete payment securely. After paying, you will return here and we will confirm your order automatically.
-                </p>
               )}
               <FieldError message={fieldErrors.paymentMethod} />
             </section>
@@ -499,15 +509,13 @@ export default function CheckoutPage() {
                   type="submit"
                   disabled={submitting || !cartValid}
                   aria-live="polite"
-                  className="mt-6 w-full rounded-full bg-primary py-4 font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-70"
+                  className="mt-6 w-full rounded-full bg-primary py-4 font-bold text-primary-foreground transition hover:bg-forest disabled:pointer-events-none disabled:opacity-70"
                 >
                   {submitting
                     ? "Placing order…"
                     : form.paymentMethod === "cod"
                       ? "Place COD Order"
-                      : form.paymentMethod === "jazzcash"
-                        ? "Pay with JazzCash"
-                        : "Place Order & Get EasyPaisa Details"}
+                      : "Place Order & Get JazzCash Details"}
                 </button>
               </div>
             </div>

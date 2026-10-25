@@ -5,8 +5,25 @@ import { useParams } from "next/navigation";
 import { AdminOrderDetailSkeleton } from "@/components/admin/AdminSkeleton";
 import { formatPKR } from "@/lib/utils/currency";
 
-const ORDER_STATUSES = ["pending", "awaiting_payment", "payment_review", "paid", "processing", "packed", "shipped", "delivered", "cancelled"];
-const PAYMENT_STATUSES = ["unpaid", "pending", "paid", "failed", "refunded"];
+const ORDER_STATUSES = [
+  { value: "pending", label: "Pending" },
+  { value: "awaiting_payment", label: "Awaiting payment" },
+  { value: "payment_review", label: "Payment review" },
+  { value: "paid", label: "Paid (ready to process)" },
+  { value: "processing", label: "Processing" },
+  { value: "packed", label: "Packed" },
+  { value: "shipped", label: "Shipped" },
+  { value: "delivered", label: "Delivered" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+const PAYMENT_STATUSES = [
+  { value: "unpaid", label: "Unpaid" },
+  { value: "pending", label: "Pending" },
+  { value: "paid", label: "Paid" },
+  { value: "failed", label: "Failed" },
+  { value: "refunded", label: "Refunded" },
+];
 
 export default function AdminOrderDetailPage() {
   const params = useParams();
@@ -70,14 +87,48 @@ export default function AdminOrderDetailPage() {
         </div>
         <div className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Update Status</h2>
-          <div className="mt-3 space-y-3">
-            <select value={updates.orderStatus} onChange={(e) => setUpdates({ ...updates, orderStatus: e.target.value })} className="w-full rounded-xl border px-3 py-2 text-sm">
-              {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <select value={updates.paymentStatus} onChange={(e) => setUpdates({ ...updates, paymentStatus: e.target.value })} className="w-full rounded-xl border px-3 py-2 text-sm">
-              {PAYMENT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <textarea placeholder="Internal note" value={updates.internalNote} onChange={(e) => setUpdates({ ...updates, internalNote: e.target.value })} className="w-full rounded-xl border px-3 py-2 text-sm" rows={3} />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Order status tracks fulfillment. Payment status tracks whether money was received.
+          </p>
+          <div className="mt-4 space-y-3">
+            <label className="block text-sm font-medium text-foreground">
+              Order status
+              <select
+                value={updates.orderStatus}
+                onChange={(e) => setUpdates({ ...updates, orderStatus: e.target.value })}
+                className="mt-1.5 w-full rounded-xl border px-3 py-2 text-sm font-normal"
+              >
+                {ORDER_STATUSES.map((s) => (
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-sm font-medium text-foreground">
+              Payment status
+              <select
+                value={updates.paymentStatus}
+                onChange={(e) => setUpdates({ ...updates, paymentStatus: e.target.value })}
+                className="mt-1.5 w-full rounded-xl border px-3 py-2 text-sm font-normal"
+              >
+                {PAYMENT_STATUSES.map((s) => (
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-sm font-medium text-foreground">
+              Internal note
+              <textarea
+                placeholder="Staff-only notes…"
+                value={updates.internalNote}
+                onChange={(e) => setUpdates({ ...updates, internalNote: e.target.value })}
+                className="mt-1.5 w-full rounded-xl border px-3 py-2 text-sm font-normal"
+                rows={3}
+              />
+            </label>
             <button type="button" onClick={save} className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">Save</button>
             <button
               type="button"
@@ -124,16 +175,16 @@ export default function AdminOrderDetailPage() {
             </span>
           </div>
 
-          {order.paymentMethod === "easypaisa" && (
+          {(order.paymentMethod === "jazzcash" || order.paymentMethod === "easypaisa") && (
             <div className="mt-4 space-y-4">
               <div className="rounded-xl border bg-surface-low p-4 text-sm">
                 <p className="font-semibold text-foreground">
-                  Verify in your own EasyPaisa app before shipping
+                  Verify in your JazzCash app before shipping
                 </p>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
                   <li>Amount expected: <span className="font-bold text-foreground">{formatPKR(order.total)}</span></li>
                   <li>
-                    TrxID submitted by customer:{" "}
+                    TID / TrxID submitted by customer:{" "}
                     <span className="font-mono font-bold text-foreground">
                       {updates.paymentReference || "— not submitted —"}
                     </span>
@@ -141,22 +192,22 @@ export default function AdminOrderDetailPage() {
                   {order.paymentGatewayResponse?.submittedAt && (
                     <li>
                       Submitted {new Date(order.paymentGatewayResponse.submittedAt).toLocaleString()}
-                      {order.paymentGatewayResponse.reusedTrxId ? " · ⚠ TrxID reused on another order" : ""}
+                      {order.paymentGatewayResponse.reusedTrxId ? " · ⚠ TID reused on another order" : ""}
                     </li>
                   )}
                   <li>
-                    Search that TrxID / amount in your EasyPaisa transaction history — trust your own wallet,
-                    never a screenshot.
+                    Search that TID / amount in JazzCash → My Account → Transaction History — trust your own
+                    wallet, never a screenshot.
                   </li>
                 </ul>
               </div>
 
               <label className="block text-sm font-medium text-foreground">
-                Transaction ID (TrxID)
+                Transaction ID (TID / TrxID)
                 <input
                   value={updates.paymentReference}
                   onChange={(e) => setUpdates({ ...updates, paymentReference: e.target.value.toUpperCase() })}
-                  placeholder="Paste or type the TrxID you verified"
+                  placeholder="Paste or type the TID you verified"
                   className="field-input mt-2 w-full"
                 />
               </label>
@@ -166,7 +217,7 @@ export default function AdminOrderDetailPage() {
                   <button
                     type="button"
                     onClick={async () => {
-                      if (!window.confirm(`Confirm you received ${formatPKR(order.total)} in your EasyPaisa account for ${order.orderNumber}. The customer will be emailed "Payment received" and the order cannot be cancelled.`)) return;
+                      if (!window.confirm(`Confirm you received ${formatPKR(order.total)} in your JazzCash account for ${order.orderNumber}. The customer will be emailed "Payment received" and the order cannot be cancelled.`)) return;
                       await fetch(`/api/admin/orders/${params.id}`, {
                         method: "PATCH",
                         headers: { "Content-Type": "application/json" },
@@ -183,7 +234,7 @@ export default function AdminOrderDetailPage() {
                     onClick={save}
                     className="rounded-full border px-5 py-2.5 text-sm font-bold"
                   >
-                    Save TrxID Only
+                    Save TID Only
                   </button>
                 </div>
               ) : (
@@ -194,7 +245,7 @@ export default function AdminOrderDetailPage() {
             </div>
           )}
 
-          {order.paymentMethod !== "easypaisa" && (
+          {order.paymentMethod !== "jazzcash" && order.paymentMethod !== "easypaisa" && (
             <p className="mt-3 text-sm text-muted-foreground">
               Current status: <span className="font-semibold text-foreground">{order.paymentStatus}</span>
               {order.paymentReference ? ` · reference ${order.paymentReference}` : ""}

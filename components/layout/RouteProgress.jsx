@@ -29,7 +29,12 @@ export function RouteProgress() {
   }, []);
 
   const clearPending = useCallback(() => {
-    pendingElRef.current?.classList.remove("is-nav-pending");
+    const el = pendingElRef.current;
+    if (el) {
+      el.classList.remove("is-nav-pending");
+      el.removeAttribute("aria-busy");
+      el.removeAttribute("aria-disabled");
+    }
     pendingElRef.current = null;
     document.documentElement.removeAttribute("data-navigating");
   }, []);
@@ -56,6 +61,8 @@ export function RouteProgress() {
 
   const start = useCallback(
     (clickedAnchor) => {
+      if (runningRef.current) return;
+
       clearTimers();
       clearPending();
       runningRef.current = true;
@@ -68,6 +75,10 @@ export function RouteProgress() {
           clickedAnchor.closest("article") ||
           clickedAnchor;
         target.classList.add("is-nav-pending");
+        target.setAttribute("aria-busy", "true");
+        if (target.tagName === "A" || target.tagName === "BUTTON") {
+          target.setAttribute("aria-disabled", "true");
+        }
         pendingElRef.current = target;
       }
 
@@ -108,13 +119,23 @@ export function RouteProgress() {
       if (url.origin !== window.location.origin) return;
       if (url.pathname === window.location.pathname && url.search === window.location.search) return;
 
+      // Block repeat clicks while the breathe/loading cue is active
+      if (runningRef.current) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
       start(anchor);
     };
 
-    const onPopState = () => start(null);
+    const onPopState = () => {
+      if (!runningRef.current) start(null);
+    };
 
     /** For router.push() flows (product cards, search) that never hit an <a> click. */
     const onProgrammatic = (event) => {
+      if (runningRef.current) return;
       const el = event.detail?.element ?? null;
       start(el);
     };

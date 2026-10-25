@@ -7,7 +7,7 @@ import { ShoppingCart } from "lucide-react";
 import { formatPKR } from "@/lib/utils/currency";
 import { useCartStore } from "@/store/cart";
 import { SizeSelect, defaultSizeId } from "@/components/catalog/SizeSelect";
-import { startRouteProgress } from "@/lib/navigation/route-progress";
+import { isRouteNavigating, startRouteProgress } from "@/lib/navigation/route-progress";
 
 export function CatalogProductCard({ product, onAddToCart }) {
   const router = useRouter();
@@ -26,6 +26,7 @@ export function CatalogProductCard({ product, onAddToCart }) {
   const handleCardClick = (e) => {
     // whole card opens the detail page — except anything interactive
     if (e.target.closest("a, button, select, input, label, textarea")) return;
+    if (isRouteNavigating()) return;
     startRouteProgress(e.currentTarget);
     router.push(`/products/${product.slug}`);
   };

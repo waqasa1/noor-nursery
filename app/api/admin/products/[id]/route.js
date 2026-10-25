@@ -3,6 +3,7 @@ import Product from "@/models/Product";
 import { requireAdmin } from "@/lib/auth/session";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 import { revalidateCatalog } from "@/lib/cache/catalog";
+import { productUpdateSchema } from "@/lib/validation/product";
 
 export async function GET(_request, { params }) {
   try {
@@ -23,10 +24,19 @@ export async function PUT(request, { params }) {
     await connectDB();
     const { id } = await params;
     const body = await request.json();
-    const product = await Product.findByIdAndUpdate(id, body, {
-      returnDocument: "after",
-      runValidators: true,
-    });
+    const parsed = productUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return jsonError("Validation failed", 400, parsed.error.flatten().fieldErrors);
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { $set: parsed.data },
+      {
+        returnDocument: "after",
+        runValidators: true,
+      }
+    );
     if (!product) return jsonError("Product not found", 404);
     revalidateCatalog({ slug: product.slug });
     return jsonSuccess({ product });

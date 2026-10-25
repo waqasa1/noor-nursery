@@ -77,19 +77,19 @@ export default function AdminSettingsPage() {
 
         <section className="rounded-2xl border-2 border-secondary/40 bg-card p-5">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-semibold">EasyPaisa Account (checkout)</h2>
+            <h2 className="font-semibold">JazzCash Account (checkout)</h2>
             <span className="rounded-full bg-leaf/25 px-2.5 py-1 text-[11px] font-bold text-leaf-foreground">
               Active method
             </span>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            Customers pay by sending money to this account, then submit their TrxID. Leave both fields empty to
-            hide EasyPaisa and show only Cash on Delivery.
+            Customers pay by JazzCash Send Money to this number, then submit their TID / TrxID. Leave both fields
+            empty to hide JazzCash and show only Cash on Delivery. (Merchant/auto JazzCash gateway is disabled.)
           </p>
           <div className="mt-4 space-y-3">
             {[
-              { id: "accountTitle", label: "Account Title (name on the EasyPaisa account)" },
-              { id: "accountNumber", label: "EasyPaisa Number" },
+              { id: "accountTitle", label: "Account Title (name on the JazzCash account)" },
+              { id: "accountNumber", label: "JazzCash Number" },
             ].map((f) => (
               <div key={f.id}>
                 <label className="block text-xs font-medium">{f.label}</label>

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { verifyPassword, normalizeEmail } from "@/lib/auth/password";
-import { rateLimit, getClientIp } from "@/lib/auth/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { jsonSuccessWithSession, jsonError, handleApiError } from "@/lib/api-response";
 
 const loginSchema = z.object({
@@ -13,7 +13,7 @@ const loginSchema = z.object({
 export async function POST(request) {
   try {
     const ip = getClientIp(request);
-    const limit = rateLimit(`login:${ip}`, { maxAttempts: 10 });
+    const limit = await rateLimitAsync(`login:${ip}`, { maxAttempts: 10 });
     if (!limit.allowed) {
       return jsonError("Too many login attempts. Please try again later.", 429);
     }

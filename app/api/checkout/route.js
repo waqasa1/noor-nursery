@@ -1,14 +1,14 @@
 import { getSession } from "@/lib/auth/session";
 import { createOrder } from "@/lib/orders/create";
 import { getAvailablePaymentMethodsAsync } from "@/lib/payments";
-import { rateLimit, getClientIp } from "@/lib/auth/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 import { checkoutSchema, mapCheckoutFieldErrors } from "@/lib/validation/checkout";
 
 export async function POST(request) {
   try {
     const ip = getClientIp(request);
-    const limit = rateLimit(`checkout:${ip}`, { maxAttempts: 10 });
+    const limit = await rateLimitAsync(`checkout:${ip}`, { maxAttempts: 10 });
     if (!limit.allowed) {
       return jsonError("Too many checkout attempts. Please wait.", 429);
     }

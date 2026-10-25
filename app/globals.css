@@ -329,6 +329,8 @@ html[data-navigating] [data-nav-brand] .nav-brand-title {
 html[data-navigating] a.is-nav-pending,
 html[data-navigating] .is-nav-pending {
   animation: nav-card-breathe 1.05s ease-in-out infinite;
+  pointer-events: none;
+  cursor: wait;
 }
 
 html[data-navigating] article.is-nav-pending,
@@ -336,4 +338,12 @@ html[data-navigating] [data-nav-pulse].is-nav-pending {
   outline: 2px solid color-mix(in oklab, var(--secondary) 55%, transparent);
   outline-offset: 2px;
   border-radius: 1rem;
+  pointer-events: none;
+  cursor: wait;
+}
+
+/* Soft-disable brand / header links while a nav is in flight */
+html[data-navigating] [data-nav-brand] {
+  pointer-events: none;
+  cursor: wait;
 }

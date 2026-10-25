@@ -120,7 +120,7 @@ export function Footer() {
             <ShieldCheck className="h-4 w-4 text-leaf" />
             Safe Payments Across Pakistan:
             <span className="font-normal text-primary-foreground/70">
-              Cash on Delivery (COD) • EasyPaisa
+              Cash on Delivery (COD) • JazzCash
             </span>
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-forest pt-4 text-xs text-primary-foreground/60">

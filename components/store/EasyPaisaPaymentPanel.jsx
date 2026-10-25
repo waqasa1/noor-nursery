@@ -36,8 +36,14 @@ function CopyRow({ label, value, mono = false }) {
   );
 }
 
-export function EasyPaisaPaymentPanel({
+/** Manual JazzCash Send Money + TID panel (legacy export name kept for imports). */
+export function EasyPaisaPaymentPanel(props) {
+  return <JazzCashPaymentPanel {...props} />;
+}
+
+export function JazzCashPaymentPanel({
   orderNumber,
+  accessToken,
   amount,
   accountTitle,
   accountNumber,
@@ -56,10 +62,11 @@ export function EasyPaisaPaymentPanel({
 
   const submit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
     setError("");
     setSuccess("");
     if (!trxId.trim()) {
-      setError("Paste the TrxID from your EasyPaisa confirmation SMS.");
+      setError("Paste the TID / TrxID from your JazzCash confirmation SMS.");
       return;
     }
     setSubmitting(true);
@@ -67,7 +74,7 @@ export function EasyPaisaPaymentPanel({
       const res = await fetch("/api/orders/payment-proof", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderNumber, trxId: trxId.trim() }),
+        body: JSON.stringify({ orderNumber, accessToken, trxId: trxId.trim() }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -87,9 +94,9 @@ export function EasyPaisaPaymentPanel({
     <div className="mt-8 rounded-2xl border-2 border-secondary/40 bg-surface-low p-5 sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-display text-lg font-bold text-foreground">EasyPaisa Payment</h3>
+          <h3 className="font-display text-lg font-bold text-foreground">JazzCash Payment</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            Send the exact amount, then paste your TrxID below. Your order ships once we verify the transfer.
+            Send the exact amount via JazzCash Send Money, then paste your TID below. We ship once we verify the transfer.
           </p>
         </div>
         <span
@@ -108,7 +115,7 @@ export function EasyPaisaPaymentPanel({
       <div className="mt-4 space-y-2.5 rounded-xl border bg-card p-4">
         <CopyRow label="Amount to send" value={`PKR ${Number(amount || 0).toLocaleString()}`} />
         <CopyRow label="Account Title" value={accountTitle || "—"} />
-        <CopyRow label="EasyPaisa Number" value={accountNumber || "—"} mono />
+        <CopyRow label="JazzCash Number" value={accountNumber || "—"} mono />
         <div className="flex items-center justify-between gap-3 border-t pt-2.5">
           <span className="text-sm text-muted-foreground">Order</span>
           <span className="font-bold text-primary">{orderNumber}</span>
@@ -116,10 +123,19 @@ export function EasyPaisaPaymentPanel({
       </div>
 
       <ol className="mt-4 list-decimal space-y-1.5 pl-5 text-xs leading-relaxed text-muted-foreground">
-        <li>Open your EasyPaisa app → <strong className="text-foreground">Send Money</strong> → Wallet / EasyPaisa number.</li>
-        <li>Send <strong className="text-foreground">PKR {Number(amount || 0).toLocaleString()}</strong> exactly — no more, no less.</li>
-        <li>Open the confirmation SMS and copy the <strong className="text-foreground">TrxID</strong>.</li>
-        <li>Paste it here. We check it in our own EasyPaisa account and mark your order paid.</li>
+        <li>
+          Open JazzCash (app or <strong className="text-foreground">*786#</strong>) →{" "}
+          <strong className="text-foreground">Send Money</strong> → JazzCash / mobile wallet.
+        </li>
+        <li>
+          Send <strong className="text-foreground">PKR {Number(amount || 0).toLocaleString()}</strong> exactly — no
+          more, no less.
+        </li>
+        <li>
+          Copy the <strong className="text-foreground">TID / TrxID</strong> from the confirmation SMS (also under My
+          Account → Transaction History).
+        </li>
+        <li>Paste it here. We check it in our JazzCash account and mark your order paid.</li>
       </ol>
 
       {confirmed ? (
@@ -134,29 +150,29 @@ export function EasyPaisaPaymentPanel({
         <form onSubmit={submit} className="mt-4 space-y-3">
           {submitted && (
             <p className="rounded-xl bg-gold/15 p-3 text-xs text-gold-foreground">
-              Submitted TrxID: <span className="font-mono font-bold">{paymentReference}</span> — waiting for
+              Submitted TID: <span className="font-mono font-bold">{paymentReference}</span> — waiting for
               verification. You can correct it below if you copied it wrong.
             </p>
           )}
           <label htmlFor="trxId" className="block text-sm font-medium text-foreground">
-            EasyPaisa Transaction ID (TrxID)
+            JazzCash Transaction ID (TID / TrxID)
           </label>
           <div className="flex flex-col gap-2 sm:flex-row">
             <input
               id="trxId"
               value={trxId}
               onChange={(e) => setTrxId(e.target.value.toUpperCase())}
-              placeholder="e.g. 2609151234567890"
+              placeholder="e.g. 12-digit TID from SMS"
               autoComplete="off"
               className="flex-1 rounded-xl border-2 border-foreground/15 bg-card px-4 py-3 font-mono text-sm uppercase outline-none transition focus:border-secondary"
             />
             <button
               type="submit"
               disabled={submitting}
-              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-70"
+              className="flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition hover:bg-forest disabled:pointer-events-none disabled:opacity-70"
             >
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              {submitting ? "Submitting…" : "Submit TrxID"}
+              {submitting ? "Submitting…" : "Submit TID"}
             </button>
           </div>
           {error && (
@@ -172,7 +188,9 @@ export function EasyPaisaPaymentPanel({
           <p className="text-[11px] text-muted-foreground">
             Don&apos;t have the SMS yet?{" "}
             <a
-              href={buildWhatsAppUrl(`Hi Noor Nursery! I just submitted the EasyPaisa TrxID for order ${orderNumber}.`)}
+              href={buildWhatsAppUrl(
+                `Hi Noor Nursery! I just submitted the JazzCash TID for order ${orderNumber}.`
+              )}
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold text-secondary hover:underline"

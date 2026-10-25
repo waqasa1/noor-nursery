@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { hashPassword, hashResetToken, validatePassword } from "@/lib/auth/password";
 import { destroySession } from "@/lib/auth/session";
-import { rateLimit, getClientIp } from "@/lib/auth/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { sendPasswordChangedEmail } from "@/lib/email";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
@@ -19,7 +19,7 @@ const schema = z.object({
 export async function POST(request) {
   try {
     const ip = getClientIp(request);
-    const limit = rateLimit(`reset:${ip}`, { maxAttempts: 5 });
+    const limit = await rateLimitAsync(`reset:${ip}`, { maxAttempts: 5 });
     if (!limit.allowed) {
       return jsonError("Too many attempts. Please try again later.", 429);
     }

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import Order from "@/models/Order";
-import { rateLimit, getClientIp } from "@/lib/auth/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
 const schema = z.object({
@@ -15,7 +15,7 @@ const schema = z.object({
 export async function POST(request) {
   try {
     const ip = getClientIp(request);
-    const limit = rateLimit(`track:${ip}`, { maxAttempts: 20, windowMs: 15 * 60 * 1000 });
+    const limit = await rateLimitAsync(`track:${ip}`, { maxAttempts: 20, windowMs: 15 * 60 * 1000 });
     if (!limit.allowed) {
       return jsonError("Too many lookup attempts. Please wait.", 429);
     }
@@ -31,9 +31,11 @@ export async function POST(request) {
     if (parsed.data.email) query["customer.email"] = parsed.data.email.toLowerCase();
     if (parsed.data.phone) query["customer.phone"] = parsed.data.phone;
 
-    const order = await Order.findOne(query).select(
-      "orderNumber orderStatus paymentStatus paymentMethod total createdAt items customer shippingAddress"
-    ).lean();
+    const order = await Order.findOne(query)
+      .select(
+        "orderNumber accessToken orderStatus paymentStatus paymentMethod total createdAt items customer shippingAddress"
+      )
+      .lean();
 
     if (!order) {
       return jsonError("Order not found. Check your order number and contact details.", 404);

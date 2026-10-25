@@ -12,6 +12,7 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     const res = await fetch("/api/auth/forgot-password", {
       method: "POST",
@@ -76,7 +77,7 @@ export default function ForgotPasswordPage() {
               <button 
                 type="submit" 
                 disabled={loading} 
-                className="mt-6 w-full rounded-full bg-primary py-3.5 font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-70"
+                className="mt-6 w-full rounded-full bg-primary py-3.5 font-bold text-primary-foreground transition hover:bg-forest disabled:pointer-events-none disabled:opacity-70"
               >
                 {loading ? "Sending link..." : "Send Reset Link"}
               </button>

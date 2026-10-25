@@ -16,6 +16,7 @@ function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     setError("");
     const res = await fetch("/api/auth/login", {
@@ -67,7 +68,7 @@ function LoginForm() {
       <button 
         type="submit" 
         disabled={loading} 
-        className="mt-6 w-full rounded-full bg-primary py-3.5 font-bold text-primary-foreground transition hover:bg-forest disabled:opacity-70"
+        className="mt-6 w-full rounded-full bg-primary py-3.5 font-bold text-primary-foreground transition hover:bg-forest disabled:pointer-events-none disabled:opacity-70"
       >
         {loading ? "Signing in..." : "Sign In to Your Account"}
       </button>

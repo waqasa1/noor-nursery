@@ -39,6 +39,8 @@ const addressSnapshotSchema = new mongoose.Schema(
 const orderSchema = new mongoose.Schema(
   {
     orderNumber: { type: String, required: true, unique: true },
+    /** Secret for order-success / payment-proof links. Required on new orders; optional for legacy rows. */
+    accessToken: { type: String, index: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     customer: {
       name: { type: String, required: true },
@@ -97,5 +99,6 @@ orderSchema.index({ "customer.email": 1 });
 orderSchema.index({ "customer.phone": 1 });
 orderSchema.index({ orderStatus: 1, paymentStatus: 1 });
 orderSchema.index({ createdAt: -1 });
+orderSchema.index({ orderNumber: 1, accessToken: 1 });
 
 export default mongoose.models.Order || mongoose.model("Order", orderSchema);
