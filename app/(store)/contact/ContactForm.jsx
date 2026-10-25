@@ -16,6 +16,7 @@ export function ContactForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
     setStatus("");
     setError("");
     setSubmitting(true);
@@ -33,53 +34,64 @@ export function ContactForm() {
       return;
     }
 
-    setStatus("Thank you! We'll get back to you soon.");
+    setStatus("Thank you — we’ll reply soon.");
     setForm({ name: "", email: "", phone: "", subject: "", message: "" });
   };
 
+  const fieldClass =
+    "mt-1.5 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-secondary focus:ring-1 focus:ring-secondary";
+
   return (
-    <>
-      <h2 className="mt-8">Send a Message</h2>
-      <form onSubmit={handleSubmit} className="mt-4 max-w-xl space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <div className="grid gap-4 sm:grid-cols-2">
         {[
-          { id: "name", label: "Your Name", type: "text", required: true },
-          { id: "email", label: "Email", type: "email", required: true },
-          { id: "phone", label: "Phone (optional)", type: "tel" },
+          { id: "name", label: "Your name", type: "text", required: true, autoComplete: "name" },
+          { id: "email", label: "Email", type: "email", required: true, autoComplete: "email" },
+          { id: "phone", label: "Phone (optional)", type: "tel", autoComplete: "tel" },
           { id: "subject", label: "Subject", type: "text", required: true },
         ].map((f) => (
-          <div key={f.id}>
-            <label htmlFor={f.id} className="block text-sm font-medium">{f.label}</label>
+          <div key={f.id} className={f.id === "subject" ? "sm:col-span-2" : undefined}>
+            <label htmlFor={f.id} className="block text-sm font-semibold text-foreground">
+              {f.label}
+            </label>
             <input
               id={f.id}
               type={f.type}
               required={f.required}
+              autoComplete={f.autoComplete}
               value={form[f.id]}
               onChange={(e) => setForm({ ...form, [f.id]: e.target.value })}
-              className="mt-1 w-full rounded-xl border px-4 py-2 text-sm"
+              className={fieldClass}
             />
           </div>
         ))}
-        <div>
-          <label htmlFor="message" className="block text-sm font-medium">Message</label>
-          <textarea
-            id="message"
-            required
-            rows={5}
-            value={form.message}
-            onChange={(e) => setForm({ ...form, message: e.target.value })}
-            className="mt-1 w-full rounded-xl border px-4 py-2 text-sm"
-          />
-        </div>
-        {status && <p className="text-sm text-leaf">{status}</p>}
-        {error && <p className="text-sm text-destructive">{error}</p>}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-70"
-        >
-          {submitting ? "Sending..." : "Send Message"}
-        </button>
-      </form>
-    </>
+      </div>
+      <div>
+        <label htmlFor="message" className="block text-sm font-semibold text-foreground">
+          Message
+        </label>
+        <textarea
+          id="message"
+          required
+          rows={5}
+          value={form.message}
+          onChange={(e) => setForm({ ...form, message: e.target.value })}
+          className={`${fieldClass} resize-y`}
+        />
+      </div>
+      {status ? <p className="text-sm font-medium text-secondary">{status}</p> : null}
+      {error ? (
+        <p role="alert" className="text-sm font-medium text-destructive">
+          {error}
+        </p>
+      ) : null}
+      <button
+        type="submit"
+        disabled={submitting}
+        className="w-full rounded-full bg-primary py-3.5 text-sm font-bold text-primary-foreground transition hover:bg-forest disabled:pointer-events-none disabled:opacity-70 sm:w-auto sm:px-10"
+      >
+        {submitting ? "Sending…" : "Send message"}
+      </button>
+    </form>
   );
 }

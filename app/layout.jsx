@@ -37,20 +37,20 @@ export const metadata = {
     template: "%s | Noor Nursery",
   },
   description:
-    "Noor Nursery, the name of customer trust. Quality you can trust, service you deserve! Shop 300+ acclimatized plants with 48-hour live arrival guarantee, COD and nationwide delivery.",
+    "Noor Nursery, the name of customer trust. Quality you can trust, service you deserve! Shop 200+ acclimatized plants with 48-hour live arrival guarantee, COD, JazzCash and nationwide delivery.",
   authors: [{ name: "Noor Nursery" }],
   openGraph: {
     type: "website",
     siteName: "Noor Nursery",
     title: "Noor Nursery — Buy Live Plants Online in Pakistan",
     description:
-      "300+ pest-free, acclimatized plants shipped in shock-resistant crates to Lahore, Karachi, Islamabad & 50+ cities. Cash on Delivery available.",
+      "200+ pest-free, acclimatized plants shipped in shock-resistant crates to Lahore, Karachi, Islamabad & 50+ cities. COD and JazzCash available.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Noor Nursery — Buy Live Plants Online in Pakistan",
     description:
-      "300+ pest-free, acclimatized plants with a 48-hour live arrival guarantee and nationwide delivery.",
+      "200+ pest-free, acclimatized plants with a 48-hour live arrival guarantee and nationwide delivery.",
   },
   icons: {
     icon: [{ url: "/logo.png", type: "image/png" }],

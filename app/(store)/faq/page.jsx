@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PlantFinder } from "@/components/plants/PlantFinder";
 import { FAQS } from "@/components/nursery/data";
 import { IMAGES } from "@/components/nursery/data";
@@ -6,9 +7,9 @@ import { JsonLdScript } from "@/lib/seo/JsonLdScript";
 import { Leaf } from "lucide-react";
 
 export const metadata = {
-  title: "Plant Care Guide — Noor Nursery",
+  title: "Plant Finder & FAQ — Noor Nursery",
   description:
-    "Find the right plant for your space with our interactive plant finder. Care tips, FAQs, and expert guidance for Pakistani homes and gardens.",
+    "Find the right plant for your space, then browse FAQs on delivery, JazzCash, COD, and plant care for Pakistani homes.",
 };
 
 export default function PlantCareGuidePage() {
@@ -26,11 +27,34 @@ export default function PlantCareGuidePage() {
             <Leaf className="h-7 w-7" />
           </div>
           <h1 className="font-display text-4xl font-bold tracking-tight text-primary-foreground sm:text-5xl">
-            Plant Care Guide
+            Plant Finder &amp; FAQ
           </h1>
-          <p className="text-urdu mt-3 text-xl text-primary-foreground/90" dir="rtl" lang="ur">
-            پودوں کی دیکھ بھال گائیڈ
+          <p className="mt-3 max-w-xl text-sm text-primary-foreground/85">
+            Two tools on one page: a quick plant finder quiz, then answers about shipping, payments, and care.
           </p>
+          <p className="text-urdu mt-2 text-lg text-primary-foreground/90" dir="rtl" lang="ur">
+            پودا تلاش کریں اور اکثر پوچھے گئے سوالات
+          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm">
+            <a
+              href="#plant-finder"
+              className="rounded-full bg-leaf px-4 py-2 font-semibold text-leaf-foreground transition hover:bg-gold hover:text-gold-foreground"
+            >
+              Plant Finder
+            </a>
+            <a
+              href="#faq"
+              className="rounded-full border border-primary-foreground/40 bg-primary-foreground/10 px-4 py-2 font-semibold text-primary-foreground transition hover:bg-primary-foreground/20"
+            >
+              FAQ
+            </a>
+            <Link
+              href="/track-order"
+              className="rounded-full border border-primary-foreground/40 bg-primary-foreground/10 px-4 py-2 font-semibold text-primary-foreground transition hover:bg-primary-foreground/20"
+            >
+              Order status
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -56,7 +80,7 @@ export default function PlantCareGuidePage() {
           ))}
         </div>
       </section>
-  
+
     </>
   );
 }

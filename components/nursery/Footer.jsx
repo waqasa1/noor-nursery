@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Camera, Globe, MessageCircle, PlayCircle, ShieldCheck, Facebook, Instagram, Phone } from "lucide-react";
-import { IMAGES } from "./data";
+import { MessageCircle, ShieldCheck, Facebook, Instagram, Phone } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
 
@@ -13,7 +12,7 @@ export function Footer() {
         <div>
           <div className="flex items-center gap-3">
             <img
-              src={IMAGES.logo}
+              src="/logo.png"
               alt=""
               className="h-12 w-12 rounded-full object-cover ring-2 ring-leaf"
             />
@@ -80,10 +79,9 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/80">
             {[
               { href: "/shipping-policy", label: "48-Hour Live Plant Guarantee" },
-              { href: "/shipping-policy", label: "Express Courier Packaging" },
               { href: "/shipping-policy", label: "Delivery Information" },
-              { href: "/faq", label: "Plant Care Guide" },
-              { href: "/track-order", label: "Track Your Order" },
+              { href: "/faq#plant-finder", label: "Plant Finder" },
+              { href: "/track-order", label: "Order status" },
             ].map((l) => (
               <li key={l.label}>
                 <Link href={l.href} className="hover:text-leaf">
@@ -102,7 +100,8 @@ export function Footer() {
             {[
               { href: "/about", label: "About Us" },
               { href: "/contact", label: "Contact" },
-              { href: "/faq", label: "FAQ" },
+              { href: "/faq#faq", label: "FAQ" },
+              { href: "/privacy-policy", label: "Privacy Policy" },
             ].map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className="hover:text-leaf">

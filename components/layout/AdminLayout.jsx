@@ -95,10 +95,12 @@ export function AdminLayout({ children }) {
 
   const logout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
     } catch {
       // still leave the admin area even if the request failed
     }
+    window.dispatchEvent(new Event("auth-changed"));
+    router.refresh();
     router.push("/login?redirect=/admin");
   };
 

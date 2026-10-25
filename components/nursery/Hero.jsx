@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   BadgeCheck,
@@ -11,16 +12,21 @@ import {
 } from "lucide-react";
 import { CATEGORIES, IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
+import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { buildPlantDoctorWhatsAppUrl } from "@/lib/whatsapp";
 
 export function Hero() {
   return (
     <section className="relative min-h-[88vh] overflow-hidden">
       <div className="absolute inset-0">
-        <img
+        <Image
           src={IMAGES.hero}
           alt="A sunlit terrace filled with lush indoor plants including palms, monstera, and hanging greenery"
-          className="animate-hero-zoom h-full w-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          quality={85}
+          className="animate-hero-zoom object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/92 via-primary/75 to-primary/35" />
         <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent" />
@@ -46,23 +52,23 @@ export function Hero() {
         </p>
 
         <p className="text-urdu animate-fade-up-delay-2 mt-3 text-lg text-primary-foreground/75" dir="rtl" lang="ur">
-          پاکستان کی سب سے بڑی آن لائن نرسری
+          ۲۰۱۲ سے پاکستانی گھروں اور باغات کے لیے قابلِ اعتماد آن لائن نرسری
         </p>
 
         <div className="animate-fade-up-delay-3 mt-8 flex flex-wrap gap-3">
-          <a
+          <Link
             href="/shop"
             className="inline-flex items-center gap-2 rounded-full bg-leaf px-7 py-3.5 font-semibold text-leaf-foreground shadow-lg transition hover:bg-gold hover:text-gold-foreground"
           >
             <Sprout className="h-5 w-5" />
             Explore Our Collection
-          </a>
-          <a
-            href="/shop"
+          </Link>
+          <Link
+            href="/faq#plant-finder"
             className="inline-flex items-center gap-2 rounded-full border-2 border-primary-foreground/30 bg-primary-foreground/10 px-7 py-3.5 font-semibold text-primary-foreground backdrop-blur-sm transition hover:bg-primary-foreground/20"
           >
             Discover Your Perfect Plant
-          </a>
+          </Link>
           <a
             href={buildPlantDoctorWhatsAppUrl()}
             target="_blank"
@@ -76,7 +82,7 @@ export function Hero() {
 
         <div className="animate-fade-up-delay-3 mt-10 grid max-w-lg grid-cols-3 gap-3">
           {[
-            { value: "300+", label: "Live Species" },
+            { value: CATALOG_SPECIES_COUNT, label: "Plant varieties" },
             { value: "48-Hr", label: "Arrival Guarantee" },
             { value: "2012", label: "Trusted Since" },
           ].map((s) => (
@@ -116,9 +122,9 @@ export function Hero() {
             },
             {
               icon: Banknote,
-              title: "Cash on Delivery",
-              urdu: "کیش آن ڈیلیوری سہولت",
-              sub: "Pay after checking parcel",
+              title: "COD & JazzCash",
+              urdu: "کیش آن ڈیلیوری اور جاز کیش",
+              sub: "Pay courier or send via JazzCash",
             },
           ].map((f) => (
             <div key={f.title} className="flex items-start gap-3">

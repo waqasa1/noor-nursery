@@ -16,13 +16,12 @@ export function TopBar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 whitespace-nowrap px-4 py-2 text-[11px] sm:text-xs lg:text-sm">
         <p className="flex min-w-0 items-center gap-2">
           <Truck className="h-4 w-4 shrink-0 text-leaf" />
-          <span className="truncate sm:hidden">Same-day delivery · Free Shipping over PKR 2,500</span>
+          <span className="truncate sm:hidden">Same-day in Lahore · Free shipping over PKR 2,500</span>
           <span className="hidden truncate sm:inline">
-            Same-day &amp; Express delivery across Lahore, Karachi, Islamabad &amp; 50+ cities across
-            Pakistan
+            Same-day in Lahore · Express delivery to Karachi, Islamabad &amp; 50+ cities
           </span>
           <span className="hidden font-semibold text-gold md:inline">
-            &nbsp;| Free Shipping over PKR 2,500
+            &nbsp;| Free shipping over PKR 2,500
           </span>
         </p>
         <div className="flex shrink-0 items-center gap-3">
@@ -200,23 +199,49 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     let alive = true;
-    fetch("/api/auth/me")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (alive && data?.success && data.user) setUser(data.user);
-      })
-      .catch(() => {});
+    const loadUser = () => {
+      fetch("/api/auth/me", { credentials: "same-origin" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (!alive) return;
+          if (data?.success && data.user) setUser(data.user);
+          else setUser(null);
+        })
+        .catch(() => {
+          if (alive) setUser(null);
+        })
+        .finally(() => {
+          if (alive) setAuthReady(true);
+        });
+    };
+    loadUser();
+    const onAuth = () => loadUser();
+    window.addEventListener("auth-changed", onAuth);
+    window.addEventListener("focus", onAuth);
     return () => {
       alive = false;
+      window.removeEventListener("auth-changed", onAuth);
+      window.removeEventListener("focus", onAuth);
     };
-  }, []);
+  }, [pathname]);
 
   const firstName = user?.name ? user.name.trim().split(/\s+/)[0] : "";
-  const accountHref = user ? (user.role === "admin" ? "/admin" : "/account") : "/login";
+  // While auth is loading, send users to /account (middleware redirects guests to login)
+  // so logged-in shoppers are not bounced to /login before /api/auth/me returns.
+  const accountHref = user
+    ? user.role === "admin"
+      ? "/admin"
+      : "/account"
+    : authReady
+      ? "/login"
+      : "/account";
+  const accountLabel = !authReady ? "Account" : firstName || "Sign in";
 
   const plantLinks = [
     { href: "/shop?category=indoor-plants", label: "Indoor Plants" },
@@ -259,8 +284,8 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
       <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-4 sm:px-4 sm:py-3">
         <Link href="/" data-nav-brand className="flex shrink-0 items-center gap-2 sm:gap-3">
           <img
-            src={IMAGES.logo}
-            alt="Noor Nursery Official Insignia"
+            src="/logo.png"
+            alt="Noor Nursery"
             className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-leaf sm:h-12 sm:w-12"
           />
           <div>
@@ -290,11 +315,11 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
           <Link
             href={accountHref}
             className="hidden max-w-[12rem] items-center gap-2 whitespace-nowrap rounded-full border border-primary bg-card px-3.5 py-2 text-sm font-semibold text-primary transition hover:bg-surface-low md:flex"
-            aria-label={firstName ? `Account — ${user.name}` : "Account"}
-            title={user?.name || "Account"}
+            aria-label={firstName ? `Account — ${user.name}` : "Sign in"}
+            title={user?.name || "Sign in"}
           >
             <User className="h-4 w-4 shrink-0" />
-            <span className="truncate">{firstName || "Account"}</span>
+            <span className="truncate">{accountLabel}</span>
           </Link>
           <Link
             href="/cart"
@@ -369,10 +394,8 @@ export function FlashDeal() {
     <div className="bg-gold text-gold-foreground">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2.5 text-center text-sm">
         <Zap className="h-4 w-4" />
-        <span className="font-bold">Special Spring Flash Deal:</span>
-        <span>
-          Flat 20% OFF on all Fruit Trees + Free Potting Mix on orders over PKR 2,999!
-        </span>
+        <span className="font-bold">Limited offer:</span>
+        <span>Flat 20% off your order — free shipping over PKR 2,500</span>
         <span className="rounded-md bg-primary px-2 py-0.5 font-mono text-xs font-bold text-gold">
           Code: NOOR20
         </span>

@@ -19,7 +19,9 @@ export default function AccountPage() {
   }, [router]);
 
   const logout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
+    window.dispatchEvent(new Event("auth-changed"));
+    router.refresh();
     router.push("/");
   };
 

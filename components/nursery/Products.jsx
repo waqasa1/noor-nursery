@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Flower2, MessageCircle, ShoppingCart, Sun } from "lucide-react";
 import { formatPKR } from "@/lib/utils/currency";
+import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { buildBulkOrderWhatsAppUrl, buildProductWhatsAppUrl } from "@/lib/whatsapp";
 import { SizeSelect, defaultSizeId } from "@/components/catalog/SizeSelect";
 
@@ -160,7 +161,7 @@ export function Products({ products = [], onAdd }) {
       <div className="mx-auto max-w-7xl px-4">
         <div className="text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-secondary">
-            Catalog Inventory · 300+ Acclimatized Live Plants Available
+            Catalog · {CATALOG_SPECIES_COUNT} acclimatized live plants
           </p>
           <h2 className="mt-2 text-3xl font-bold tracking-tight text-primary sm:text-4xl">
             Featured Nursery Plants &amp; Size Variants

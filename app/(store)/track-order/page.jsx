@@ -6,8 +6,12 @@ import { IMAGES } from "@/components/nursery/data";
 import { Leaf, MessageCircle, Package, Search } from "lucide-react";
 import { buildOrderWhatsAppUrl } from "@/lib/whatsapp";
 
+function statusLabel(status) {
+  return String(status || "").replace(/_/g, " ");
+}
+
 function TrackOrderContent() {
-  const [form, setForm] = useState({ orderNumber: "", email: "" });
+  const [form, setForm] = useState({ orderNumber: "", email: "", phone: "" });
   const [order, setOrder] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,13 +26,21 @@ function TrackOrderContent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
+    if (!form.email.trim() && !form.phone.trim()) {
+      setError("Enter the email or phone number used at checkout.");
+      return;
+    }
     setLoading(true);
     setError("");
     setOrder(null);
     const res = await fetch("/api/orders/track", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        orderNumber: form.orderNumber,
+        email: form.email.trim() || undefined,
+        phone: form.phone.trim() || undefined,
+      }),
     });
     const data = await res.json();
     setLoading(false);
@@ -41,7 +53,6 @@ function TrackOrderContent() {
 
   return (
     <div className="flex min-h-[calc(100vh-140px)] flex-col lg:flex-row">
-        {/* Left Side: Image */}
         <div className="relative hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-between lg:bg-primary lg:p-12">
           <div className="absolute inset-0 z-0 opacity-40">
             <img src={IMAGES.indoor} alt="Plants background" className="h-full w-full object-cover" />
@@ -55,57 +66,79 @@ function TrackOrderContent() {
           </div>
           <div className="relative z-10 mt-auto max-w-md">
             <h2 className="font-display text-4xl font-bold leading-tight text-primary-foreground">
-              Where are my plants?
+              Check your order status
             </h2>
             <p className="mt-4 text-lg text-primary-foreground/80">
-              Track your shipment in real-time. We ensure safe, shock-proof delivery across Pakistan.
+              See where your order is in our process — from payment and packing through to dispatch.
+              Live courier GPS maps are not available yet; for parcel updates after shipping, message us on WhatsApp.
             </p>
           </div>
         </div>
 
-        {/* Right Side: Form */}
         <div className="flex flex-1 items-center justify-center p-6 lg:w-1/2 lg:p-12">
           <div className="w-full max-w-md">
             <div className="mb-10 text-center lg:text-left">
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary lg:mx-0">
                 <Search className="h-8 w-8" />
               </div>
-              <h1 className="font-display text-3xl font-bold tracking-tight text-primary lg:text-4xl">Track Your Order</h1>
-              <p className="text-urdu mt-2 text-lg text-secondary" dir="rtl" lang="ur">اپنا آرڈر ٹریک کریں</p>
-              <p className="mt-2 text-sm text-muted-foreground">Enter your order number and email to see the current status.</p>
+              <h1 className="font-display text-3xl font-bold tracking-tight text-primary lg:text-4xl">
+                Track your order status
+              </h1>
+              <p className="text-urdu mt-2 text-lg text-secondary" dir="rtl" lang="ur">آرڈر کی صورتحال چیک کریں</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Enter your order number plus the email <em>or</em> phone used at checkout. This shows our internal
+                order status — not live courier tracking.
+              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="orderNumber" className="block text-sm font-medium text-foreground">Order Number</label>
-                <input 
-                  id="orderNumber" 
-                  required 
-                  value={form.orderNumber} 
-                  onChange={(e) => setForm({ ...form, orderNumber: e.target.value })} 
-                  className="mt-2 w-full rounded-2xl border bg-surface-low px-4 py-3 text-sm outline-none transition focus:border-secondary focus:ring-1 focus:ring-secondary" 
-                  placeholder="e.g. NN-250909-ABC123" 
+                <input
+                  id="orderNumber"
+                  required
+                  value={form.orderNumber}
+                  onChange={(e) => setForm({ ...form, orderNumber: e.target.value })}
+                  className="mt-2 w-full rounded-2xl border bg-surface-low px-4 py-3 text-sm outline-none transition focus:border-secondary focus:ring-1 focus:ring-secondary"
+                  placeholder="e.g. NN-250909-ABC123"
+                  autoComplete="off"
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-foreground">Email Address</label>
-                <input 
-                  id="email" 
-                  type="email" 
-                  required 
-                  value={form.email} 
-                  onChange={(e) => setForm({ ...form, email: e.target.value })} 
-                  className="mt-2 w-full rounded-2xl border bg-surface-low px-4 py-3 text-sm outline-none transition focus:border-secondary focus:ring-1 focus:ring-secondary" 
+                <label htmlFor="email" className="block text-sm font-medium text-foreground">
+                  Email Address <span className="font-normal text-muted-foreground">(or phone below)</span>
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  className="mt-2 w-full rounded-2xl border bg-surface-low px-4 py-3 text-sm outline-none transition focus:border-secondary focus:ring-1 focus:ring-secondary"
                   placeholder="you@example.com"
+                  autoComplete="email"
+                />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-foreground">
+                  Phone Number <span className="font-normal text-muted-foreground">(optional if email given)</span>
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  className="mt-2 w-full rounded-2xl border bg-surface-low px-4 py-3 text-sm outline-none transition focus:border-secondary focus:ring-1 focus:ring-secondary"
+                  placeholder="03XX-XXXXXXX"
+                  autoComplete="tel"
                 />
               </div>
               {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
-              <button 
-                type="submit" 
-                disabled={loading} 
+              <button
+                type="submit"
+                disabled={loading}
                 className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 font-bold text-primary-foreground transition hover:bg-forest disabled:pointer-events-none disabled:opacity-70"
               >
-                {loading ? "Searching..." : <><Search className="h-4 w-4" /> Track Order</>}
+                {loading ? "Searching..." : <><Search className="h-4 w-4" /> Check status</>}
               </button>
             </form>
 
@@ -116,22 +149,30 @@ function TrackOrderContent() {
                     <Package className="h-5 w-5 text-secondary" />
                     <h3 className="font-display text-lg font-bold text-foreground">{order.orderNumber}</h3>
                   </div>
+                  {order.customerName && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      For {order.customerName}
+                      {order.deliveryCity ? ` · ${order.deliveryCity}` : ""}
+                    </p>
+                  )}
                   <div className="mt-4 flex flex-wrap gap-2">
                     <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold capitalize text-primary">
-                      Status: {order.orderStatus.replace("_", " ")}
+                      Order: {statusLabel(order.orderStatus)}
                     </span>
                     <span className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-bold capitalize text-secondary">
-                      Payment: {order.paymentStatus}
+                      Payment: {statusLabel(order.paymentStatus)}
                     </span>
                   </div>
-                  {(order.paymentMethod === "jazzcash" || order.paymentMethod === "easypaisa") &&
-                    order.paymentStatus !== "paid" &&
-                    order.accessToken && (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Status from Noor Nursery — not a courier scan feed. After your parcel ships, WhatsApp us for the
+                    latest courier update.
+                  </p>
+                  {order.paymentActionUrl && (
                     <a
-                      href={`/order-success/${order.orderNumber}?t=${encodeURIComponent(order.accessToken)}`}
+                      href={order.paymentActionUrl}
                       className="mt-4 inline-flex rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground transition hover:bg-forest"
                     >
-                      {order.paymentReference
+                      {order.hasPaymentTid
                         ? "View / correct your JazzCash TID"
                         : "Send JazzCash payment & submit TID"}
                     </a>
@@ -155,7 +196,7 @@ function TrackOrderContent() {
                     <MessageCircle className="h-4 w-4" /> Ask about this order on WhatsApp
                   </a>
                   <div className="mt-4">
-                    <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Items</h4>
+                    <h4 className="mb-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">Items</h4>
                     <ul className="space-y-3">
                       {order.items?.map((item, i) => (
                         <li key={i} className="flex justify-between text-sm">

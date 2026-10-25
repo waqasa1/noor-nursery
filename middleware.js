@@ -40,7 +40,8 @@ export async function middleware(request) {
   }
 
   if (isAuthRoute && session) {
-    return NextResponse.redirect(new URL("/account", request.url));
+    const dest = session.role === "admin" ? "/admin" : "/account";
+    return NextResponse.redirect(new URL(dest, request.url));
   }
 
   const response = NextResponse.next();

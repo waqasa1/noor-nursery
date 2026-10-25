@@ -4,7 +4,12 @@ export const metadata = { title: "Return Policy — Noor Nursery" };
 
 export default function ReturnPolicyPage() {
   return (
-    <PolicyPage title="Return & Refund Policy" titleUr="واپسی اور رقم واپسی کی پالیسی">
+    <PolicyPage
+      title="Return & Refund Policy"
+      titleUr="واپسی اور رقم واپسی کی پالیسی"
+      lead="Live arrival guarantee, replacements, and how JazzCash refunds work."
+      updated="October 2026"
+    >
       <h2>Live Arrival Guarantee</h2>
       <p>We offer a 100% live arrival guarantee. Report damaged plants within 48 hours of delivery with photos via WhatsApp or email.</p>
       <h2>Replacements</h2>

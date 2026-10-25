@@ -20,6 +20,7 @@ export default function SignupPage() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
       body: JSON.stringify(form),
     });
     const data = await res.json();
@@ -28,6 +29,8 @@ export default function SignupPage() {
       setError(data.message || Object.values(data.errors || {}).flat().join(", ") || "Signup failed");
       return;
     }
+    window.dispatchEvent(new Event("auth-changed"));
+    router.refresh();
     router.push("/account");
   };
 

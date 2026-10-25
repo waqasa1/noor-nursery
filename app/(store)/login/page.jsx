@@ -31,6 +31,7 @@ function LoginForm() {
       setError(data.message || "Login failed");
       return;
     }
+    window.dispatchEvent(new Event("auth-changed"));
     router.refresh();
     router.push(redirect);
   };

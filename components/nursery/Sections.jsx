@@ -259,7 +259,7 @@ export function Testimonials() {
           </h2>
           <p className="mt-2 text-sm text-primary-foreground/75">
             Real testimonials from Karachi, Lahore, Islamabad, Faisalabad and beyond ·{" "}
-            <strong className="text-leaf">Over 4,800+ 5-Star Reviews Nationwide</strong>
+            <strong className="text-leaf">Loved by plant parents across Pakistan</strong>
           </p>
         </div>
 
