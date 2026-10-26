@@ -97,8 +97,11 @@
     border-color: var(--color-border);
   }
 
-  html {
-    scroll-behavior: smooth;
+  /* Prefer auto for route changes. In-page anchors can still use scroll-smooth on the target. */
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-navigating]) {
+      scroll-behavior: auto;
+    }
   }
 
   body {
@@ -342,8 +345,4 @@ html[data-navigating] [data-nav-pulse].is-nav-pending {
   cursor: wait;
 }
 
-/* Soft-disable brand / header links while a nav is in flight */
-html[data-navigating] [data-nav-brand] {
-  pointer-events: none;
-  cursor: wait;
-}
+/* Brand keeps a soft pulse while navigating, but stays clickable so users can bail out. */

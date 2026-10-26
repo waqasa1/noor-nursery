@@ -1,7 +1,6 @@
 export const IMAGES = {
   logo: "https://lh3.googleusercontent.com/aida-public/AB6AXuAJSHS6zRFb3eMzKy4C-tonaETCdG4KyAESrWoUdeIxrkwXSfb5xzQiF9isCxEAywiYMIle80ORJndbxKhRxm-59_F9ZEA6Ybj3rUYaOSmS_neilbCLgMXFdUFB5bgOEsw7yXHMImr7sZ-g4tj7x0ZR4YrabmC-VjhRUpy3S1BNce9lCVVlHnjy3ntkYaJwBKqJiPmGjsUuOUDXuvRw2YVIvvDQZflECs2-sLBkC9bgQ_viT209Z3chdCaomSQtn4Wu-g",
-  // High-res Unsplash (plants / terrace) — replace with a Noor Nursery photo when available
-  hero: "https://images.unsplash.com/photo-1466781783364-36c955e42a7f?auto=format&fit=crop&w=2400&q=80",
+  hero: "/heroimage-clean.png",
   fruitTrees: "https://lh3.googleusercontent.com/aida-public/AB6AXuCIJWq8qmlMGB60V7iIX5Muqh7EwZUHKftXQkymG7hc7OsRMYvhchAiqdB2PZCX1LgRwF_tYZT57ysv4xE5cu7dqFuiWUTl_SRfyAWaXQI0yQiv_YBGeizU88UBuY2WWfk-E_e3-N4nQkaotf_i0Tppfri7MWlRGrF_T_Mb-2vpnCOErTezztBlwMYzNmiCAFMZ3f6Efs_JW1qyRi1daDL7cyb79GapSMw8KK4XCSDshjEXwuy6URQe",
   indoor: "https://lh3.googleusercontent.com/aida-public/AB6AXuByV_axm2KaqUDasUrNnKQT27cdhWVt_0rL5bxknk_EBOJ93u1KzHd-sLLYxiyhqyYXg35L4knA9SNDpCPYR7Cv5n4axw-l97B__86oRlcO3M-vpfum0-oL-3bb-oJFqfJ8QdU-ZYYKsU8A6l7pCPgvKO_2cvL8eySFJYnaZU_6qDcxORsDf-XuLlyzRswItrP9RhVeehhz51_YxcWifSX_VTpP2QM_jeJj2OhEqCEYGXUudXazylu3",
   flowering: "https://lh3.googleusercontent.com/aida-public/AB6AXuD6OFVs1DDcnhMLyX6BMxEshCht4ZN5SjFDN5lmf1RCH8qjPW3EXY5-jF5WSmyEGC9AhXwZ4z7heb0eF6-CTxBrFgVzgqddBjHTPf8-7HcupiU-50buLqrIYf-fwpnqb1lkK2kIHrM--zyES9ltOC1kCVLyAmZXu89iQWm6tEsoSSqybCNgYazDs7UURfw6YkudNP2iilFBYIhCRzK8j4zsEn1hcP4Poku1T-XO3kzsRAlQVfIxwnfb",

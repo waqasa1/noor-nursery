@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { TopBar, Header, FlashDeal } from "@/components/nursery/Header";
 import { Footer } from "@/components/nursery/Footer";
 import { HelpPanel } from "@/components/help/HelpPanel";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { useCartStore } from "@/store/cart";
 import { formatPKR } from "@/lib/utils/currency";
 
@@ -34,6 +35,9 @@ export function StoreLayout({ children, showFlashDeal }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <Suspense fallback={null}>
+        <ScrollToTop />
+      </Suspense>
       <TopBar />
       <Header cartCount={displayCount} cartTotal={displayTotal} />
       {flash && <FlashDeal />}

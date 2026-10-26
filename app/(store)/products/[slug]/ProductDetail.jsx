@@ -14,7 +14,7 @@ import {
 import { ProductInfoSections } from "@/components/products/ProductInfoSections";
 import { CatalogProductCard } from "@/components/catalog/ProductCard";
 import { BRAND } from "@/lib/brand";
-import { extractBotanicalName } from "@/lib/products/product-detail-content";
+import { extractBotanicalName, isPlantProduct } from "@/lib/products/product-detail-content";
 import { buildProductWhatsAppUrl } from "@/lib/whatsapp";
 import { useCartStore } from "@/store/cart";
 import { formatPKR } from "@/lib/utils/currency";
@@ -37,6 +37,7 @@ export function ProductDetail({ product, related }) {
 
   const variant = activeVariants[selectedIdx];
   const outOfStock = !variant || variant.stock <= 0;
+  const isPlant = isPlantProduct(product);
   const botanical = extractBotanicalName(product);
 
   const handleAdd = () => {
@@ -231,25 +232,27 @@ export function ProductDetail({ product, related }) {
             </a>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            {product.sunlight && (
-              <div className="flex items-center gap-2 rounded-xl bg-surface-low px-3 py-2.5 text-sm">
-                <Sun className="h-4 w-4 text-gold" />
-                <span className="capitalize">{product.sunlight} light</span>
-              </div>
-            )}
-            {product.watering && (
-              <div className="flex items-center gap-2 rounded-xl bg-surface-low px-3 py-2.5 text-sm">
-                <Droplets className="h-4 w-4 text-secondary" />
-                <span className="capitalize">{product.watering} watering</span>
-              </div>
-            )}
-            {product.difficulty && (
-              <div className="rounded-xl bg-surface-low px-3 py-2.5 text-sm capitalize">
-                {product.difficulty} care
-              </div>
-            )}
-          </div>
+          {isPlant && (
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              {product.sunlight && (
+                <div className="flex items-center gap-2 rounded-xl bg-surface-low px-3 py-2.5 text-sm">
+                  <Sun className="h-4 w-4 text-gold" />
+                  <span className="capitalize">{product.sunlight} light</span>
+                </div>
+              )}
+              {product.watering && (
+                <div className="flex items-center gap-2 rounded-xl bg-surface-low px-3 py-2.5 text-sm">
+                  <Droplets className="h-4 w-4 text-secondary" />
+                  <span className="capitalize">{product.watering} watering</span>
+                </div>
+              )}
+              {product.difficulty && (
+                <div className="rounded-xl bg-surface-low px-3 py-2.5 text-sm capitalize">
+                  {product.difficulty} care
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="mt-6 rounded-2xl border bg-surface-low/60 p-4">
             <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -261,10 +264,12 @@ export function ProductDetail({ product, related }) {
                 <Package className="h-3.5 w-3.5 text-secondary" />
                 Secure packaging
               </span>
-              <span className="flex items-center gap-1.5">
-                <BadgeCheck className="h-3.5 w-3.5 text-secondary" />
-                48-hr live guarantee
-              </span>
+              {isPlant ? (
+                <span className="flex items-center gap-1.5">
+                  <BadgeCheck className="h-3.5 w-3.5 text-secondary" />
+                  48-hr live guarantee
+                </span>
+              ) : null}
               <span>Cash on Delivery available</span>
             </div>
           </div>
@@ -275,7 +280,9 @@ export function ProductDetail({ product, related }) {
 
       {related?.length > 0 && (
         <div className="mt-14">
-          <h2 className="font-display text-2xl font-bold text-primary">Related Plants</h2>
+          <h2 className="font-display text-2xl font-bold text-primary">
+            {isPlant ? "Related Plants" : "Related Products"}
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             More from {product.categoryId?.nameEn || "our collection"}
           </p>

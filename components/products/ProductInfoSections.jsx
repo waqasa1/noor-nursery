@@ -8,6 +8,7 @@ import {
   buildQuickFacts,
   buildSpecifications,
   extractBotanicalName,
+  isPlantProduct,
 } from "@/lib/products/product-detail-content";
 
 function AccordionSection({ id, title, icon: Icon, defaultOpen = false, children }) {
@@ -43,13 +44,15 @@ function AccordionSection({ id, title, icon: Icon, defaultOpen = false, children
 }
 
 export function ProductInfoSections({ product, variant }) {
+  const isPlant = isPlantProduct(product);
   const botanical = extractBotanicalName(product);
   const quickFacts = buildQuickFacts(product);
   const specifications = buildSpecifications(product, variant);
   const careGuide = buildCareGuide(product);
   const faqs = buildProductFaqs(product);
 
-  const hasCareInstructions = Boolean(product.careInstructionsEn || product.careInstructionsUr);
+  const hasCareInstructions =
+    isPlant && Boolean(product.careInstructionsEn || product.careInstructionsUr);
   const hasDescription = Boolean(product.descriptionEn || product.descriptionUr);
 
   return (
@@ -59,7 +62,9 @@ export function ProductInfoSections({ product, variant }) {
           Product Information
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Everything you need to know about {product.nameEn}
+          {isPlant
+            ? `Everything you need to know about ${product.nameEn}`
+            : `Details and options for ${product.nameEn}`}
           {botanical ? ` (${botanical})` : ""}
         </p>
       </div>

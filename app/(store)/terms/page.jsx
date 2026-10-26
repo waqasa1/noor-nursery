@@ -11,7 +11,7 @@ export default function TermsPage() {
       updated="October 2026"
     >
       <p>
-        By using noornursery.pk you agree to these terms. Noor Nursery is an online plant retailer based in Lahore,
+        By using noornursery.pk you agree to these terms. Noor Nursery is an online plant retailer based in Karachi,
         Pakistan.
       </p>
       <h2>Orders</h2>

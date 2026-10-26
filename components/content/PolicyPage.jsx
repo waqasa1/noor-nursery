@@ -14,7 +14,7 @@ export function PolicyPage({ title, titleUr, lead, children, updated }) {
       <div className="relative bg-[linear-gradient(180deg,var(--surface-low)_0%,var(--background)_28%,var(--background)_100%)]">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-14 lg:px-6 lg:py-20">
           <aside className="hidden lg:block">
-            <div className="sticky top-28 space-y-4">
+            <div className="sticky top-40 space-y-4 pt-2">
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">
                 On this page
               </p>

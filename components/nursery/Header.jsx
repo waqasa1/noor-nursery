@@ -201,7 +201,6 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   const [user, setUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     let alive = true;
@@ -220,6 +219,7 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
           if (alive) setAuthReady(true);
         });
     };
+    // Once on mount + auth/focus — not on every route change (that added latency).
     loadUser();
     const onAuth = () => loadUser();
     window.addEventListener("auth-changed", onAuth);
@@ -229,7 +229,7 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
       window.removeEventListener("auth-changed", onAuth);
       window.removeEventListener("focus", onAuth);
     };
-  }, [pathname]);
+  }, []);
 
   const firstName = user?.name ? user.name.trim().split(/\s+/)[0] : "";
   // While auth is loading, send users to /account (middleware redirects guests to login)

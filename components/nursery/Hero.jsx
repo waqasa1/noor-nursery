@@ -21,7 +21,7 @@ export function Hero() {
       <div className="absolute inset-0">
         <Image
           src={IMAGES.hero}
-          alt="A sunlit terrace filled with lush indoor plants including palms, monstera, and hanging greenery"
+          alt="Noor Nursery — healthy plants ready for Pakistani homes and gardens"
           fill
           priority
           sizes="100vw"

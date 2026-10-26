@@ -1,34 +1,31 @@
 import Link from "next/link";
-import { IMAGES } from "@/components/nursery/data";
 
 /**
  * Slim brand-led hero for About / Contact / policy pages.
- * One job: title + optional Urdu + short lead. No cards, no badges.
+ * Gradient + pattern only (no remote Google image) so these pages paint fast.
  */
 export function ContentHero({
   eyebrow = "Noor Nursery",
   title,
   titleUr,
   lead,
-  image = IMAGES.indoor,
   actions,
 }) {
   return (
     <header className="relative isolate overflow-hidden bg-primary text-primary-foreground">
-      <div className="absolute inset-0">
-        <img src={image} alt="" className="h-full w-full object-cover opacity-35" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-forest/80" />
-        <div
-          className="absolute inset-0 opacity-[0.12]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 20%, var(--leaf) 0.6px, transparent 0.7px)",
-            backgroundSize: "18px 18px",
-          }}
-        />
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-forest" />
+      <div
+        className="absolute inset-0 opacity-[0.14]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 18% 22%, var(--leaf) 0.7px, transparent 0.8px), radial-gradient(circle at 82% 68%, color-mix(in oklab, var(--gold) 70%, transparent) 0.55px, transparent 0.65px)",
+          backgroundSize: "20px 20px, 28px 28px",
+        }}
+      />
+      <div className="absolute -right-24 top-0 h-72 w-72 rounded-full bg-leaf/15 blur-3xl" aria-hidden />
+      <div className="absolute -left-16 bottom-0 h-56 w-56 rounded-full bg-gold/10 blur-3xl" aria-hidden />
 
-      <div className="relative mx-auto flex min-h-[42vh] max-w-6xl flex-col justify-end px-4 pb-12 pt-20 sm:min-h-[38vh] sm:pb-14 lg:px-6">
+      <div className="relative mx-auto flex min-h-[36vh] max-w-6xl flex-col justify-end px-4 pb-12 pt-20 sm:min-h-[32vh] sm:pb-14 lg:px-6">
         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-leaf">{eyebrow}</p>
         <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
           {title}

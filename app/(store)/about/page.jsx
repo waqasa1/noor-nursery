@@ -24,7 +24,7 @@ const PILLARS = [
   {
     icon: Truck,
     title: "Nationwide delivery",
-    body: "Lahore same-day options, plus COD and JazzCash across 50+ cities.",
+    body: "Karachi-based fulfilment, plus COD and JazzCash across 50+ cities.",
   },
   {
     icon: Leaf,
@@ -40,7 +40,6 @@ export default function AboutPage() {
         title="About Noor Nursery"
         titleUr="نور نرسری کے بارے میں"
         lead={`${BRAND.sloganPrimary} Growing with Pakistani homes and gardens since ${BRAND.since}.`}
-        image={IMAGES.hero}
         actions={
           <>
             <ContentCtaLink href="/shop">Shop plants</ContentCtaLink>
