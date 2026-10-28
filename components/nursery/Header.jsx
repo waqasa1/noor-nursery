@@ -3,29 +3,58 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { ChevronDown, Heart, Menu, MessageCircle, Phone, Search, ShoppingBag, Truck, User, X, Zap } from "lucide-react";
+import {
+  ChevronDown,
+  Heart,
+  Menu,
+  MessageCircle,
+  Phone,
+  Search,
+  ShoppingBag,
+  Truck,
+  User,
+  X,
+  Zap,
+} from "lucide-react";
 import { IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
-import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
-import { isRouteNavigating, startRouteProgress } from "@/lib/navigation/route-progress";
+import {
+  buildWhatsAppUrl,
+  formatStorePhone,
+  generalSupportMessage,
+} from "@/lib/whatsapp";
+import {
+  isRouteNavigating,
+  startRouteProgress,
+} from "@/lib/navigation/route-progress";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+import { formatPKR } from "@/lib/utils/currency";
 
 export function TopBar() {
+  const settings = useSiteSettings();
+  const freeShipLabel = formatPKR(settings.delivery?.freeThreshold ?? 2500);
+
   return (
     <div className="bg-primary text-primary-foreground">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2 text-[11px] sm:text-xs lg:text-sm">
         <p className="flex min-w-0 items-center gap-2">
           <Truck className="h-4 w-4 shrink-0 text-leaf" />
-          <span className="sm:hidden">Same-day delivery in Karachi · Free ship over PKR 2,500</span>
+          <span className="sm:hidden">
+            Same-day delivery in Karachi · Free ship over {freeShipLabel}
+          </span>
           <span className="hidden sm:inline">
-            Same-day in Karachi · Express delivery to Karachi, Islamabad &amp; 50+ cities
+            Same-day in Karachi · Express delivery to Lahore, Islamabad &amp;
+            50+ cities
           </span>
           <span className="hidden font-semibold text-gold md:inline">
-            &nbsp;| Free shipping over PKR 2,500
+            &nbsp;| Free shipping over {freeShipLabel}
           </span>
         </p>
         <div className="flex shrink-0 items-center gap-3">
-          <a href={`tel:+${formatStorePhone().replace(/\D/g, "")}`} className="flex items-center gap-1.5 hover:text-leaf">
+          <a
+            href={`tel:+${formatStorePhone().replace(/\D/g, "")}`}
+            className="flex items-center gap-1.5 hover:text-leaf"
+          >
             <Phone className="h-3.5 w-3.5" /> {formatStorePhone()}
           </a>
           <a
@@ -45,11 +74,14 @@ export function TopBar() {
 function useIsActive() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const currentPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : "");
+  const currentPath =
+    pathname + (searchParams.toString() ? `?${searchParams.toString()}` : "");
 
   const isActive = (href) =>
     currentPath === href ||
-    (href === "/shop" && currentPath.startsWith("/shop") && !searchParams.toString());
+    (href === "/shop" &&
+      currentPath.startsWith("/shop") &&
+      !searchParams.toString());
 
   return { currentPath, isActive };
 }
@@ -61,8 +93,16 @@ function NavigationLinks({ navLinks }) {
     <>
       {navLinks.map((link) => {
         if (link.children) {
-          const parentActive = link.children.some((c) => isActive(c.href)) || isActive(link.href);
-          return <NavDropdown key={link.label} link={link} parentActive={parentActive} isActive={isActive} />;
+          const parentActive =
+            link.children.some((c) => isActive(c.href)) || isActive(link.href);
+          return (
+            <NavDropdown
+              key={link.label}
+              link={link}
+              parentActive={parentActive}
+              isActive={isActive}
+            />
+          );
         }
 
         const active = isActive(link.href);
@@ -70,10 +110,11 @@ function NavigationLinks({ navLinks }) {
           <Link
             key={link.href}
             href={link.href}
-            className={`shrink-0 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${active
+            className={`shrink-0 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${
+              active
                 ? "border-b-2 border-secondary font-semibold text-secondary"
                 : "text-foreground hover:text-secondary"
-              }`}
+            }`}
           >
             {link.label}
           </Link>
@@ -101,21 +142,25 @@ function NavDropdown({ link, parentActive, isActive }) {
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((o) => !o)}
-        className={`flex shrink-0 items-center gap-1 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${parentActive
+        className={`flex shrink-0 items-center gap-1 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${
+          parentActive
             ? "border-b-2 border-secondary font-semibold text-secondary"
             : "text-foreground hover:text-secondary"
-          }`}
+        }`}
       >
         {link.label}
-        <ChevronDown className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       <div
         role="menu"
-        className={`absolute left-0 top-full z-50 w-64 rounded-xl border bg-card p-2 shadow-xl transition ${open
+        className={`absolute left-0 top-full z-50 w-64 rounded-xl border bg-card p-2 shadow-xl transition ${
+          open
             ? "visible opacity-100"
             : "invisible opacity-0 group-hover:visible group-hover:opacity-100"
-          }`}
+        }`}
       >
         {link.children.map((child) => (
           <Link
@@ -123,11 +168,15 @@ function NavDropdown({ link, parentActive, isActive }) {
             href={child.href}
             role="menuitem"
             onClick={() => setOpen(false)}
-            className={`block rounded-lg px-3 py-2 text-sm transition ${child.strong ? "mb-1 border-b border-foreground/10 pb-2.5 font-extrabold text-primary" : "font-medium"
-              } ${isActive(child.href)
+            className={`block rounded-lg px-3 py-2 text-sm transition ${
+              child.strong
+                ? "mb-1 border-b border-foreground/10 pb-2.5 font-extrabold text-primary"
+                : "font-medium"
+            } ${
+              isActive(child.href)
                 ? "bg-surface-low font-semibold text-secondary"
                 : "text-foreground hover:bg-surface-low hover:text-secondary"
-              }`}
+            }`}
           >
             {child.label}
           </Link>
@@ -154,11 +203,15 @@ function MobileNavigationLinks({ navLinks, setMenuOpen }) {
                   key={child.href}
                   href={child.href}
                   onClick={() => setMenuOpen && setMenuOpen(false)}
-                  className={`block rounded-lg py-2 pr-3 text-sm transition ${i === 0 ? "pl-3 font-extrabold text-primary" : "pl-7 text-muted-foreground"
-                    } ${isActive(child.href)
+                  className={`block rounded-lg py-2 pr-3 text-sm transition ${
+                    i === 0
+                      ? "pl-3 font-extrabold text-primary"
+                      : "pl-7 text-muted-foreground"
+                  } ${
+                    isActive(child.href)
                       ? "bg-surface-low !font-semibold !text-secondary"
                       : "hover:bg-surface-low hover:text-secondary"
-                    }`}
+                  }`}
                 >
                   {child.label}
                 </Link>
@@ -173,10 +226,11 @@ function MobileNavigationLinks({ navLinks, setMenuOpen }) {
             key={link.href}
             href={link.href}
             onClick={() => setMenuOpen && setMenuOpen(false)}
-            className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition ${active
+            className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+              active
                 ? "bg-surface-low text-secondary font-semibold"
                 : "text-foreground hover:bg-surface-low hover:text-secondary"
-              }`}
+            }`}
           >
             {link.label}
           </Link>
@@ -185,7 +239,6 @@ function MobileNavigationLinks({ navLinks, setMenuOpen }) {
     </>
   );
 }
-
 
 export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -269,7 +322,11 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   const navLinks = [
     { href: "/shop", label: "All Products" },
     ...plantLinks,
-    { href: "/shop?type=accessories", label: "Accessories", children: accessoryLinks },
+    {
+      href: "/shop?type=accessories",
+      label: "Accessories",
+      children: accessoryLinks,
+    },
     { href: "/categories", label: "Categories" },
     { href: "/about", label: "About" },
   ];
@@ -285,7 +342,11 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   return (
     <header className="sticky top-0 z-40 border-b bg-card/95 shadow-sm backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-4 sm:px-4 sm:py-3">
-        <Link href="/" data-nav-brand className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <Link
+          href="/"
+          data-nav-brand
+          className="flex shrink-0 items-center gap-2 sm:gap-3"
+        >
           <img
             src="/logo.png"
             alt="Noor Nursery"
@@ -301,7 +362,10 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
           </div>
         </Link>
 
-        <form onSubmit={handleSearch} className="ml-2 hidden flex-1 items-center gap-2 lg:flex">
+        <form
+          onSubmit={handleSearch}
+          className="ml-2 hidden flex-1 items-center gap-2 lg:flex"
+        >
           <div className="flex flex-1 items-center gap-2 rounded-full border bg-surface-low px-4 py-2">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
@@ -333,7 +397,10 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
             <span className="hidden sm:inline">{cartTotal}</span>
             <span className="rounded-full bg-leaf px-1.5 py-0.5 text-[11px] font-bold leading-tight text-leaf-foreground sm:px-2 sm:text-xs">
               {cartCount}
-              <span className="hidden sm:inline"> item{cartCount === 1 ? "" : "s"}</span>
+              <span className="hidden sm:inline">
+                {" "}
+                item{cartCount === 1 ? "" : "s"}
+              </span>
             </span>
           </Link>
           <button
@@ -343,7 +410,11 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((o) => !o)}
           >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {menuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
@@ -369,18 +440,26 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
               onClick={() => setMenuOpen(false)}
             >
               <User className="h-4 w-4" />
-              <span className="truncate">{user ? user.name : "Login / Create Account"}</span>
+              <span className="truncate">
+                {user ? user.name : "Login / Create Account"}
+              </span>
             </Link>
             <nav className="mt-3 grid gap-1" aria-label="Mobile navigation">
               <Suspense fallback={null}>
-                <MobileNavigationLinks navLinks={navLinks} setMenuOpen={setMenuOpen} />
+                <MobileNavigationLinks
+                  navLinks={navLinks}
+                  setMenuOpen={setMenuOpen}
+                />
               </Suspense>
             </nav>
           </div>
         </div>
       )}
 
-      <nav className="hidden border-t bg-surface-low lg:block" aria-label="Main navigation">
+      <nav
+        className="hidden border-t bg-surface-low lg:block"
+        aria-label="Main navigation"
+      >
         {/* no overflow-x here: it would clip the Accessories dropdown */}
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-1 px-4">
           <Suspense fallback={null}>

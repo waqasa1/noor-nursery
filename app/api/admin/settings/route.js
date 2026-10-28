@@ -22,7 +22,10 @@ const updateSchema = z.object({
   store: z.object({
     name: z.string().min(1),
     phone: z.string().optional(),
-    email: z.string().email().optional(),
+    email: z.preprocess(
+      (v) => (v === "" || v == null ? undefined : v),
+      z.string().email().optional()
+    ),
     address: z.string().optional(),
   }).optional(),
   bank: z.object({
@@ -78,23 +81,75 @@ export async function GET() {
   }
 }
 
+function normalizePromoCode(raw) {
+  return String(raw || "").trim().toUpperCase();
+}
+
+/** Ensure checkout promo uses the Flash Deal banner code. */
+function syncPromoCodesWithBanner(promoCodes, banner) {
+  const code = normalizePromoCode(banner?.code);
+  if (!code) return promoCodes;
+
+  const existing =
+    promoCodes?.[code] ||
+    Object.values(promoCodes || {}).find(
+      (p) => normalizePromoCode(p?.code) === code
+    ) ||
+    Object.values(promoCodes || {})[0] ||
+    {};
+
+  const value = Number(existing.value ?? 20);
+  return {
+    [code]: {
+      code,
+      type: existing.type === "fixed" ? "fixed" : "percent",
+      value: Number.isFinite(value) ? value : 20,
+      minSubtotal: Number(existing.minSubtotal ?? 0),
+      active: existing.active ?? true,
+      label: existing.label || `${Number.isFinite(value) ? value : 20}% off your order`,
+    },
+  };
+}
+
 export async function PUT(request) {
   try {
     await requireAdmin();
     const body = await request.json();
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError("Validation failed", 400);
+      const first =
+        parsed.error.issues?.[0]?.message || "Validation failed";
+      return jsonError(first, 400, parsed.error.flatten());
+    }
+
+    const data = { ...parsed.data };
+    if (data.banner) {
+      data.banner = {
+        ...data.banner,
+        code: normalizePromoCode(data.banner.code),
+      };
+      data.promo_codes = syncPromoCodesWithBanner(
+        data.promo_codes || (await getPromoCodes()),
+        data.banner
+      );
+    } else if (data.promo_codes) {
+      // Keep keys uppercase and code field in sync
+      data.promo_codes = Object.fromEntries(
+        Object.entries(data.promo_codes).map(([key, promo]) => {
+          const code = normalizePromoCode(promo.code || key);
+          return [code, { ...promo, code }];
+        })
+      );
     }
 
     const updates = [];
-    if (parsed.data.delivery) updates.push(setSetting("delivery", parsed.data.delivery));
-    if (parsed.data.store) updates.push(setSetting("store", parsed.data.store));
-    if (parsed.data.bank) updates.push(setSetting("bank", parsed.data.bank));
-    if (parsed.data.easypaisa) updates.push(setSetting("easypaisa", parsed.data.easypaisa));
-    if (parsed.data.promo_codes) updates.push(setSetting("promo_codes", parsed.data.promo_codes));
-    if (parsed.data.banner) updates.push(setSetting("banner", parsed.data.banner));
-    if (parsed.data.site_content) updates.push(setSetting("site_content", parsed.data.site_content));
+    if (data.delivery) updates.push(setSetting("delivery", data.delivery));
+    if (data.store) updates.push(setSetting("store", data.store));
+    if (data.bank) updates.push(setSetting("bank", data.bank));
+    if (data.easypaisa) updates.push(setSetting("easypaisa", data.easypaisa));
+    if (data.promo_codes) updates.push(setSetting("promo_codes", data.promo_codes));
+    if (data.banner) updates.push(setSetting("banner", data.banner));
+    if (data.site_content) updates.push(setSetting("site_content", data.site_content));
 
     await Promise.all(updates);
     return jsonSuccess({ message: "Settings saved" });

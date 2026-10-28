@@ -9,6 +9,8 @@ export function ImageUpload({
   onChange,
   folder = "noor-nursery/products",
   required = false,
+  /** When false, only Cloudinary file upload is offered (no paste-URL field). */
+  allowUrl = true,
 }) {
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
@@ -82,27 +84,42 @@ export function ImageUpload({
           )}
           {!configured && (
             <p className="text-xs text-muted-foreground">
-              Cloudinary not configured — paste an image URL below.
+              {allowUrl
+                ? "Cloudinary not configured — paste an image URL below."
+                : "Cloudinary is not configured. Add CLOUDINARY_* env vars to upload images."}
             </p>
           )}
-          {/*
-            type="text", not "url": the native url constraint rejects relative
-            paths like /placeholder-plant.jpg and silently blocks the whole
-            form submit with a browser tooltip. Soft check below instead.
-          */}
-          <input
-            type="text"
-            inputMode="url"
-            value={value}
-            required={required}
-            placeholder="https://… or /placeholder-plant.jpg"
-            onChange={(e) => onChange?.(e.target.value)}
-            className="w-full rounded-xl border px-3 py-2 text-sm"
-          />
-          {value && !/^(https?:\/\/|\/)/.test(value.trim()) && (
-            <p className="text-xs text-destructive">
-              Use a full https:// link or a path starting with /
-            </p>
+          {allowUrl && (
+            <>
+              {/*
+                type="text", not "url": the native url constraint rejects relative
+                paths like /placeholder-plant.jpg and silently blocks the whole
+                form submit with a browser tooltip. Soft check below instead.
+              */}
+              <input
+                type="text"
+                inputMode="url"
+                value={value}
+                required={required}
+                placeholder="https://… or /placeholder-plant.jpg"
+                onChange={(e) => onChange?.(e.target.value)}
+                className="w-full rounded-xl border px-3 py-2 text-sm"
+              />
+              {value && !/^(https?:\/\/|\/)/.test(value.trim()) && (
+                <p className="text-xs text-destructive">
+                  Use a full https:// link or a path starting with /
+                </p>
+              )}
+            </>
+          )}
+          {!allowUrl && value && (
+            <button
+              type="button"
+              onClick={() => onChange?.("")}
+              className="text-xs font-medium text-destructive hover:underline"
+            >
+              Remove image
+            </button>
           )}
           {error && <p className="text-xs text-destructive">{error}</p>}
         </div>

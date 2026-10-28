@@ -162,34 +162,6 @@ export const CATEGORIES = [
   { name: "Self-Watering", urdu: "خودکار گملے", image: IMAGES.selfWatering },
 ];
 
-export const TESTIMONIALS = [
-  {
-    initials: "AK",
-    name: "Ayesha Khan",
-    location: "DHA Phase 6, Karachi • Verified Buyer",
-    when: "Yesterday",
-    quote:
-      "Ordered 2 large Areca Palms and Motia for my Clifton Karachi apartment. Arrived in just 2 days via Trax courier, moist soil, not a single snapped branch. Noor Nursery's packing is unmatched!",
-  },
-  {
-    initials: "MS",
-    name: "Malik Salman",
-    location: "Gulberg III, Lahore • Verified Buyer",
-    when: "3 days ago",
-    quote:
-      "پودے بہت تروتازہ اور صحت مند پہنچے۔ پپیتا اور امرود کے پودے خاص طور پر بہت اچھے ہیں۔ واٹس ایپ پر کیئر کے بارے میں رہنمائی بھی فوری ملی۔ جزاک اللہ!",
-    rtl: true,
-  },
-  {
-    initials: "DR",
-    name: "Dr. Rabia Zafar",
-    location: "F-8/2, Islamabad • Verified Buyer",
-    when: "1 week ago",
-    quote:
-      "Best online nursery in Pakistan without exaggeration. The Snake plant Laurentii has huge healthy yellow margins and already sprouted a new pup in my office room.",
-  },
-];
-
 export const JOURNAL = [
   {
     tag: "Summer Care",

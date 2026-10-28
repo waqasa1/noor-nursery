@@ -15,7 +15,7 @@ const testimonialSchema = z.object({
 export async function PUT(request, { params }) {
   try {
     await requireAdmin();
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const parsed = testimonialSchema.safeParse(body);
     if (!parsed.success) {
@@ -37,7 +37,7 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     await requireAdmin();
-    const { id } = params;
+    const { id } = await params;
 
     const testimonials = (await getSetting("testimonials", [])) ?? [];
     const filtered = testimonials.filter((t) => t.id !== id);

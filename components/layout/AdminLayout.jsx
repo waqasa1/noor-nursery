@@ -33,6 +33,7 @@ const NAV_GROUPS = [
   {
     title: "System",
     items: [
+      { href: "/admin/testimonials", label: "Testimonials" },
       { href: "/admin/settings", label: "Settings" },
       { href: "/admin/account", label: "Account" },
     ],

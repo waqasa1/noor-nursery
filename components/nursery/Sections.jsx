@@ -15,7 +15,7 @@ import {
   SunMedium,
   Truck,
 } from "lucide-react";
-import { FAQS, IMAGES, TESTIMONIALS } from "./data";
+import { FAQS, IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 
@@ -249,6 +249,11 @@ export function Trust() {
 }
 
 export function Testimonials() {
+  const settings = useSiteSettings();
+  const testimonials = settings.testimonials || [];
+
+  if (testimonials.length === 0) return null;
+
   return (
     <section className="bg-primary py-14 text-primary-foreground">
       <div className="mx-auto max-w-7xl px-4">
@@ -258,26 +263,31 @@ export function Testimonials() {
               <Star key={i} className="h-5 w-5 fill-gold text-gold" />
             ))}
           </div>
-          <p className="mt-2 font-display text-sm font-bold text-gold">4.9 / 5.0 Rating</p>
+          <p className="mt-2 font-display text-sm font-bold text-gold">Customer Reviews</p>
           <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            Verified Plant Lover Reviews
+            What Plant Lovers Say
           </h2>
           <p className="mt-2 text-sm text-primary-foreground/75">
-            Real testimonials from Karachi, Lahore, Islamabad, Faisalabad and beyond ·{" "}
-            <strong className="text-leaf">Loved by plant parents across Pakistan</strong>
+            Reviews from customers across Pakistan ·{" "}
+            <strong className="text-leaf">Shared by real buyers</strong>
           </p>
         </div>
 
         <div className="mt-9 grid gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <figure key={t.name} className="rounded-2xl bg-card p-6 text-card-foreground shadow-lg">
+          {testimonials.map((t) => (
+            <figure
+              key={t.id || t.name}
+              className="rounded-2xl bg-card p-6 text-card-foreground shadow-lg"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex gap-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-gold text-gold" />
                   ))}
                 </div>
-                <span className="text-xs text-muted-foreground">{t.when}</span>
+                {t.when ? (
+                  <span className="text-xs text-muted-foreground">{t.when}</span>
+                ) : null}
               </div>
               <blockquote
                 className={`mt-3 text-sm leading-relaxed text-foreground ${t.rtl ? "text-urdu" : ""}`}
@@ -292,7 +302,9 @@ export function Testimonials() {
                 </span>
                 <div>
                   <p className="text-sm font-bold text-foreground">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.location}</p>
+                  {t.location ? (
+                    <p className="text-xs text-muted-foreground">{t.location}</p>
+                  ) : null}
                 </div>
               </figcaption>
             </figure>

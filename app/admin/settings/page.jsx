@@ -2,11 +2,48 @@
 
 import { useEffect, useState } from "react";
 import { AdminSettingsSkeleton } from "@/components/admin/AdminSkeleton";
-import { Zap, Image as ImageIcon, Globe, Share2 } from "lucide-react";
+import { ImageUpload } from "@/components/admin/ImageUpload";
+import { invalidateSiteSettingsCache } from "@/lib/useSiteSettings";
+import { Zap, Image as ImageIcon, Share2, Loader2 } from "lucide-react";
+
+function normalizePromoCode(raw) {
+  return String(raw || "").trim().toUpperCase();
+}
+
+/** Keep a single checkout promo that matches the Flash Deal banner code. */
+function syncPromoToBanner(promoCodes, banner, discountValue, active) {
+  const code = normalizePromoCode(banner?.code);
+  if (!code) return promoCodes || {};
+
+  const existing =
+    promoCodes?.[code] ||
+    Object.values(promoCodes || {}).find(
+      (p) => normalizePromoCode(p?.code) === code
+    ) ||
+    Object.values(promoCodes || {})[0] ||
+    {};
+
+  const value =
+    typeof discountValue === "number"
+      ? discountValue
+      : Number(existing.value ?? 20);
+
+  return {
+    [code]: {
+      code,
+      type: "percent",
+      value: Number.isFinite(value) ? value : 20,
+      minSubtotal: existing.minSubtotal ?? 0,
+      active: typeof active === "boolean" ? active : existing.active ?? true,
+      label: existing.label || `${Number.isFinite(value) ? value : 20}% off your order`,
+    },
+  };
+}
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -20,28 +57,52 @@ export default function AdminSettingsPage() {
   }, []);
 
   const save = async () => {
+    if (saving) return;
     setMessage("");
     setError("");
-    const res = await fetch("/api/admin/settings", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        delivery: settings.delivery,
-        store: settings.store,
-        bank: settings.bank,
-        easypaisa: settings.easypaisa,
-        promo_codes: settings.promo_codes,
-        banner: settings.banner,
-        site_content: settings.site_content,
-      }),
-    });
-    const data = await res.json();
-    if (!data.success) {
-      setError(data.message || "Failed to save");
-      return;
+    setSaving(true);
+
+    try {
+      const banner = {
+        ...(settings.banner || {}),
+        code: normalizePromoCode(settings.banner?.code),
+      };
+      const promoKey = banner.code;
+      const livePromo = promoKey ? settings.promo_codes?.[promoKey] : null;
+      const promo_codes = syncPromoToBanner(
+        settings.promo_codes,
+        banner,
+        livePromo?.value,
+        livePromo?.active
+      );
+
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          delivery: settings.delivery,
+          store: settings.store,
+          bank: settings.bank,
+          easypaisa: settings.easypaisa,
+          promo_codes,
+          banner,
+          site_content: settings.site_content,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        setError(data.message || `Failed to save (${res.status})`);
+        return;
+      }
+      setSettings((s) => ({ ...s, banner, promo_codes }));
+      invalidateSiteSettingsCache();
+      setMessage("Settings saved successfully!");
+      setTimeout(() => setMessage(""), 5000);
+    } catch {
+      setError("Network error — could not save settings. Try again.");
+    } finally {
+      setSaving(false);
     }
-    setMessage("Settings saved successfully!");
-    setTimeout(() => setMessage(""), 4000);
   };
 
   if (loading || !settings) {
@@ -52,8 +113,61 @@ export default function AdminSettingsPage() {
     setSettings((s) => ({ ...s, [section]: { ...s[section], [field]: value } }));
   };
 
-  const banner = settings.banner ?? { active: true, text: "Limited offer:", subtext: "Flat 20% off your order — free shipping over PKR 2,500", code: "NOOR20" };
-  const site_content = settings.site_content ?? { heroImage: "", indoorImage: "", aboutImage: "", facebookUrl: "", instagramUrl: "", copyrightText: "Noor Nursery Pakistan. All rights reserved." };
+  const banner = settings.banner ?? {
+    active: true,
+    text: "Limited offer:",
+    subtext: "Flat 20% off your order — free shipping over PKR 2,500",
+    code: "NOOR20",
+  };
+  const site_content = settings.site_content ?? {
+    heroImage: "",
+    indoorImage: "",
+    aboutImage: "",
+    facebookUrl: "",
+    instagramUrl: "",
+    copyrightText: "Noor Nursery Pakistan. All rights reserved.",
+  };
+
+  const promoCode = normalizePromoCode(banner.code);
+  const promo =
+    (promoCode && settings.promo_codes?.[promoCode]) ||
+    Object.values(settings.promo_codes || {})[0] ||
+    { active: true, type: "percent", value: 20 };
+
+  const setBannerCode = (raw) => {
+    const nextCode = normalizePromoCode(raw);
+    setSettings((s) => {
+      const prevCode = normalizePromoCode(s.banner?.code);
+      const prevPromo =
+        (prevCode && s.promo_codes?.[prevCode]) ||
+        Object.values(s.promo_codes || {})[0] ||
+        { active: true, type: "percent", value: 20 };
+
+      const nextBanner = { ...s.banner, code: nextCode };
+      const nextPromos = nextCode
+        ? syncPromoToBanner(s.promo_codes, nextBanner, prevPromo.value, prevPromo.active)
+        : s.promo_codes;
+
+      return {
+        ...s,
+        banner: nextBanner,
+        promo_codes: nextPromos,
+      };
+    });
+  };
+
+  const updatePromo = (field, value) => {
+    if (!promoCode) return;
+    setSettings((s) => ({
+      ...s,
+      promo_codes: syncPromoToBanner(
+        s.promo_codes,
+        { ...s.banner, code: promoCode },
+        field === "value" ? Number(value) : s.promo_codes?.[promoCode]?.value,
+        field === "active" ? value : s.promo_codes?.[promoCode]?.active
+      ),
+    }));
+  };
 
   return (
     <>
@@ -61,9 +175,6 @@ export default function AdminSettingsPage() {
       <p className="mt-1 text-sm text-muted-foreground">
         Manage delivery fees, store info, banner, images, social links, and promo codes.
       </p>
-
-      {message && <p className="mt-4 rounded-xl bg-leaf/10 px-4 py-3 text-sm font-medium text-leaf">{message}</p>}
-      {error && <p className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">{error}</p>}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
 
@@ -86,11 +197,11 @@ export default function AdminSettingsPage() {
             </label>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Controls the gold banner shown below the top bar. Toggle active to show/hide it.
+            Controls the gold banner below the top bar. The promo code here is the same code accepted at checkout.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <div>
-              <label className="block text-xs font-medium">Bold Label (e.g. "Limited offer:")</label>
+              <label className="block text-xs font-medium">Bold Label (e.g. &quot;Limited offer:&quot;)</label>
               <input
                 value={banner.text ?? ""}
                 onChange={(e) => update("banner", "text", e.target.value)}
@@ -104,20 +215,19 @@ export default function AdminSettingsPage() {
                 value={banner.subtext ?? ""}
                 onChange={(e) => update("banner", "subtext", e.target.value)}
                 className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                placeholder="Flat 20% off your order — free shipping over PKR 2,500"
+                placeholder="Flat 20% off your order"
               />
             </div>
             <div>
               <label className="block text-xs font-medium">Promo Code (leave empty to hide)</label>
               <input
                 value={banner.code ?? ""}
-                onChange={(e) => update("banner", "code", e.target.value)}
+                onChange={(e) => setBannerCode(e.target.value)}
                 className="mt-1 w-full rounded-xl border px-3 py-2 text-sm font-mono"
                 placeholder="NOOR20"
               />
             </div>
           </div>
-          {/* Live preview */}
           {banner.active && (
             <div className="mt-4 rounded-xl bg-yellow-400 px-4 py-2.5 text-center text-sm text-yellow-900">
               <span className="mr-2">⚡</span>
@@ -125,7 +235,7 @@ export default function AdminSettingsPage() {
               {" "}{banner.subtext || "Flat 20% off your order"}
               {banner.code && (
                 <span className="ml-2 rounded bg-yellow-900 px-2 py-0.5 font-mono text-xs font-bold text-yellow-400">
-                  Code: {banner.code}
+                  Code: {normalizePromoCode(banner.code)}
                 </span>
               )}
             </div>
@@ -196,31 +306,22 @@ export default function AdminSettingsPage() {
             <h2 className="font-semibold">Site Images</h2>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Paste an image URL or upload path. Leave empty to use the default image.
+            Upload images to Cloudinary. Leave empty to keep the default storefront image.
           </p>
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div className="mt-4 grid gap-6 sm:grid-cols-3">
             {[
-              { field: "heroImage", label: "Hero Banner Image", placeholder: "/heroimage-clean.png" },
-              { field: "indoorImage", label: "Indoor Collection Image", placeholder: "https://..." },
-              { field: "aboutImage", label: "About Us / Brand Story Image", placeholder: "https://..." },
-            ].map(({ field, label, placeholder }) => (
-              <div key={field}>
-                <label className="block text-xs font-medium">{label}</label>
-                <input
-                  value={site_content[field] ?? ""}
-                  onChange={(e) => update("site_content", field, e.target.value)}
-                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                  placeholder={placeholder}
-                />
-                {site_content[field] && (
-                  <img
-                    src={site_content[field]}
-                    alt={label}
-                    className="mt-2 h-24 w-full rounded-xl object-cover"
-                    onError={(e) => { e.currentTarget.style.display = "none"; }}
-                  />
-                )}
-              </div>
+              { field: "heroImage", label: "Hero Banner Image" },
+              { field: "indoorImage", label: "Indoor Collection Image" },
+              { field: "aboutImage", label: "About Us / Brand Story Image" },
+            ].map(({ field, label }) => (
+              <ImageUpload
+                key={field}
+                label={label}
+                value={site_content[field] ?? ""}
+                onChange={(url) => update("site_content", field, url)}
+                folder="noor-nursery/site"
+                allowUrl={false}
+              />
             ))}
           </div>
         </section>
@@ -283,6 +384,9 @@ export default function AdminSettingsPage() {
         {/* ── Delivery Fees ── */}
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Delivery Fees</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Free-delivery threshold also updates the top header line (“Free shipping over …”).
+          </p>
           <div className="mt-4 space-y-3">
             <div>
               <label className="block text-xs font-medium">Default Fee (PKR)</label>
@@ -301,59 +405,81 @@ export default function AdminSettingsPage() {
                 onChange={(e) => update("delivery", "freeThreshold", Number(e.target.value))}
                 className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
               />
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Shown in the storefront header as free shipping over this amount.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* ── Promo Code ── */}
+        {/* ── Promo discount (tied to banner code) ── */}
         <section className="rounded-2xl border bg-card p-5">
-          <h2 className="font-semibold">Promo Code — NOOR20</h2>
-          <div className="mt-4 space-y-3">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={settings.promo_codes?.NOOR20?.active ?? true}
-                onChange={(e) =>
-                  setSettings((s) => ({
-                    ...s,
-                    promo_codes: {
-                      ...s.promo_codes,
-                      NOOR20: { ...s.promo_codes.NOOR20, active: e.target.checked },
-                    },
-                  }))
-                }
-              />
-              Active
-            </label>
-            <div>
-              <label className="block text-xs font-medium">Discount (%)</label>
-              <input
-                type="number"
-                value={settings.promo_codes?.NOOR20?.value ?? 20}
-                onChange={(e) =>
-                  setSettings((s) => ({
-                    ...s,
-                    promo_codes: {
-                      ...s.promo_codes,
-                      NOOR20: { ...s.promo_codes.NOOR20, type: "percent", value: Number(e.target.value) },
-                    },
-                  }))
-                }
-                className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-              />
-            </div>
-          </div>
+          <h2 className="font-semibold">
+            Promo Discount{promoCode ? ` — ${promoCode}` : ""}
+          </h2>
+          {!promoCode ? (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Set a promo code in the Flash Deal Banner above to enable checkout discounts for that code.
+            </p>
+          ) : (
+            <>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Discount for code <span className="font-mono font-semibold">{promoCode}</span> from the banner. Changing the banner code updates this promo.
+              </p>
+              <div className="mt-4 space-y-3">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={promo.active ?? true}
+                    onChange={(e) => updatePromo("active", e.target.checked)}
+                  />
+                  Active at checkout
+                </label>
+                <div>
+                  <label className="block text-xs font-medium">Discount (%)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={promo.value ?? 20}
+                    onChange={(e) => updatePromo("value", e.target.value)}
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </section>
 
       </div>
 
-      <button
-        type="button"
-        onClick={save}
-        className="mt-8 rounded-full bg-primary px-8 py-3 text-sm font-bold text-primary-foreground hover:bg-forest transition"
-      >
-        Save All Settings
-      </button>
+      <div className="mt-8 space-y-3">
+        {message && (
+          <p
+            role="status"
+            className="rounded-xl bg-leaf/10 px-4 py-3 text-sm font-medium text-leaf"
+          >
+            {message}
+          </p>
+        )}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-xl bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
+          >
+            {error}
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={save}
+          disabled={saving}
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-bold text-primary-foreground transition hover:bg-forest disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+          {saving ? "Saving…" : "Save All Settings"}
+        </button>
+      </div>
     </>
   );
 }
