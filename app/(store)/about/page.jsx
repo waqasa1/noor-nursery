@@ -37,26 +37,32 @@ const PILLARS = [
 
 const STORY = [
   {
+    era: "01",
     heading: "The beginning — Mr. Noor Ali Visani",
     body: `Our journey began in ${BRAND.since} with one man's passion. Our grandfather, Mr. Noor Ali Visani, started this nursery not just as a business, but as a hobby that lived in his heart. His vision was simple: "Everyone is doing nursery business, but no one has all the varieties."`,
   },
   {
+    era: "02",
     heading: "Collecting every variety",
     body: "Even with a small space, he started collecting every variety he could find. Some survived, some didn't. We faced heavy losses because many plants could not survive in Karachi's climate. But he never gave up.",
   },
   {
+    era: "03",
     heading: "Fruit plants — our specialty",
     body: "He noticed that people in Karachi have a deep love for fruits. So he introduced our specialty: all varieties of fruit plants. He searched the whole of Pakistan to bring the best fruit varieties to one place. Customers became family, and a name built on trust was born.",
   },
   {
+    era: "04",
     heading: "Second generation — Mr. Mohammad Hanif Noor Ali Visani",
     body: "Then came the second generation — our father, Mr. Mohammad Hanif Noor Ali Visani. He focused on quality and quantity, improved sizes, and studied which plant grows best in which area. To overcome the challenge of space, he expanded from one nursery to two, two to three, and today, Alhamdulillah, we have 6 branches across Karachi with our own separate farms.",
   },
   {
+    era: "05",
     heading: "Third generation — Mr. Alishan Mohammad Hanif",
     body: "Then came the third generation — Mr. Alishan Mohammad Hanif. He took the business online through our website, YouTube, Instagram, and Facebook, and brought innovation: grafted and air-layered plants that fruit and flower faster.",
   },
   {
+    era: "06",
     heading: "You — our customers",
     body: "And the most important part of our growth has been you — our customers. We listened to every customer complaint, every difficulty, every feedback. We never saw a complaint as a failure. We saw it as a lesson. That improvement built trust, and that trust turned into a beautiful family bond. We learned from our customers, and our customers learned from us.",
   },
@@ -66,34 +72,56 @@ export default function AboutPage() {
   return (
     <>
       <ContentHero
-        title="About Noor Nursery"
+        title="From a Hobby to an Empire Built on Trust"
         titleUr="نور نرسری کے بارے میں"
-        lead={`${BRAND.sloganPrimary} Growing with Pakistani homes and gardens since ${BRAND.since}.`}
+        lead={`${BRAND.sloganPrimary} ${BRAND.sloganSecondary}`}
         actions={
           <>
-            <ContentCtaLink href="/shop">Shop plants</ContentCtaLink>
-            <ContentCtaLink href="/contact" variant="ghost">
-              Contact us
+            <ContentCtaLink href="#our-story">Read our story</ContentCtaLink>
+            <ContentCtaLink href="/shop" variant="ghost">
+              Shop plants
             </ContentCtaLink>
           </>
         }
       />
 
-      <section className="relative overflow-hidden bg-[linear-gradient(165deg,var(--surface-low)_0%,var(--background)_45%,var(--surface-mid)_100%)]">
-        <div className="mx-auto grid max-w-6xl items-start gap-12 px-4 py-16 lg:grid-cols-2 lg:gap-16 lg:px-6 lg:py-24">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">Our story</p>
+      {/* Story first — not buried below intro + image */}
+      <section
+        id="our-story"
+        className="scroll-mt-24 relative overflow-hidden bg-[linear-gradient(165deg,var(--surface-low)_0%,var(--background)_45%,var(--surface-mid)_100%)]"
+      >
+        <div className="mx-auto grid max-w-6xl items-start gap-12 px-4 py-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:px-6 lg:py-20">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">
+              Our story
+            </p>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-              From a Hobby to an Empire Built on Trust
+              Growing Spaces. Creating Connections.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-foreground/80">
-              Today, what started as a small hobby in {BRAND.since} has become an empire, known across
-              Pakistan for the largest quantity and the finest quality.
+              Today, what started as a small hobby in {BRAND.since} has become an empire, known
+              across Pakistan for the largest quantity and the finest quality.
             </p>
+            <p className="mt-3 text-sm font-medium text-secondary">{BRAND.sloganPrimary}</p>
             <p className="text-urdu mt-4 text-lg text-secondary" dir="rtl" lang="ur">
               ۱۹۶۵ سے پاکستان بھر میں گھروں اور باغات کو سرسبز بناتے ہوئے۔
             </p>
-            <div className="mt-8 flex items-start gap-3 text-sm text-foreground/80">
+
+            <div className="relative mt-8 overflow-hidden rounded-[1.75rem] shadow-[0_24px_60px_-28px_rgba(20,60,40,0.45)]">
+              <img
+                src={IMAGES.indoor}
+                alt="Lush indoor plants arranged in a bright living space"
+                className="aspect-[5/4] w-full object-cover lg:aspect-[4/5]"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent p-6 pt-24">
+                <p className="flex items-center gap-2 text-sm font-semibold text-primary-foreground">
+                  <BadgeCheck className="h-4 w-4 text-leaf" />
+                  Trusted since {BRAND.since}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-start gap-3 rounded-2xl border border-border/70 bg-card/80 p-4 text-sm text-foreground/80">
               <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-secondary" />
               <div>
                 <p>
@@ -116,35 +144,22 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="relative lg:sticky lg:top-28">
-            <div className="absolute -inset-3 rounded-[2rem] bg-leaf/25 blur-2xl" aria-hidden />
-            <div className="relative overflow-hidden rounded-[1.75rem] shadow-[0_24px_60px_-28px_rgba(20,60,40,0.45)]">
-              <img
-                src={IMAGES.indoor}
-                alt="Lush indoor plants arranged in a bright living space"
-                className="aspect-[4/5] w-full object-cover sm:aspect-[5/4] lg:aspect-[4/5]"
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent p-6 pt-24">
-                <p className="flex items-center gap-2 text-sm font-semibold text-primary-foreground">
-                  <BadgeCheck className="h-4 w-4 text-leaf" />
-                  Trusted since {BRAND.since}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mx-auto max-w-6xl px-4 pb-16 lg:px-6 lg:pb-24">
-          <div className="max-w-3xl space-y-10 border-t border-border/60 pt-12">
+          <ol className="relative space-y-0 border-l border-secondary/30 pl-6 sm:pl-8">
             {STORY.map((block) => (
-              <div key={block.heading}>
+              <li key={block.era} className="relative pb-10 last:pb-2">
+                <span
+                  className="absolute -left-[1.55rem] top-1 grid h-7 w-7 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground sm:-left-[2.05rem]"
+                  aria-hidden
+                >
+                  {block.era}
+                </span>
                 <h3 className="font-display text-xl font-bold text-primary sm:text-2xl">
                   {block.heading}
                 </h3>
                 <p className="mt-3 text-base leading-relaxed text-foreground/80">{block.body}</p>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
@@ -153,7 +168,7 @@ export default function AboutPage() {
           <div className="max-w-2xl">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-leaf">Why choose us</p>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              Built for Pakistani plant lovers
+              {BRAND.sloganSecondary}
             </h2>
             <p className="mt-3 text-primary-foreground/75">
               One mission: quality plants, honest delivery, and help when you need it — three
@@ -169,7 +184,9 @@ export default function AboutPage() {
                 </span>
                 <div>
                   <h3 className="font-display text-lg font-bold">{item.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-primary-foreground/75">{item.body}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-primary-foreground/75">
+                    {item.body}
+                  </p>
                 </div>
               </li>
             ))}
@@ -180,9 +197,11 @@ export default function AboutPage() {
       <section className="mx-auto max-w-6xl px-4 py-16 lg:px-6 lg:py-20">
         <div className="flex flex-col items-start justify-between gap-6 rounded-[2rem] bg-[linear-gradient(120deg,var(--surface-mid),var(--surface-low)_55%,transparent)] px-6 py-10 sm:flex-row sm:items-center sm:px-10">
           <div>
-            <h2 className="font-display text-2xl font-bold text-primary sm:text-3xl">Ready to grow with us?</h2>
+            <h2 className="font-display text-2xl font-bold text-primary sm:text-3xl">
+              Your Space Deserves Something Alive.
+            </h2>
             <p className="mt-2 max-w-md text-sm text-muted-foreground">
-              Browse the catalog, or ask our team about bulk orders and plant care.
+              {BRAND.sloganPrimary}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
