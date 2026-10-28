@@ -6,6 +6,7 @@ import { slugify } from "@/lib/utils/slug";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 import { revalidateCatalog } from "@/lib/cache/catalog";
 import { productWriteSchema } from "@/lib/validation/product";
+import { applyProductSearch } from "@/lib/products/search";
 
 export async function GET(request) {
   try {
@@ -18,8 +19,7 @@ export async function GET(request) {
     const search = searchParams.get("search");
     const type = searchParams.get("type");
 
-    const filter = {};
-    if (search) filter.$text = { $search: search };
+    const filter = applyProductSearch({}, search);
 
     if (type === "plant" || type === "accessory") {
       const cats = await Category.find({ type }).select("_id").lean();

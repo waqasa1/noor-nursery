@@ -325,24 +325,8 @@
   }
 }
 
+/* Soft brand pulse only — never disable pointer events (that blocked routing until refresh). */
 html[data-navigating] [data-nav-brand] .nav-brand-title {
   animation: nav-breathe 1.1s ease-in-out infinite;
 }
 
-html[data-navigating] a.is-nav-pending,
-html[data-navigating] .is-nav-pending {
-  animation: nav-card-breathe 1.05s ease-in-out infinite;
-  pointer-events: none;
-  cursor: wait;
-}
-
-html[data-navigating] article.is-nav-pending,
-html[data-navigating] [data-nav-pulse].is-nav-pending {
-  outline: 2px solid color-mix(in oklab, var(--secondary) 55%, transparent);
-  outline-offset: 2px;
-  border-radius: 1rem;
-  pointer-events: none;
-  cursor: wait;
-}
-
-/* Brand keeps a soft pulse while navigating, but stays clickable so users can bail out. */

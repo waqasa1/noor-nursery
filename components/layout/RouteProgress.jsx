@@ -4,9 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 /**
- * Top progress bar + subtle “still on this page” cues while the next route loads:
- * - document.documentElement[data-navigating] → soft brand/header pulse
- * - clicked <a>.is-nav-pending → breathing highlight on that link/card
+ * Thin top progress bar during client navigations.
+ * Does not block clicks or freeze the current page — destination `loading.jsx` owns content loaders.
  */
 export function RouteProgress() {
   const pathname = usePathname();
@@ -14,91 +13,60 @@ export function RouteProgress() {
   const [visible, setVisible] = useState(false);
   const barRef = useRef(null);
   const timersRef = useRef([]);
-  const intervalRef = useRef(null);
   const runningRef = useRef(false);
-  const startHrefRef = useRef("");
-  const pendingElRef = useRef(null);
+  const startKeyRef = useRef("");
+
+  const routeKey = `${pathname}?${searchParams?.toString() || ""}`;
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((id) => clearTimeout(id));
     timersRef.current = [];
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
-
-  const clearPending = useCallback(() => {
-    const el = pendingElRef.current;
-    if (el) {
-      el.classList.remove("is-nav-pending");
-      el.removeAttribute("aria-busy");
-      el.removeAttribute("aria-disabled");
-    }
-    pendingElRef.current = null;
-    document.documentElement.removeAttribute("data-navigating");
   }, []);
 
   const setBar = useCallback((value, animate = true) => {
     const el = barRef.current;
     if (!el) return;
-    el.style.transition = animate ? "transform 300ms cubic-bezier(0.2, 0.7, 0.3, 1)" : "none";
+    el.style.transition = animate
+      ? "transform 280ms cubic-bezier(0.2, 0.7, 0.3, 1)"
+      : "none";
     el.style.transform = `scaleX(${value})`;
   }, []);
 
   const finish = useCallback(() => {
-    if (!runningRef.current) return;
+    if (!runningRef.current) {
+      document.documentElement.removeAttribute("data-navigating");
+      return;
+    }
     clearTimers();
     runningRef.current = false;
-    clearPending();
+    document.documentElement.removeAttribute("data-navigating");
     setBar(1, true);
     timersRef.current.push(
       setTimeout(() => {
         setVisible(false);
-      }, 350)
+        setBar(0, false);
+      }, 280)
     );
-  }, [clearPending, clearTimers, setBar]);
+  }, [clearTimers, setBar]);
 
-  const start = useCallback(
-    (clickedAnchor) => {
-      if (runningRef.current) return;
+  const start = useCallback(() => {
+    clearTimers();
+    runningRef.current = true;
+    startKeyRef.current = `${window.location.pathname}?${window.location.search.replace(/^\?/, "")}`;
+    document.documentElement.setAttribute("data-navigating", "true");
+    setVisible(true);
+    setBar(0, false);
 
-      clearTimers();
-      clearPending();
-      runningRef.current = true;
-      startHrefRef.current = window.location.href;
-      document.documentElement.setAttribute("data-navigating", "true");
-
-      if (clickedAnchor instanceof HTMLElement) {
-        const target =
-          clickedAnchor.closest("[data-nav-pulse]") ||
-          clickedAnchor.closest("article") ||
-          clickedAnchor;
-        target.classList.add("is-nav-pending");
-        target.setAttribute("aria-busy", "true");
-        if (target.tagName === "A" || target.tagName === "BUTTON") {
-          target.setAttribute("aria-disabled", "true");
-        }
-        pendingElRef.current = target;
-      }
-
-      setVisible(true);
-      setBar(0, false);
-
-      requestAnimationFrame(() => {
-        if (!runningRef.current) return;
-        setBar(0.2, true);
-        timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.45), 250));
-        timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.68), 700));
-        timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.84), 1500));
-        timersRef.current.push(setTimeout(finish, 20000));
-        intervalRef.current = setInterval(() => {
-          if (window.location.href !== startHrefRef.current) finish();
-        }, 120);
-      });
-    },
-    [clearPending, clearTimers, finish, setBar]
-  );
+    requestAnimationFrame(() => {
+      if (!runningRef.current) return;
+      setBar(0.22, true);
+      timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.48), 200));
+      timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.72), 600));
+      timersRef.current.push(setTimeout(() => runningRef.current && setBar(0.88), 1400));
+      // Safety: never leave the bar stuck if the route key does not change
+      timersRef.current.push(setTimeout(finish, 8000));
+    });
+  }, [clearTimers, finish, setBar]);
 
   useEffect(() => {
     const onClick = (event) => {
@@ -117,58 +85,66 @@ export function RouteProgress() {
         return;
       }
       if (url.origin !== window.location.origin) return;
-      if (url.pathname === window.location.pathname && url.search === window.location.search) return;
-
-      // Block repeat clicks while the breathe/loading cue is active
-      if (runningRef.current) {
-        event.preventDefault();
-        event.stopPropagation();
+      if (url.pathname === window.location.pathname && url.search === window.location.search) {
         return;
       }
 
-      start(anchor);
+      // Never preventDefault — navigation must always proceed
+      start();
     };
 
-    const onPopState = () => {
-      if (!runningRef.current) start(null);
-    };
-
-    /** For router.push() flows (product cards, search) that never hit an <a> click. */
-    const onProgrammatic = (event) => {
-      if (runningRef.current) return;
-      const el = event.detail?.element ?? null;
-      start(el);
+    const onProgrammatic = () => {
+      start();
     };
 
     document.addEventListener("click", onClick, true);
-    window.addEventListener("popstate", onPopState);
     window.addEventListener("route-progress:start", onProgrammatic);
     return () => {
       document.removeEventListener("click", onClick, true);
-      window.removeEventListener("popstate", onPopState);
       window.removeEventListener("route-progress:start", onProgrammatic);
       clearTimers();
-      clearPending();
-      runningRef.current = false;
     };
-  }, [clearPending, clearTimers, start]);
+  }, [clearTimers, start]);
 
-  // Finish when the destination route is committed (path or query).
+  // Finish when the App Router commits a new URL
   useEffect(() => {
-    finish();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, searchParams]);
+    if (!runningRef.current) return;
+    if (routeKey !== startKeyRef.current) {
+      finish();
+    }
+  }, [routeKey, finish]);
+
+  // Clear stranded state on bfcache restore; start bar on back/forward
+  useEffect(() => {
+    const onPageShow = () => {
+      if (!runningRef.current) {
+        document.documentElement.removeAttribute("data-navigating");
+        return;
+      }
+      const now = `${window.location.pathname}?${window.location.search.replace(/^\?/, "")}`;
+      if (now !== startKeyRef.current) finish();
+    };
+    const onPopState = () => {
+      if (!runningRef.current) start();
+    };
+    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("popstate", onPopState);
+    };
+  }, [finish, start]);
 
   return (
     <div
       aria-hidden="true"
-      className={`pointer-events-none fixed inset-x-0 top-0 z-[100] h-1 transition-opacity duration-200 ${
+      className={`pointer-events-none fixed inset-x-0 top-0 z-[100] h-0.5 transition-opacity duration-200 ${
         visible ? "opacity-100" : "opacity-0"
       }`}
     >
       <div
         ref={barRef}
-        className="h-full w-full origin-left scale-x-0 bg-secondary shadow-[0_0_8px_rgba(0,0,0,0.35)]"
+        className="h-full w-full origin-left scale-x-0 bg-secondary"
       />
     </div>
   );

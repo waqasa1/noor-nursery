@@ -22,10 +22,7 @@ import {
   formatStorePhone,
   generalSupportMessage,
 } from "@/lib/whatsapp";
-import {
-  isRouteNavigating,
-  startRouteProgress,
-} from "@/lib/navigation/route-progress";
+import { startRouteProgress } from "@/lib/navigation/route-progress";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { formatPKR } from "@/lib/utils/currency";
 
@@ -332,8 +329,8 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (!searchQuery.trim() || isRouteNavigating()) return;
-    startRouteProgress(e.currentTarget);
+    if (!searchQuery.trim()) return;
+    startRouteProgress();
     router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
     setMenuOpen(false);
   };

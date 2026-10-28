@@ -2,6 +2,7 @@ import { connectDB, isDBConfigured } from "@/lib/db";
 import Product from "@/models/Product";
 import Category from "@/models/Category";
 import { jsonSuccess, handleApiError } from "@/lib/api-response";
+import { applyProductSearch } from "@/lib/products/search";
 
 export async function GET(request) {
   try {
@@ -42,9 +43,7 @@ export async function GET(request) {
       filter.variants = { $elemMatch: { isActive: true, stock: { $gt: 0 } } };
     }
 
-    if (search) {
-      filter.$text = { $search: search };
-    }
+    Object.assign(filter, applyProductSearch({}, search));
 
     let sortOption = { createdAt: -1 };
     if (sort === "price_asc") sortOption = { "variants.0.price": 1 };

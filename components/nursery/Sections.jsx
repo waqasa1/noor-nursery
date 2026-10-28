@@ -23,7 +23,7 @@ export function FeaturedPlant() {
   const settings = useSiteSettings();
   const indoorImageSrc = settings.site_content?.indoorImage || IMAGES.indoor;
   return (
-    <section className="overflow-hidden bg-card py-16">
+    <section className="bg-card py-16">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 lg:grid-cols-2">
         <div className="relative order-2 lg:order-1">
           <div className="overflow-hidden rounded-3xl shadow-2xl">
@@ -31,7 +31,7 @@ export function FeaturedPlant() {
               src={indoorImageSrc}
               alt="Lush indoor plant collection featuring monstera and tropical foliage"
               loading="lazy"
-              className="aspect-[4/5] w-full object-cover transition duration-700 hover:scale-105"
+              className="aspect-[4/5] w-full object-cover"
             />
           </div>
         </div>
