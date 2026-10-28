@@ -236,11 +236,20 @@ function MobileNavigationLinks({ navLinks, setMenuOpen }) {
   );
 }
 
+const ACCESSORY_FALLBACK = [
+  { href: "/shop?category=fertilizers-soil", label: "Fertilizers & Soil" },
+  { href: "/shop?category=pest-control", label: "Pest & Disease Control" },
+  { href: "/shop?category=pots-planters", label: "Pots & Planters" },
+  { href: "/shop?category=tools-equipment", label: "Tools & Equipment" },
+  { href: "/shop?category=watering-sprayers", label: "Watering & Sprayers" },
+];
+
 export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
+  const [accessoryCats, setAccessoryCats] = useState(ACCESSORY_FALLBACK);
   const router = useRouter();
 
   useEffect(() => {
@@ -269,6 +278,26 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
       alive = false;
       window.removeEventListener("auth-changed", onAuth);
       window.removeEventListener("focus", onAuth);
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/categories")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!alive || !data?.success || !Array.isArray(data.categories)) return;
+        const accessories = data.categories
+          .filter((c) => c.type === "accessory" && c.slug && c.nameEn)
+          .map((c) => ({
+            href: `/shop?category=${encodeURIComponent(c.slug)}`,
+            label: c.nameEn,
+          }));
+        if (accessories.length) setAccessoryCats(accessories);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
     };
   }, []);
 
@@ -308,11 +337,7 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
 
   const accessoryLinks = [
     { href: "/shop?type=accessories", label: "All Accessories", strong: true },
-    { href: "/shop?category=fertilizers-soil", label: "Fertilizers & Soil" },
-    { href: "/shop?category=pest-control", label: "Pest & Disease Control" },
-    { href: "/shop?category=pots-planters", label: "Pots & Planters" },
-    { href: "/shop?category=tools-equipment", label: "Tools & Equipment" },
-    { href: "/shop?category=watering-sprayers", label: "Watering & Sprayers" },
+    ...accessoryCats,
   ];
 
   const navLinks = [

@@ -150,13 +150,15 @@ export function Hero() {
 }
 
 export function Categories({ categories = [] }) {
-  const list = categories.length
-    ? categories
+  const fromDb = categories.filter((c) => c.type !== "accessory");
+  const list = fromDb.length
+    ? fromDb
     : CATEGORIES.map((c) => ({
         slug: c.name.toLowerCase().replace(/\s+/g, "-"),
         nameEn: c.name,
         nameUr: c.urdu,
         image: c.image || "/placeholder-plant.jpg",
+        type: "plant",
       }));
 
   if (!list.length) return null;
@@ -172,6 +174,7 @@ export function Categories({ categories = [] }) {
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           Hand-picked varieties for home, terrace, and lawn — browse with confidence.
+          Tools, pots, seeds, and more are under Accessories.
         </p>
       </div>
 

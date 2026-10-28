@@ -3,7 +3,7 @@ import Image from "next/image";
 const FALLBACK = "/placeholder-plant.jpg";
 
 /**
- * next/image wrapper for catalog thumbnails (local public/ + Cloudinary).
+ * next/image wrapper for catalog thumbnails (local, Cloudinary, Google CDN).
  */
 export function CatalogImage({
   src,

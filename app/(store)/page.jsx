@@ -20,10 +20,16 @@ export default async function Page() {
     console.error("[homepage] Failed to load catalog:", error.message);
   }
 
+  // Homepage "Shop by Category" is plant-focused — accessories (e.g. Seeds) live under Accessories.
+  const plantCategories = categories
+    .filter((c) => c.type !== "accessory")
+    .slice(0, 5)
+    .map(serializeCategory);
+
   return (
     <HomePageClient
       products={products.map(serializeProduct)}
-      categories={categories.slice(0, 7).map(serializeCategory)}
+      categories={plantCategories}
     />
   );
 }
