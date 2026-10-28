@@ -4,6 +4,7 @@ import Order from "@/models/Order";
 import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 import { orderSuccessPath } from "@/lib/orders/access";
+import { isManualWalletPayment } from "@/lib/payments/methods";
 
 const schema = z
   .object({
@@ -70,7 +71,7 @@ export async function POST(request) {
     }
 
     const needsPaymentAction =
-      (order.paymentMethod === "jazzcash" || order.paymentMethod === "easypaisa") &&
+      isManualWalletPayment(order.paymentMethod) &&
       order.paymentStatus !== "paid" &&
       Boolean(order.accessToken);
 

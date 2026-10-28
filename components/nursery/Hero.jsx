@@ -156,8 +156,10 @@ export function Categories({ categories = [] }) {
         slug: c.name.toLowerCase().replace(/\s+/g, "-"),
         nameEn: c.name,
         nameUr: c.urdu,
-        image: c.image,
+        image: c.image || "/placeholder-plant.jpg",
       }));
+
+  if (!list.length) return null;
 
   return (
     <section id="categories" className="mx-auto max-w-7xl px-4 py-16">

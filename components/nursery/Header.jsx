@@ -16,7 +16,6 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
 import {
   buildWhatsAppUrl,

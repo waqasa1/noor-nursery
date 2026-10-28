@@ -83,7 +83,7 @@ export default function AdminSettingsPage() {
           delivery: settings.delivery,
           store: settings.store,
           bank: settings.bank,
-          easypaisa: settings.easypaisa,
+          jazzcash: settings.jazzcash,
           promo_codes,
           banner,
           site_content: settings.site_content,
@@ -346,8 +346,8 @@ export default function AdminSettingsPage() {
               <div key={f.id}>
                 <label className="block text-xs font-medium">{f.label}</label>
                 <input
-                  value={settings.easypaisa?.[f.id] || ""}
-                  onChange={(e) => update("easypaisa", f.id, e.target.value)}
+                  value={settings.jazzcash?.[f.id] || ""}
+                  onChange={(e) => update("jazzcash", f.id, e.target.value)}
                   placeholder={f.id === "accountNumber" ? "03XX-XXXXXXX" : "Noor Nursery"}
                   className="field-input mt-1 w-full rounded-xl border px-3 py-2 text-sm"
                 />

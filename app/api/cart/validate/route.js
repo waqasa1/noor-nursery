@@ -11,6 +11,8 @@ const schema = z.object({
       productId: z.string(),
       variantId: z.string(),
       quantity: z.number().int().min(1),
+      nameEn: z.string().optional(),
+      sizeLabelEn: z.string().optional(),
     })
   ),
   city: z.string().optional(),
@@ -30,7 +32,10 @@ export async function POST(request) {
     }
 
     await connectDB();
-    const { valid, errors, validatedItems } = await validateCartItems(parsed.data.items);
+    // Pass client labels so error copy can name the plant, not a database id
+    const { valid, errors, validatedItems, unavailableKeys } = await validateCartItems(
+      parsed.data.items
+    );
     const subtotal = buildCartSummary(validatedItems).subtotal;
     const deliveryFee = await calculateDeliveryFeeAsync(parsed.data.city, subtotal);
 
@@ -48,7 +53,14 @@ export async function POST(request) {
 
     const totals = buildCartSummary(validatedItems, deliveryFee, discount);
 
-    return jsonSuccess({ valid, errors, items: validatedItems, totals, promo });
+    return jsonSuccess({
+      valid,
+      errors,
+      items: validatedItems,
+      totals,
+      promo,
+      unavailableKeys,
+    });
   } catch (error) {
     return handleApiError(error);
   }

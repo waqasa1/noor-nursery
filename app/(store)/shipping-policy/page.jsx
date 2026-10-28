@@ -1,8 +1,26 @@
 import { PolicyPage } from "@/components/content/PolicyPage";
+import { getDeliveryConfig, getBannerConfig } from "@/lib/settings";
+import { formatPKR } from "@/lib/utils/currency";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Shipping Policy — Noor Nursery" };
 
-export default function ShippingPolicyPage() {
+export default async function ShippingPolicyPage() {
+  let freeThreshold = 2500;
+  let promoCode = "";
+  try {
+    const [delivery, banner] = await Promise.all([
+      getDeliveryConfig(),
+      getBannerConfig(),
+    ]);
+    freeThreshold = delivery.freeThreshold;
+    promoCode = banner.active ? String(banner.code || "").trim().toUpperCase() : "";
+  } catch {
+    /* use defaults when DB unavailable at build/runtime */
+  }
+  const thresholdLabel = formatPKR(freeThreshold);
+
   return (
     <PolicyPage
       title="Shipping & Delivery Policy"
@@ -18,18 +36,26 @@ export default function ShippingPolicyPage() {
 
       <h2>Delivery Times</h2>
       <ul className="list-disc space-y-2 pl-5">
-        <li>Lahore: 1–2 business days (same-day available when capacity allows)</li>
+        <li>Karachi: 1–2 business days (same-day available when capacity allows)</li>
         <li>Major cities: 2–4 business days</li>
         <li>Other areas: 3–6 business days</li>
       </ul>
 
       <h2>Delivery Fees</h2>
       <p>
-        A standard delivery fee is calculated at checkout. <strong>Free delivery on orders of PKR 2,500 or more</strong>
+        A standard delivery fee is calculated at checkout.{" "}
+        <strong>Free delivery on orders of {thresholdLabel} or more</strong>
         {" "}(before promo discounts, subject to the total shown at checkout). City-specific rates may apply for remote areas.
       </p>
       <p>
-        Promotional codes such as <strong>NOOR20</strong> (percentage off) are separate from free-delivery eligibility.
+        {promoCode ? (
+          <>
+            Promotional codes such as <strong>{promoCode}</strong> (percentage off) are separate from free-delivery
+            eligibility.{" "}
+          </>
+        ) : (
+          <>Promotional codes shown on the storefront banner are separate from free-delivery eligibility.{" "} </>
+        )}
         Always check the checkout summary for the fee that applies to your cart.
       </p>
 

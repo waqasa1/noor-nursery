@@ -15,7 +15,7 @@ import {
   SunMedium,
   Truck,
 } from "lucide-react";
-import { FAQS, IMAGES } from "./data";
+import { IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 
@@ -158,11 +158,17 @@ export function BrandStory() {
 }
 
 export function FinalCTA() {
+  const settings = useSiteSettings();
+  const ctaImage =
+    settings.site_content?.aboutImage ||
+    settings.site_content?.heroImage ||
+    IMAGES.flowering;
+
   return (
     <section className="relative overflow-hidden bg-primary py-20 text-center text-primary-foreground">
       <div className="absolute inset-0 opacity-20">
         <img
-          src={IMAGES.flowering}
+          src={ctaImage}
           alt=""
           aria-hidden="true"
           className="h-full w-full object-cover"
@@ -317,6 +323,10 @@ export function Testimonials() {
 
 export function Faq() {
   const [open, setOpen] = useState(0);
+  const settings = useSiteSettings();
+  const faqs = settings.faqs || [];
+
+  if (faqs.length === 0) return null;
 
   return (
     <section id="faq" className="bg-surface-low py-14">
@@ -334,8 +344,8 @@ export function Faq() {
         </div>
 
         <div className="mt-8 space-y-3">
-          {FAQS.map((f, i) => (
-            <div key={f.q} className="overflow-hidden rounded-2xl border bg-card shadow-sm">
+          {faqs.map((f, i) => (
+            <div key={f.id || f.q} className="overflow-hidden rounded-2xl border bg-card shadow-sm">
               <button
                 onClick={() => setOpen(open === i ? null : i)}
                 className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"

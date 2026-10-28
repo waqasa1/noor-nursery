@@ -6,12 +6,18 @@ import {
   getDeliveryConfig,
   getStoreInfo,
   getBankConfig,
-  getEasypaisaConfig,
+  getJazzCashWalletConfig,
+  setJazzCashWalletConfig,
   getPromoCodes,
   getBannerConfig,
   getSiteContent,
 } from "@/lib/settings";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
+
+const jazzcashWalletSchema = z.object({
+  accountTitle: z.string().max(80).optional(),
+  accountNumber: z.string().max(30).optional(),
+});
 
 const updateSchema = z.object({
   delivery: z.object({
@@ -34,10 +40,7 @@ const updateSchema = z.object({
     bankName: z.string().optional(),
     branch: z.string().optional(),
   }).optional(),
-  easypaisa: z.object({
-    accountTitle: z.string().max(80).optional(),
-    accountNumber: z.string().max(30).optional(),
-  }).optional(),
+  jazzcash: jazzcashWalletSchema.optional(),
   promo_codes: z.record(z.object({
     code: z.string(),
     type: z.enum(["percent", "fixed"]),
@@ -65,17 +68,17 @@ const updateSchema = z.object({
 export async function GET() {
   try {
     await requireAdmin();
-    const [delivery, store, bank, easypaisa, promo_codes, banner, site_content, raw] = await Promise.all([
+    const [delivery, store, bank, jazzcash, promo_codes, banner, site_content, raw] = await Promise.all([
       getDeliveryConfig(),
       getStoreInfo(),
       getBankConfig(),
-      getEasypaisaConfig(),
+      getJazzCashWalletConfig(),
       getPromoCodes(),
       getBannerConfig(),
       getSiteContent(),
       getAllSettings(),
     ]);
-    return jsonSuccess({ delivery, store, bank, easypaisa, promo_codes, banner, site_content, raw });
+    return jsonSuccess({ delivery, store, bank, jazzcash, promo_codes, banner, site_content, raw });
   } catch (error) {
     return handleApiError(error);
   }
@@ -146,7 +149,7 @@ export async function PUT(request) {
     if (data.delivery) updates.push(setSetting("delivery", data.delivery));
     if (data.store) updates.push(setSetting("store", data.store));
     if (data.bank) updates.push(setSetting("bank", data.bank));
-    if (data.easypaisa) updates.push(setSetting("easypaisa", data.easypaisa));
+    if (data.jazzcash) updates.push(setJazzCashWalletConfig(data.jazzcash));
     if (data.promo_codes) updates.push(setSetting("promo_codes", data.promo_codes));
     if (data.banner) updates.push(setSetting("banner", data.banner));
     if (data.site_content) updates.push(setSetting("site_content", data.site_content));

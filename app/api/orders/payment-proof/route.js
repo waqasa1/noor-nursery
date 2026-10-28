@@ -4,8 +4,10 @@ import Order from "@/models/Order";
 import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 import { sendTidReceivedEmail } from "@/lib/email";
-
-const MANUAL_WALLET_METHODS = new Set(["jazzcash", "easypaisa"]);
+import {
+  isManualWalletPayment,
+  MANUAL_WALLET_METHODS,
+} from "@/lib/payments/methods";
 
 const proofSchema = z.object({
   orderNumber: z.string().min(6).max(32),
@@ -19,7 +21,7 @@ const proofSchema = z.object({
 });
 
 /**
- * Customer submits JazzCash TID (or legacy EasyPaisa TrxID) after Send Money.
+ * Customer submits JazzCash TID after Send Money.
  * Never marks paid — seller confirms the ID in their JazzCash app first.
  */
 export async function POST(request) {
@@ -42,8 +44,8 @@ export async function POST(request) {
     const order = await Order.findOne({ orderNumber, accessToken });
     if (!order) return jsonError("Order not found", 404);
 
-    if (!MANUAL_WALLET_METHODS.has(order.paymentMethod)) {
-      return jsonError("This order does not use JazzCash / wallet payment", 400);
+    if (!isManualWalletPayment(order.paymentMethod)) {
+      return jsonError("This order does not use JazzCash payment", 400);
     }
 
     if (order.paymentStatus === "paid") {

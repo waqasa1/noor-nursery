@@ -28,14 +28,16 @@ export async function POST(request) {
     await connectDB();
     const user = await User.findOne({ email: normalizeEmail(parsed.data.email) });
 
-    if (user) {
+    // Only issue a token when Resend can deliver it (avoids dead reset links).
+    // Response stays generic either way (no account / email enumeration).
+    if (user && getEnv().RESEND_API_KEY) {
       const { token, hash } = generateResetToken();
       user.passwordResetTokenHash = hash;
       user.passwordResetExpiresAt = new Date(Date.now() + 60 * 60 * 1000);
       await user.save();
 
       const resetUrl = `${getEnv().NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
-      sendPasswordResetEmail(user.email, resetUrl).catch(() => {});
+      await sendPasswordResetEmail(user.email, resetUrl).catch(() => {});
     }
 
     return jsonSuccess({

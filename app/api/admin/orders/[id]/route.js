@@ -57,7 +57,7 @@ export async function PATCH(request, { params }) {
     }
     if (parsed.data.internalNote !== undefined) order.internalNote = parsed.data.internalNote;
 
-    // Verifying a manual JazzCash (or legacy EasyPaisa) transfer clears payment states.
+    // Verifying a manual JazzCash transfer clears payment states.
     if (
       parsed.data.paymentStatus === "paid" &&
       prevPaymentStatus !== "paid" &&

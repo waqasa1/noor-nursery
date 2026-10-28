@@ -3,15 +3,14 @@ import { connectDB, isDBConfigured } from "@/lib/db";
 import Order from "@/models/Order";
 import { formatPKR } from "@/lib/utils/currency";
 import { getJazzCashWalletConfig } from "@/lib/settings";
-import { JazzCashPaymentPanel } from "@/components/store/EasyPaisaPaymentPanel";
+import { JazzCashPaymentPanel } from "@/components/store/JazzCashPaymentPanel";
 import { CheckCircle2, Truck, ShoppingBag, MessageCircle } from "lucide-react";
 import { buildOrderWhatsAppUrl } from "@/lib/whatsapp";
 import { getEnv } from "@/lib/env";
 import { orderAccessAllowed } from "@/lib/orders/access";
+import { isManualWalletPayment } from "@/lib/payments/methods";
 
 export const metadata = { robots: { index: false } };
-
-const MANUAL_WALLET = new Set(["jazzcash", "easypaisa"]);
 
 export default async function OrderSuccessPage({ params, searchParams }) {
   const { orderNumber } = await params;
@@ -26,7 +25,7 @@ export default async function OrderSuccessPage({ params, searchParams }) {
     const found = await Order.findOne({ orderNumber }).lean();
     if (found && orderAccessAllowed(found, accessToken)) {
       order = found;
-      if (MANUAL_WALLET.has(order.paymentMethod)) {
+      if (isManualWalletPayment(order.paymentMethod)) {
         wallet = await getJazzCashWalletConfig();
       }
     } else if (found) {
@@ -54,7 +53,7 @@ export default async function OrderSuccessPage({ params, searchParams }) {
   }
 
   const awaitingManualPay =
-    MANUAL_WALLET.has(order.paymentMethod) && order.paymentStatus !== "paid";
+    isManualWalletPayment(order.paymentMethod) && order.paymentStatus !== "paid";
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 lg:py-24">
@@ -85,7 +84,7 @@ export default async function OrderSuccessPage({ params, searchParams }) {
             </span>
           </div>
 
-          {MANUAL_WALLET.has(order.paymentMethod) && wallet && (
+          {isManualWalletPayment(order.paymentMethod) && wallet && (
             <JazzCashPaymentPanel
               orderNumber={orderNumber}
               accessToken={accessToken}

@@ -36,11 +36,7 @@ function CopyRow({ label, value, mono = false }) {
   );
 }
 
-/** Manual JazzCash Send Money + TID panel (legacy export name kept for imports). */
-export function EasyPaisaPaymentPanel(props) {
-  return <JazzCashPaymentPanel {...props} />;
-}
-
+/** Manual JazzCash Send Money + TID panel. */
 export function JazzCashPaymentPanel({
   orderNumber,
   accessToken,
