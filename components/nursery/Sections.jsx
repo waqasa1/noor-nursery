@@ -15,17 +15,20 @@ import {
   SunMedium,
   Truck,
 } from "lucide-react";
-import { FAQS, IMAGES, TESTIMONIALS } from "./data";
+import { IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 export function FeaturedPlant() {
+  const settings = useSiteSettings();
+  const indoorImageSrc = settings.site_content?.indoorImage || IMAGES.indoor;
   return (
     <section className="overflow-hidden bg-card py-16">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 lg:grid-cols-2">
         <div className="relative order-2 lg:order-1">
           <div className="overflow-hidden rounded-3xl shadow-2xl">
             <img
-              src={IMAGES.indoor}
+              src={indoorImageSrc}
               alt="Lush indoor plant collection featuring monstera and tropical foliage"
               loading="lazy"
               className="aspect-[4/5] w-full object-cover transition duration-700 hover:scale-105"
@@ -119,6 +122,8 @@ export function PlantCareFinder() {
 }
 
 export function BrandStory() {
+  const settings = useSiteSettings();
+  const aboutImageSrc = settings.site_content?.aboutImage || IMAGES.fruitTrees;
   return (
     <section className="mx-auto max-w-7xl px-4 py-16">
       <div className="grid items-center gap-10 lg:grid-cols-2">
@@ -141,7 +146,7 @@ export function BrandStory() {
         </div>
         <div className="overflow-hidden rounded-3xl shadow-xl">
           <img
-            src={IMAGES.fruitTrees}
+            src={aboutImageSrc}
             alt="Noor Nursery garden with fruit trees and flowering plants"
             loading="lazy"
             className="aspect-[4/3] w-full object-cover"
@@ -153,11 +158,17 @@ export function BrandStory() {
 }
 
 export function FinalCTA() {
+  const settings = useSiteSettings();
+  const ctaImage =
+    settings.site_content?.aboutImage ||
+    settings.site_content?.heroImage ||
+    IMAGES.flowering;
+
   return (
     <section className="relative overflow-hidden bg-primary py-20 text-center text-primary-foreground">
       <div className="absolute inset-0 opacity-20">
         <img
-          src={IMAGES.flowering}
+          src={ctaImage}
           alt=""
           aria-hidden="true"
           className="h-full w-full object-cover"
@@ -244,6 +255,11 @@ export function Trust() {
 }
 
 export function Testimonials() {
+  const settings = useSiteSettings();
+  const testimonials = settings.testimonials || [];
+
+  if (testimonials.length === 0) return null;
+
   return (
     <section className="bg-primary py-14 text-primary-foreground">
       <div className="mx-auto max-w-7xl px-4">
@@ -253,26 +269,31 @@ export function Testimonials() {
               <Star key={i} className="h-5 w-5 fill-gold text-gold" />
             ))}
           </div>
-          <p className="mt-2 font-display text-sm font-bold text-gold">4.9 / 5.0 Rating</p>
+          <p className="mt-2 font-display text-sm font-bold text-gold">Customer Reviews</p>
           <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            Verified Plant Lover Reviews
+            What Plant Lovers Say
           </h2>
           <p className="mt-2 text-sm text-primary-foreground/75">
-            Real testimonials from Karachi, Lahore, Islamabad, Faisalabad and beyond ·{" "}
-            <strong className="text-leaf">Loved by plant parents across Pakistan</strong>
+            Reviews from customers across Pakistan ·{" "}
+            <strong className="text-leaf">Shared by real buyers</strong>
           </p>
         </div>
 
         <div className="mt-9 grid gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <figure key={t.name} className="rounded-2xl bg-card p-6 text-card-foreground shadow-lg">
+          {testimonials.map((t) => (
+            <figure
+              key={t.id || t.name}
+              className="rounded-2xl bg-card p-6 text-card-foreground shadow-lg"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex gap-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-gold text-gold" />
                   ))}
                 </div>
-                <span className="text-xs text-muted-foreground">{t.when}</span>
+                {t.when ? (
+                  <span className="text-xs text-muted-foreground">{t.when}</span>
+                ) : null}
               </div>
               <blockquote
                 className={`mt-3 text-sm leading-relaxed text-foreground ${t.rtl ? "text-urdu" : ""}`}
@@ -287,7 +308,9 @@ export function Testimonials() {
                 </span>
                 <div>
                   <p className="text-sm font-bold text-foreground">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.location}</p>
+                  {t.location ? (
+                    <p className="text-xs text-muted-foreground">{t.location}</p>
+                  ) : null}
                 </div>
               </figcaption>
             </figure>
@@ -300,6 +323,10 @@ export function Testimonials() {
 
 export function Faq() {
   const [open, setOpen] = useState(0);
+  const settings = useSiteSettings();
+  const faqs = settings.faqs || [];
+
+  if (faqs.length === 0) return null;
 
   return (
     <section id="faq" className="bg-surface-low py-14">
@@ -317,8 +344,8 @@ export function Faq() {
         </div>
 
         <div className="mt-8 space-y-3">
-          {FAQS.map((f, i) => (
-            <div key={f.q} className="overflow-hidden rounded-2xl border bg-card shadow-sm">
+          {faqs.map((f, i) => (
+            <div key={f.id || f.q} className="overflow-hidden rounded-2xl border bg-card shadow-sm">
               <button
                 onClick={() => setOpen(open === i ? null : i)}
                 className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"

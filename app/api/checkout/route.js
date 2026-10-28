@@ -31,7 +31,10 @@ export async function POST(request) {
     });
 
     if (!result.success) {
-      return jsonError("Unable to place order", 400, result.errors);
+      const detail = Array.isArray(result.errors)
+        ? result.errors[0]
+        : "Unable to place order";
+      return jsonError(detail || "Unable to place order", 400, result.errors);
     }
 
     return jsonSuccess({
@@ -39,6 +42,7 @@ export async function POST(request) {
         orderNumber: result.order.orderNumber,
         total: result.order.total,
         paymentMethod: result.order.paymentMethod,
+        accessToken: result.order.accessToken,
       },
       payment: result.payment,
     }, 201);

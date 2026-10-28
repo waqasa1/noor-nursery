@@ -1,8 +1,26 @@
 import { PolicyPage } from "@/components/content/PolicyPage";
+import { getDeliveryConfig, getBannerConfig } from "@/lib/settings";
+import { formatPKR } from "@/lib/utils/currency";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Terms of Service — Noor Nursery" };
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  let freeThreshold = 2500;
+  let promoCode = "";
+  try {
+    const [delivery, banner] = await Promise.all([
+      getDeliveryConfig(),
+      getBannerConfig(),
+    ]);
+    freeThreshold = delivery.freeThreshold;
+    promoCode = banner.active ? String(banner.code || "").trim().toUpperCase() : "";
+  } catch {
+    /* use defaults when DB unavailable at build/runtime */
+  }
+  const thresholdLabel = formatPKR(freeThreshold);
+
   return (
     <PolicyPage
       title="Terms of Service"
@@ -18,9 +36,11 @@ export default function TermsPage() {
       <p>All orders are subject to product availability. We reserve the right to cancel orders with incorrect pricing due to system errors.</p>
       <h2>Pricing &amp; delivery</h2>
       <p>
-        Prices are in PKR. Delivery fees are calculated at checkout. Orders of PKR 2,500 or more qualify for free
-        standard delivery unless checkout shows otherwise. Promo codes (for example NOOR20) are separate from free
-        delivery and may change without notice.
+        Prices are in PKR. Delivery fees are calculated at checkout. Orders of {thresholdLabel} or more qualify for free
+        standard delivery unless checkout shows otherwise.
+        {promoCode
+          ? ` Promo codes (for example ${promoCode}) are separate from free delivery and may change without notice.`
+          : " Promo codes shown on the storefront are separate from free delivery and may change without notice."}
       </p>
       <h2>Payment</h2>
       <p>

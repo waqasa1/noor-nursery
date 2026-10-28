@@ -46,10 +46,7 @@ const STATUS_COLORS = {
 
 const METHOD_COLORS = {
   cod: COLORS.primary,
-  easypaisa: COLORS.secondary,
   jazzcash: COLORS.warn,
-  bank_transfer: COLORS.blue,
-  payfast: COLORS.accent,
 };
 
 function ChartCard({ title, subtitle, children, className = "" }) {

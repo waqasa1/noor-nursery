@@ -31,7 +31,7 @@ export async function POST(request) {
     const env = getEnv();
     const to = env.CONTACT_TO || env.EMAIL_REPLY_TO || store.email || getContactInbox();
 
-    await sendEmail({
+    const result = await sendEmail({
       to,
       replyTo: parsed.data.email,
       subject: `[Contact] ${parsed.data.subject}`,
@@ -43,6 +43,19 @@ export async function POST(request) {
       `,
       text: `${parsed.data.name} <${parsed.data.email}>: ${parsed.data.message}`,
     });
+
+    if (result?.skipped) {
+      return jsonError(
+        "Email is not configured on the server. Please WhatsApp or call the store instead.",
+        503
+      );
+    }
+    if (!result?.success) {
+      return jsonError(
+        "We could not send your message right now. Please try WhatsApp or call the store.",
+        502
+      );
+    }
 
     return jsonSuccess({ message: "Message sent" });
   } catch (error) {

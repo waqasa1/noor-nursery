@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
 import { formatPKR } from "@/lib/utils/currency";
@@ -51,7 +50,6 @@ function inputClass(hasError) {
 }
 
 export default function CheckoutPage() {
-  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const { items, getSubtotal, clearCart } = useCartStore();
   const [paymentMethods, setPaymentMethods] = useState(COD_FALLBACK);
@@ -65,6 +63,8 @@ export default function CheckoutPage() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  /** Keeps checkout UI from flashing "empty cart" after clearCart + before navigation */
+  const [orderRedirect, setOrderRedirect] = useState(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -99,12 +99,18 @@ export default function CheckoutPage() {
   }, []);
 
   useEffect(() => {
-    if (!isMounted || items.length === 0) return;
+    if (!isMounted || items.length === 0 || orderRedirect) return;
     fetch("/api/cart/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })),
+        items: items.map((i) => ({
+          productId: i.productId,
+          variantId: i.variantId,
+          quantity: i.quantity,
+          nameEn: i.nameEn,
+          sizeLabelEn: i.sizeLabelEn,
+        })),
         city: form.city,
         promoCode: appliedPromo || undefined,
       }),
@@ -116,7 +122,7 @@ export default function CheckoutPage() {
         setCartValid(data.valid !== false);
         setCartErrors(data.errors || []);
       });
-  }, [items, form.city, appliedPromo, isMounted]);
+  }, [items, form.city, appliedPromo, isMounted, orderRedirect]);
 
   const applyPromo = async () => {
     setPromoError("");
@@ -124,7 +130,13 @@ export default function CheckoutPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })),
+        items: items.map((i) => ({
+          productId: i.productId,
+          variantId: i.variantId,
+          quantity: i.quantity,
+          nameEn: i.nameEn,
+          sizeLabelEn: i.sizeLabelEn,
+        })),
         city: form.city,
         promoCode,
       }),
@@ -205,8 +217,6 @@ export default function CheckoutPage() {
     }
 
     if (data.payment?.formAction && data.payment?.formParams) {
-      // Keep cart until the gateway form actually submits — if JazzCash WAF
-      // rejects, the user can retry without losing items (order still exists).
       const formEl = document.createElement("form");
       formEl.method = "POST";
       formEl.action = data.payment.formAction;
@@ -220,18 +230,23 @@ export default function CheckoutPage() {
         formEl.appendChild(input);
       });
       document.body.appendChild(formEl);
+      setOrderRedirect({ url: data.payment.formAction, orderNumber: data.order?.orderNumber });
       clearCart();
       formEl.submit();
       return;
     }
 
-    clearCart();
     const token = data.order?.accessToken;
     const fallback = token
       ? `/order-success/${data.order.orderNumber}?t=${encodeURIComponent(token)}`
-      : "/track-order";
-    router.push(data.payment?.redirectUrl || fallback);
-    router.refresh();
+      : data.order?.orderNumber
+        ? `/order-success/${data.order.orderNumber}`
+        : "/track-order";
+    const nextUrl = data.payment?.redirectUrl || fallback;
+    setOrderRedirect({ url: nextUrl, orderNumber: data.order?.orderNumber });
+    clearCart();
+    // Hard navigation avoids a React re-render of the empty-cart checkout screen
+    window.location.assign(nextUrl);
   };
 
   const displayItems = isMounted ? items : [];
@@ -240,6 +255,22 @@ export default function CheckoutPage() {
     accountTitle: jazzcashMethod?.accountTitle || "",
     accountNumber: jazzcashMethod?.accountNumber || "",
   };
+
+  if (orderRedirect) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+        <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-leaf/20 text-leaf">
+          <Truck className="h-12 w-12" />
+        </div>
+        <h2 className="font-display text-2xl font-bold text-primary">Order placed</h2>
+        <p className="mt-2 text-muted-foreground">
+          {orderRedirect.orderNumber
+            ? `Order ${orderRedirect.orderNumber} — taking you to confirmation…`
+            : "Taking you to your order confirmation…"}
+        </p>
+      </div>
+    );
+  }
 
   if (isMounted && displayItems.length === 0) {
     return (
@@ -441,7 +472,7 @@ export default function CheckoutPage() {
                     <input
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                      placeholder="NOOR20"
+                      placeholder="Promo code"
                       className="flex-1 rounded-xl border bg-surface-low px-3 py-2 text-sm uppercase"
                     />
                     <button

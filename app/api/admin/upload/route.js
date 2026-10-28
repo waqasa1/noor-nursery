@@ -6,7 +6,12 @@ const MAX_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
 export async function GET() {
-  return jsonSuccess({ configured: isCloudinaryConfigured() });
+  try {
+    await requireAdmin();
+    return jsonSuccess({ configured: isCloudinaryConfigured() });
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
 
 export async function POST(request) {

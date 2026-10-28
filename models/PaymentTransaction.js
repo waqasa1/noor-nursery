@@ -6,7 +6,7 @@ const paymentTransactionSchema = new mongoose.Schema(
     orderNumber: { type: String, required: true },
     provider: {
       type: String,
-      enum: ["cod", "bank_transfer", "jazzcash", "easypaisa", "payfast"],
+      enum: ["cod", "jazzcash"],
       required: true,
     },
     idempotencyKey: { type: String, required: true, unique: true },

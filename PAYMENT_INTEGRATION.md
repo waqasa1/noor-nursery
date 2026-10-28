@@ -2,150 +2,51 @@
 
 ## Overview
 
-Payments use a provider abstraction in `lib/payments/`. Each method implements:
+Checkout offers two methods:
 
-- `initiate({ order })` — start payment flow
-- `handleCallback(payload)` — verify and process gateway response
-- `verifyPayment(payload)` — confirm payment authenticity
+1. **Cash on Delivery (COD)** — always available
+2. **JazzCash Send Money (manual)** — shown when a JazzCash wallet is configured in Admin → Settings
 
-**Never trust client-side payment confirmation.** Orders are marked paid only after server-verified callbacks.
+There is no merchant gateway redirect.
 
-## Payment Methods
+**Never trust client-side payment confirmation.** JazzCash orders stay unpaid until staff verify the TID in Admin.
 
-### 1. Cash on Delivery (COD)
-
-**Status:** Works without credentials.
+## 1. Cash on Delivery
 
 - Order created with `paymentStatus: unpaid`, `orderStatus: pending`
-- Confirmation email sent immediately
-- Admin marks payment received on delivery
+- Customer pays the courier on delivery
 
-### 2. Bank Transfer
+## 2. JazzCash (manual Send Money + TID)
 
-**Status:** Works when bank details are configured.
+**Configure the receiving wallet** (preferred):
 
-**Environment variables:**
+Admin → Settings → JazzCash Account (account title + number)
 
-```env
-BANK_ACCOUNT_TITLE=Noor Nursery
-BANK_ACCOUNT_NUMBER=your-account-number
-BANK_NAME=HBL
-BANK_BRANCH=Lahore Main
-```
-
-- Order created with `paymentStatus: pending`, `orderStatus: awaiting_payment`
-- Customer receives bank instructions email with order number as reference
-- Admin manually updates payment status to `paid` after verifying transfer
-
-### 3. JazzCash
-
-**Status:** Requires merchant credentials.
-
-**Environment variables:**
+**Env fallback** (used only if Settings are empty):
 
 ```env
-JAZZCASH_MERCHANT_ID=
-JAZZCASH_PASSWORD=
-JAZZCASH_INTEGRITY_SALT=
-JAZZCASH_RETURN_URL=https://noor-nursery.vercel.app/api/jazzcash/return
-JAZZCASH_ENV=sandbox
-```
-
-**Mode:** HTTP POST — Page Redirect (not REST/SOAP). Customer is sent to JazzCash’s hosted form.
-
-**Flow:**
-
-1. Checkout calls `jazzcashProvider.initiate()` — returns form POST to JazzCash sandbox/production URL
-2. Customer completes payment on JazzCash
-3. JazzCash POSTs to `/api/jazzcash/return`
-4. Server verifies `pp_SecureHash` before updating order
-
-**Callback URL:** Must match the Return URL you registered when generating credentials (and `JAZZCASH_RETURN_URL`).
-
-**Disable until configured:** Method hidden from checkout when credentials missing (`jazzcashProvider.isConfigured()` returns false).
-
-### 4. EasyPaisa
-
-**Environment variables:**
-
-```env
-EASYPAISA_STORE_ID=
-EASYPAISA_HASH_KEY=
-EASYPAISA_RETURN_URL=https://yourdomain.com/api/payments/easypaisa/return
-```
-
-**Flow:** Similar redirect + hash verification on return.
-
-**Callback:** `/api/payments/easypaisa/return`
-
-### 5. PayFast
-
-**Environment variables:**
-
-```env
-PAYFAST_MERCHANT_ID=
-PAYFAST_MERCHANT_KEY=
-PAYFAST_SECRET=
-PAYFAST_RETURN_URL=https://yourdomain.com/api/payments/payfast/return
-PAYFAST_CANCEL_URL=https://yourdomain.com/api/payments/payfast/cancel
-PAYFAST_NOTIFY_URL=https://yourdomain.com/api/payments/payfast/notify
+JAZZCASH_ACCOUNT_TITLE=Noor Nursery
+JAZZCASH_ACCOUNT_NUMBER=03XXXXXXXXX
 ```
 
 **Flow:**
 
-1. Server generates signed form parameters
-2. Customer redirected to PayFast
-3. PayFast sends ITN (notification) to `/api/payments/payfast/notify`
-4. Signature verified before marking order paid
+1. Customer chooses JazzCash at checkout
+2. Order is created (`awaiting_payment`)
+3. Order success page shows wallet details + amount
+4. Customer Send Money’s from the JazzCash app and submits TID / TrxID
+5. Admin verifies the TID and marks the order paid → packing / ship
 
-**Important:** The success/return page alone does NOT mark orders paid — only verified ITN/callback does.
+**Disable JazzCash at checkout:**
 
-## Status Mapping
-
-| Gateway Status | Internal paymentStatus | Internal orderStatus |
-|----------------|------------------------|----------------------|
-| Success | `paid` | `paid` or `processing` |
-| Pending | `pending` | `awaiting_payment` |
-| Failed | `failed` | `awaiting_payment` |
-| Cancelled | `failed` | `cancelled` |
-| COD | `unpaid` | `pending` |
-| Bank Transfer | `pending` | `awaiting_payment` |
-
-## Idempotency
-
-Payment callbacks use idempotency keys stored in `PaymentTransaction` collection:
-
-```
-{provider}-{externalReference}-{orderNumber}
+```env
+CHECKOUT_COD_ONLY=true
 ```
 
-Duplicate callbacks with the same key are ignored if already processed as success.
+Or leave both JazzCash account fields empty in Admin Settings.
 
-## Security Constraints
+## Security notes
 
-- Merchant keys, passwords, and secrets are **server-only** environment variables
-- Never log raw payment payloads containing sensitive data in production
-- Verify cryptographic signatures/checksums per provider documentation
-- Do not expose secrets in client JavaScript, error messages, or git
-- Use HTTPS in production for all callback URLs
-
-## Sandbox Testing
-
-- **JazzCash:** Use sandbox URL in provider (currently points to sandbox — update for production)
-- **EasyPaisa:** Request sandbox credentials from EasyPaisa merchant support
-- **PayFast:** Use sandbox at `sandbox.payfast.co.za` (update `formAction` in provider for production)
-
-## Disabling a Payment Method
-
-Remove or leave empty the required environment variables for that method. The checkout API rejects unavailable methods, and `getAvailablePaymentMethods()` excludes unconfigured providers.
-
-## Audit Trail
-
-All payment events are logged in `PaymentTransaction` with:
-
-- Order reference
-- Provider
-- Amount
-- Status
-- Sanitized gateway response (no secrets)
-- Processed timestamp
+- TID submission is rate-limited
+- Admin must verify transfers before marking paid
+- Never ask customers for JazzCash PIN or OTP

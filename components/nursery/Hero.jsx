@@ -14,13 +14,16 @@ import { CATEGORIES, IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
 import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { buildPlantDoctorWhatsAppUrl } from "@/lib/whatsapp";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 export function Hero() {
+  const settings = useSiteSettings();
+  const heroImageSrc = settings.site_content?.heroImage || IMAGES.hero;
   return (
     <section className="relative min-h-[88vh] overflow-hidden">
       <div className="absolute inset-0">
         <Image
-          src={IMAGES.hero}
+          src={heroImageSrc}
           alt="Noor Nursery — healthy plants ready for Pakistani homes and gardens"
           fill
           priority
@@ -153,8 +156,10 @@ export function Categories({ categories = [] }) {
         slug: c.name.toLowerCase().replace(/\s+/g, "-"),
         nameEn: c.name,
         nameUr: c.urdu,
-        image: c.image,
+        image: c.image || "/placeholder-plant.jpg",
       }));
+
+  if (!list.length) return null;
 
   return (
     <section id="categories" className="mx-auto max-w-7xl px-4 py-16">

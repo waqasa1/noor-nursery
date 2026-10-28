@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AdminOrderDetailSkeleton } from "@/components/admin/AdminSkeleton";
 import { formatPKR } from "@/lib/utils/currency";
+import { isManualWalletPayment } from "@/lib/payments/methods";
 
 const ORDER_STATUSES = [
   { value: "pending", label: "Pending" },
@@ -176,7 +177,7 @@ export default function AdminOrderDetailPage() {
             </span>
           </div>
 
-          {(order.paymentMethod === "jazzcash" || order.paymentMethod === "easypaisa") && (
+          {isManualWalletPayment(order.paymentMethod) && (
             <div className="mt-4 space-y-4">
               <div className="rounded-xl border bg-surface-low p-4 text-sm">
                 <p className="font-semibold text-foreground">
@@ -246,7 +247,7 @@ export default function AdminOrderDetailPage() {
             </div>
           )}
 
-          {order.paymentMethod !== "jazzcash" && order.paymentMethod !== "easypaisa" && (
+          {!isManualWalletPayment(order.paymentMethod) && (
             <p className="mt-3 text-sm text-muted-foreground">
               Current status: <span className="font-semibold text-foreground">{order.paymentStatus}</span>
               {order.paymentReference ? ` · reference ${order.paymentReference}` : ""}

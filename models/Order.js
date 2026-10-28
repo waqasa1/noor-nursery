@@ -57,7 +57,7 @@ const orderSchema = new mongoose.Schema(
     currency: { type: String, default: "PKR" },
     paymentMethod: {
       type: String,
-      enum: ["cod", "bank_transfer", "jazzcash", "easypaisa", "payfast"],
+      enum: ["cod", "jazzcash"],
       required: true,
     },
     paymentStatus: {

@@ -4,7 +4,7 @@ import { SESSION_COOKIE, getAuthSecretKey } from "@/lib/auth/session";
 
 const adminPaths = ["/admin"];
 const authPaths = ["/login", "/signup", "/forgot-password", "/reset-password"];
-const protectedPaths = ["/account", "/checkout"];
+const protectedPaths = ["/account"];
 
 async function verifySession(token) {
   try {

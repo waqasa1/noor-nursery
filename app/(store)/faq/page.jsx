@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { PlantFinder } from "@/components/plants/PlantFinder";
-import { FAQS } from "@/components/nursery/data";
 import { IMAGES } from "@/components/nursery/data";
+import { getStoreFaqs } from "@/lib/faqs.server";
 import { faqJsonLd } from "@/lib/seo/structured-data";
 import { JsonLdScript } from "@/lib/seo/JsonLdScript";
 import { Leaf } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Plant Finder & FAQ — Noor Nursery",
@@ -12,10 +14,12 @@ export const metadata = {
     "Find the right plant for your space, then browse FAQs on delivery, JazzCash, COD, and plant care for Pakistani homes.",
 };
 
-export default function PlantCareGuidePage() {
+export default async function PlantCareGuidePage() {
+  const faqs = await getStoreFaqs();
+
   return (
     <>
-    <JsonLdScript data={faqJsonLd(FAQS)} />
+      <JsonLdScript data={faqJsonLd(faqs)} />
 
       <div className="relative h-64 w-full bg-primary lg:h-80">
         <div className="absolute inset-0 z-0 opacity-30">
@@ -71,16 +75,21 @@ export default function PlantCareGuidePage() {
           </p>
         </div>
 
-        <div className="mt-8 space-y-4">
-          {FAQS.map((faq, i) => (
-            <details key={i} className="rounded-2xl border bg-card p-5 shadow-sm">
-              <summary className="cursor-pointer font-semibold text-foreground">{faq.q}</summary>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{faq.a}</p>
-            </details>
-          ))}
-        </div>
+        {faqs.length === 0 ? (
+          <p className="mt-8 text-center text-sm text-muted-foreground">
+            No FAQs published yet. Check back soon, or contact us on WhatsApp.
+          </p>
+        ) : (
+          <div className="mt-8 space-y-4">
+            {faqs.map((faq, i) => (
+              <details key={faq.id || i} className="rounded-2xl border bg-card p-5 shadow-sm">
+                <summary className="cursor-pointer font-semibold text-foreground">{faq.q}</summary>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{faq.a}</p>
+              </details>
+            ))}
+          </div>
+        )}
       </section>
-
     </>
   );
 }

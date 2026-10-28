@@ -3,9 +3,22 @@
 import Link from "next/link";
 import { MessageCircle, ShieldCheck, Facebook, Instagram, Phone } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
+import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage, normalizeWhatsAppPhone } from "@/lib/whatsapp";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 export function Footer() {
+  const settings = useSiteSettings();
+  const sc = settings.site_content;
+  const storePhone = settings.store?.phone || "";
+
+  const displayPhone = formatStorePhone(storePhone || undefined);
+  const telHref = `tel:+${normalizeWhatsAppPhone(storePhone || undefined)}`;
+  const waHref = buildWhatsAppUrl(generalSupportMessage());
+
+  const facebookUrl = sc.facebookUrl || "https://www.facebook.com/Noor.Nursery.24hr";
+  const instagramUrl = sc.instagramUrl || "https://www.instagram.com/noornursery_official/";
+  const copyrightText = sc.copyrightText || "Noor Nursery Pakistan. All rights reserved.";
+
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-2 lg:grid-cols-4">
@@ -29,17 +42,17 @@ export function Footer() {
             delivered to your doorstep with guaranteed live arrival.
           </p>
           <div className="mt-6 flex items-center gap-4">
-            <a href="https://www.facebook.com/Noor.Nursery.24hr" target="_blank" rel="noopener noreferrer" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Facebook">
+            <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Facebook">
               <Facebook className="h-4 w-4" />
             </a>
-            <a href="https://www.instagram.com/noornursery_official/" target="_blank" rel="noopener noreferrer" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Instagram">
+            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Instagram">
               <Instagram className="h-4 w-4" />
             </a>
-            <a href={`tel:+${formatStorePhone().replace(/\D/g, "")}`} className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Phone">
+            <a href={telHref} className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Phone">
               <Phone className="h-4 w-4" />
             </a>
             <a
-              href={buildWhatsAppUrl(generalSupportMessage())}
+              href={waHref}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground"
@@ -123,7 +136,7 @@ export function Footer() {
             </span>
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-forest pt-4 text-xs text-primary-foreground/60">
-            <p>© {new Date().getFullYear()} Noor Nursery Pakistan. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} {copyrightText}</p>
             <div className="flex gap-4">
               <Link href="/privacy-policy" className="hover:text-leaf">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-leaf">Terms of Service</Link>
