@@ -9,10 +9,25 @@ import { serializeProducts } from "@/lib/utils/serialize";
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);
-  if (!category) return { title: "Category Not Found" };
+  if (!category) return { title: "Category Not Found", robots: { index: false } };
+
+  const title = category.nameEn;
+  const description =
+    category.seoDescription ||
+    category.descriptionEn ||
+    `Shop ${category.nameEn} at Noor Nursery — live plants and garden supplies delivered across Pakistan.`;
+  const path = `/categories/${slug}`;
+
   return {
-    title: `${category.nameEn} — Noor Nursery`,
-    description: category.descriptionEn || category.seoDescription,
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      title,
+      description,
+      url: path,
+      images: category.image ? [{ url: category.image }] : undefined,
+    },
   };
 }
 

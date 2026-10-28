@@ -1,7 +1,12 @@
 import { PolicyPage } from "@/components/content/PolicyPage";
 import { BRAND, storePublicEmail } from "@/lib/brand";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = { title: "Privacy Policy — Noor Nursery" };
+export const metadata = pageMetadata({
+  title: "Privacy Policy",
+  description: "How Noor Nursery collects, uses, and protects your information.",
+  path: "/privacy-policy",
+});
 
 export default function PrivacyPolicyPage() {
   const email = storePublicEmail();

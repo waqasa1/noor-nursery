@@ -1,10 +1,15 @@
 import { PolicyPage } from "@/components/content/PolicyPage";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { getDeliveryConfig, getBannerConfig } from "@/lib/settings";
 import { formatPKR } from "@/lib/utils/currency";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Terms of Service — Noor Nursery" };
+export const metadata = pageMetadata({
+  title: "Terms of Service",
+  description: "Terms of service for shopping at Noor Nursery online in Pakistan.",
+  path: "/terms",
+});
 
 export default async function TermsPage() {
   let freeThreshold = 2500;

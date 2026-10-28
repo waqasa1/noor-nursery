@@ -1,7 +1,7 @@
 import { getEnv } from "@/lib/env";
 
 export default function robots() {
-  const baseUrl = getEnv().NEXT_PUBLIC_APP_URL;
+  const baseUrl = getEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
   return {
     rules: [
       {
@@ -16,10 +16,13 @@ export default function robots() {
           "/signup",
           "/forgot-password",
           "/reset-password",
+          "/order-success",
+          "/track-order",
           "/api/",
         ],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
+    host: baseUrl,
   };
 }

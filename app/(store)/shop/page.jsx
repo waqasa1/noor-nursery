@@ -16,11 +16,28 @@ export async function generateMetadata({ searchParams }) {
   const params = readShopParams(await searchParams);
   const heading = shopHeading(params);
   const noun = isAccessoryView(params) ? "accessories" : "plants";
+  const hasSearch = Boolean(params.search?.trim());
+
+  // Prefer a stable canonical for filtered catalog views; never index search result URLs.
+  const qs = new URLSearchParams();
+  if (params.category) qs.set("category", params.category);
+  if (params.type) qs.set("type", params.type);
+  if (params.featured === "true") qs.set("featured", "true");
+  const query = qs.toString();
+  const path = query ? `/shop?${query}` : "/shop";
+
+  const title =
+    heading === "All Products" ? "Shop Plants Online in Pakistan" : heading;
+  const description = `Browse ${heading.toLowerCase()} — ${noun} in Small, Medium and Large sizes with nationwide delivery across Pakistan. COD and JazzCash.`;
 
   return {
-    title: heading === "All Products" ? "Shop Plants — Noor Nursery" : `${heading} — Noor Nursery`,
-    description: `Browse ${heading.toLowerCase()} — ${noun} in Small, Medium and Large sizes with nationwide delivery across Pakistan.`,
-    robots: { index: true, follow: true },
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: { title, description, url: path },
+    robots: hasSearch
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
   };
 }
 

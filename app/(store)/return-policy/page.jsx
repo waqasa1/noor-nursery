@@ -1,6 +1,12 @@
 import { PolicyPage } from "@/components/content/PolicyPage";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = { title: "Return Policy — Noor Nursery" };
+export const metadata = pageMetadata({
+  title: "Return Policy",
+  description:
+    "Live arrival guarantee, replacements, and refunds for Noor Nursery plant orders in Pakistan.",
+  path: "/return-policy",
+});
 
 export default function ReturnPolicyPage() {
   return (

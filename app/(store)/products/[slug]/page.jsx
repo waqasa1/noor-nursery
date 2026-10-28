@@ -2,26 +2,40 @@ import { notFound } from "next/navigation";
 import { ProductDetail } from "./ProductDetail";
 import { getProductBySlug, getRelatedProducts } from "@/lib/data/products";
 import { serializeProduct, serializeProducts } from "@/lib/utils/serialize";
-import { productJsonLd, breadcrumbJsonLd } from "@/lib/seo/structured-data";
+import { productJsonLd, breadcrumbJsonLd, absoluteUrl } from "@/lib/seo/structured-data";
 import { JsonLdScript } from "@/lib/seo/JsonLdScript";
-import { getEnv } from "@/lib/env";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/metadata";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-  if (!product) return { title: "Product Not Found" };
+  if (!product) return { title: "Product Not Found", robots: { index: false } };
 
-  const env = getEnv();
+  const title = product.seoTitle || product.nameEn;
+  const description =
+    product.seoDescription ||
+    product.shortDescriptionEn ||
+    `Buy ${product.nameEn} online from Noor Nursery Pakistan. COD and JazzCash available.`;
+  const image = product.featuredImage || product.images?.[0] || DEFAULT_OG_IMAGE;
+  const path = `/products/${slug}`;
+
   return {
-    title: product.seoTitle || `${product.nameEn} — Noor Nursery`,
-    description: product.seoDescription || product.shortDescriptionEn,
+    title,
+    description,
+    alternates: { canonical: absoluteUrl(path) },
     openGraph: {
       title: product.nameEn,
-      description: product.shortDescriptionEn,
-      images: product.featuredImage ? [product.featuredImage] : [],
-      url: `${env.NEXT_PUBLIC_APP_URL}/products/${slug}`,
+      description,
+      url: absoluteUrl(path),
+      type: "website",
+      images: [{ url: image }],
     },
-    alternates: { canonical: `${env.NEXT_PUBLIC_APP_URL}/products/${slug}` },
+    twitter: {
+      card: "summary_large_image",
+      title: product.nameEn,
+      description,
+      images: [image],
+    },
   };
 }
 

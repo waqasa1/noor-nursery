@@ -1,10 +1,16 @@
 import { PolicyPage } from "@/components/content/PolicyPage";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { getDeliveryConfig, getBannerConfig } from "@/lib/settings";
 import { formatPKR } from "@/lib/utils/currency";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Shipping Policy — Noor Nursery" };
+export const metadata = pageMetadata({
+  title: "Shipping Policy",
+  description:
+    "Noor Nursery delivery across Pakistan, free shipping threshold, 48-hour live plant guarantee, COD and JazzCash.",
+  path: "/shipping-policy",
+});
 
 export default async function ShippingPolicyPage() {
   let freeThreshold = 2500;

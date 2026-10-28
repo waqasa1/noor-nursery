@@ -4,7 +4,7 @@ import Product from "@/models/Product";
 import Category from "@/models/Category";
 
 export default async function sitemap() {
-  const baseUrl = getEnv().NEXT_PUBLIC_APP_URL;
+  const baseUrl = getEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
 
   const staticPages = [
     "", "/shop", "/categories", "/about", "/contact", "/faq",

@@ -1,12 +1,15 @@
 import Link from "next/link";
+import { Leaf, ShoppingBag } from "lucide-react";
 import { getCategories } from "@/lib/data/products";
 import { IMAGES } from "@/components/nursery/data";
-import { Leaf, ShoppingBag } from "lucide-react";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "Categories — Noor Nursery",
-  description: "Browse indoor plants, fruit plants, flowering plants, herbs, pots, fertilizers and garden accessories.",
-};
+export const metadata = pageMetadata({
+  title: "Plant Categories",
+  description:
+    "Browse indoor plants, fruit plants, flowering plants, herbs, pots, fertilizers and garden accessories.",
+  path: "/categories",
+});
 
 /** Cached until admin/seed calls revalidateCatalog(). */
 export const revalidate = false;

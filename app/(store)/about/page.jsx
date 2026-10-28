@@ -4,11 +4,13 @@ import { ContentCtaLink, ContentHero } from "@/components/content/ContentHero";
 import { BRAND } from "@/lib/brand";
 import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { IMAGES } from "@/components/nursery/data";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "About Us — Noor Nursery",
+export const metadata = pageMetadata({
+  title: "About Us",
   description: `${BRAND.sloganPrimary} Pakistan's trusted online nursery since ${BRAND.since}.`,
-};
+  path: "/about",
+});
 
 const PILLARS = [
   {

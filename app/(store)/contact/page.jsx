@@ -1,13 +1,15 @@
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { ContentHero } from "@/components/content/ContentHero";
 import { BRAND, storePublicEmail } from "@/lib/brand";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
 import { ContactForm } from "./ContactForm";
 
-export const metadata = {
-  title: "Contact — Noor Nursery",
+export const metadata = pageMetadata({
+  title: "Contact",
   description: "Reach Noor Nursery for orders, plant care, and wholesale. Email or WhatsApp us.",
-};
+  path: "/contact",
+});
 
 export default function ContactPage() {
   const email = storePublicEmail();

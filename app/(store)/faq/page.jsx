@@ -1,18 +1,20 @@
 import Link from "next/link";
+import { Leaf } from "lucide-react";
 import { PlantFinder } from "@/components/plants/PlantFinder";
 import { IMAGES } from "@/components/nursery/data";
 import { getStoreFaqs } from "@/lib/faqs.server";
 import { faqJsonLd } from "@/lib/seo/structured-data";
 import { JsonLdScript } from "@/lib/seo/JsonLdScript";
-import { Leaf } from "lucide-react";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Plant Finder & FAQ — Noor Nursery",
+export const metadata = pageMetadata({
+  title: "Plant Finder & FAQ",
   description:
     "Find the right plant for your space, then browse FAQs on delivery, JazzCash, COD, and plant care for Pakistani homes.",
-};
+  path: "/faq",
+});
 
 export default async function PlantCareGuidePage() {
   const faqs = await getStoreFaqs();
