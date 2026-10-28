@@ -136,7 +136,23 @@ export function Footer() {
             </span>
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-forest pt-4 text-xs text-primary-foreground/60">
-            <p>© {new Date().getFullYear()} {copyrightText}</p>
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span>© {new Date().getFullYear()} {copyrightText}</span>
+              <span className="text-primary-foreground/35" aria-hidden>
+                ·
+              </span>
+              <span>
+                Created by{" "}
+                <a
+                  href="https://www.marsweb.tech/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-foreground/75 underline-offset-2 hover:text-leaf hover:underline"
+                >
+                  Mars Web
+                </a>
+              </span>
+            </p>
             <div className="flex gap-4">
               <Link href="/privacy-policy" className="hover:text-leaf">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-leaf">Terms of Service</Link>
