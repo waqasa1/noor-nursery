@@ -8,17 +8,17 @@ import { IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
 import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage } from "@/lib/whatsapp";
 import { isRouteNavigating, startRouteProgress } from "@/lib/navigation/route-progress";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 export function TopBar() {
   return (
     <div className="bg-primary text-primary-foreground">
-      {/* single line, never wraps: long promo truncates on small screens */}
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 whitespace-nowrap px-4 py-2 text-[11px] sm:text-xs lg:text-sm">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2 text-[11px] sm:text-xs lg:text-sm">
         <p className="flex min-w-0 items-center gap-2">
           <Truck className="h-4 w-4 shrink-0 text-leaf" />
-          <span className="truncate sm:hidden">Same-day in Lahore · Free shipping over PKR 2,500</span>
-          <span className="hidden truncate sm:inline">
-            Same-day in Lahore · Express delivery to Karachi, Islamabad &amp; 50+ cities
+          <span className="sm:hidden">Same-day delivery in Karachi · Free ship over PKR 2,500</span>
+          <span className="hidden sm:inline">
+            Same-day in Karachi · Express delivery to Karachi, Islamabad &amp; 50+ cities
           </span>
           <span className="hidden font-semibold text-gold md:inline">
             &nbsp;| Free shipping over PKR 2,500
@@ -70,11 +70,10 @@ function NavigationLinks({ navLinks }) {
           <Link
             key={link.href}
             href={link.href}
-            className={`shrink-0 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${
-              active
+            className={`shrink-0 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${active
                 ? "border-b-2 border-secondary font-semibold text-secondary"
                 : "text-foreground hover:text-secondary"
-            }`}
+              }`}
           >
             {link.label}
           </Link>
@@ -102,11 +101,10 @@ function NavDropdown({ link, parentActive, isActive }) {
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((o) => !o)}
-        className={`flex shrink-0 items-center gap-1 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${
-          parentActive
+        className={`flex shrink-0 items-center gap-1 whitespace-nowrap px-3 py-2.5 text-[13px] font-medium transition ${parentActive
             ? "border-b-2 border-secondary font-semibold text-secondary"
             : "text-foreground hover:text-secondary"
-        }`}
+          }`}
       >
         {link.label}
         <ChevronDown className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`} />
@@ -114,11 +112,10 @@ function NavDropdown({ link, parentActive, isActive }) {
 
       <div
         role="menu"
-        className={`absolute left-0 top-full z-50 w-64 rounded-xl border bg-card p-2 shadow-xl transition ${
-          open
+        className={`absolute left-0 top-full z-50 w-64 rounded-xl border bg-card p-2 shadow-xl transition ${open
             ? "visible opacity-100"
             : "invisible opacity-0 group-hover:visible group-hover:opacity-100"
-        }`}
+          }`}
       >
         {link.children.map((child) => (
           <Link
@@ -126,13 +123,11 @@ function NavDropdown({ link, parentActive, isActive }) {
             href={child.href}
             role="menuitem"
             onClick={() => setOpen(false)}
-            className={`block rounded-lg px-3 py-2 text-sm transition ${
-              child.strong ? "mb-1 border-b border-foreground/10 pb-2.5 font-extrabold text-primary" : "font-medium"
-            } ${
-              isActive(child.href)
+            className={`block rounded-lg px-3 py-2 text-sm transition ${child.strong ? "mb-1 border-b border-foreground/10 pb-2.5 font-extrabold text-primary" : "font-medium"
+              } ${isActive(child.href)
                 ? "bg-surface-low font-semibold text-secondary"
                 : "text-foreground hover:bg-surface-low hover:text-secondary"
-            }`}
+              }`}
           >
             {child.label}
           </Link>
@@ -159,13 +154,11 @@ function MobileNavigationLinks({ navLinks, setMenuOpen }) {
                   key={child.href}
                   href={child.href}
                   onClick={() => setMenuOpen && setMenuOpen(false)}
-                  className={`block rounded-lg py-2 pr-3 text-sm transition ${
-                    i === 0 ? "pl-3 font-extrabold text-primary" : "pl-7 text-muted-foreground"
-                  } ${
-                    isActive(child.href)
+                  className={`block rounded-lg py-2 pr-3 text-sm transition ${i === 0 ? "pl-3 font-extrabold text-primary" : "pl-7 text-muted-foreground"
+                    } ${isActive(child.href)
                       ? "bg-surface-low !font-semibold !text-secondary"
                       : "hover:bg-surface-low hover:text-secondary"
-                  }`}
+                    }`}
                 >
                   {child.label}
                 </Link>
@@ -180,11 +173,10 @@ function MobileNavigationLinks({ navLinks, setMenuOpen }) {
             key={link.href}
             href={link.href}
             onClick={() => setMenuOpen && setMenuOpen(false)}
-            className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-              active
+            className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition ${active
                 ? "bg-surface-low text-secondary font-semibold"
                 : "text-foreground hover:bg-surface-low hover:text-secondary"
-            }`}
+              }`}
           >
             {link.label}
           </Link>
@@ -230,6 +222,17 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
       window.removeEventListener("focus", onAuth);
     };
   }, []);
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   const firstName = user?.name ? user.name.trim().split(/\s+/)[0] : "";
   // While auth is loading, send users to /account (middleware redirects guests to login)
@@ -346,7 +349,7 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
       </div>
 
       {menuOpen && (
-        <div className="border-t bg-card lg:hidden">
+        <div className="border-t bg-card lg:hidden overflow-y-auto max-h-[calc(100svh-3.5rem)]">
           <div className="mx-auto max-w-7xl px-4 py-4">
             <form onSubmit={handleSearch} className="mb-3">
               <div className="flex items-center gap-2 rounded-full border bg-surface-low px-4 py-2">
@@ -390,15 +393,22 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
 }
 
 export function FlashDeal() {
+  const settings = useSiteSettings();
+  const banner = settings.banner;
+
+  if (!banner.active) return null;
+
   return (
     <div className="bg-gold text-gold-foreground">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2.5 text-center text-sm">
         <Zap className="h-4 w-4" />
-        <span className="font-bold">Limited offer:</span>
-        <span>Flat 20% off your order — free shipping over PKR 2,500</span>
-        <span className="rounded-md bg-primary px-2 py-0.5 font-mono text-xs font-bold text-gold">
-          Code: NOOR20
-        </span>
+        <span className="font-bold">{banner.text}</span>
+        <span>{banner.subtext}</span>
+        {banner.code && (
+          <span className="rounded-md bg-primary px-2 py-0.5 font-mono text-xs font-bold text-gold">
+            Code: {banner.code}
+          </span>
+        )}
       </div>
     </div>
   );

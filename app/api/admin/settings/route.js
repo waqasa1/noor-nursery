@@ -8,6 +8,8 @@ import {
   getBankConfig,
   getEasypaisaConfig,
   getPromoCodes,
+  getBannerConfig,
+  getSiteContent,
 } from "@/lib/settings";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
@@ -41,20 +43,36 @@ const updateSchema = z.object({
     active: z.boolean(),
     label: z.string().optional(),
   })).optional(),
+  banner: z.object({
+    active: z.boolean(),
+    text: z.string().max(120),
+    subtext: z.string().max(240),
+    code: z.string().max(40),
+  }).optional(),
+  site_content: z.object({
+    heroImage: z.string().optional(),
+    indoorImage: z.string().optional(),
+    aboutImage: z.string().optional(),
+    facebookUrl: z.string().optional(),
+    instagramUrl: z.string().optional(),
+    copyrightText: z.string().max(200).optional(),
+  }).optional(),
 });
 
 export async function GET() {
   try {
     await requireAdmin();
-    const [delivery, store, bank, easypaisa, promo_codes, raw] = await Promise.all([
+    const [delivery, store, bank, easypaisa, promo_codes, banner, site_content, raw] = await Promise.all([
       getDeliveryConfig(),
       getStoreInfo(),
       getBankConfig(),
       getEasypaisaConfig(),
       getPromoCodes(),
+      getBannerConfig(),
+      getSiteContent(),
       getAllSettings(),
     ]);
-    return jsonSuccess({ delivery, store, bank, easypaisa, promo_codes, raw });
+    return jsonSuccess({ delivery, store, bank, easypaisa, promo_codes, banner, site_content, raw });
   } catch (error) {
     return handleApiError(error);
   }
@@ -75,6 +93,8 @@ export async function PUT(request) {
     if (parsed.data.bank) updates.push(setSetting("bank", parsed.data.bank));
     if (parsed.data.easypaisa) updates.push(setSetting("easypaisa", parsed.data.easypaisa));
     if (parsed.data.promo_codes) updates.push(setSetting("promo_codes", parsed.data.promo_codes));
+    if (parsed.data.banner) updates.push(setSetting("banner", parsed.data.banner));
+    if (parsed.data.site_content) updates.push(setSetting("site_content", parsed.data.site_content));
 
     await Promise.all(updates);
     return jsonSuccess({ message: "Settings saved" });

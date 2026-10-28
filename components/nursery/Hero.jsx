@@ -14,13 +14,16 @@ import { CATEGORIES, IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
 import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { buildPlantDoctorWhatsAppUrl } from "@/lib/whatsapp";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 export function Hero() {
+  const settings = useSiteSettings();
+  const heroImageSrc = settings.site_content?.heroImage || IMAGES.hero;
   return (
     <section className="relative min-h-[88vh] overflow-hidden">
       <div className="absolute inset-0">
         <Image
-          src={IMAGES.hero}
+          src={heroImageSrc}
           alt="Noor Nursery — healthy plants ready for Pakistani homes and gardens"
           fill
           priority

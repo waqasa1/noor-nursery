@@ -17,15 +17,18 @@ import {
 } from "lucide-react";
 import { FAQS, IMAGES, TESTIMONIALS } from "./data";
 import { BRAND } from "@/lib/brand";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 export function FeaturedPlant() {
+  const settings = useSiteSettings();
+  const indoorImageSrc = settings.site_content?.indoorImage || IMAGES.indoor;
   return (
     <section className="overflow-hidden bg-card py-16">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 lg:grid-cols-2">
         <div className="relative order-2 lg:order-1">
           <div className="overflow-hidden rounded-3xl shadow-2xl">
             <img
-              src={IMAGES.indoor}
+              src={indoorImageSrc}
               alt="Lush indoor plant collection featuring monstera and tropical foliage"
               loading="lazy"
               className="aspect-[4/5] w-full object-cover transition duration-700 hover:scale-105"
@@ -119,6 +122,8 @@ export function PlantCareFinder() {
 }
 
 export function BrandStory() {
+  const settings = useSiteSettings();
+  const aboutImageSrc = settings.site_content?.aboutImage || IMAGES.fruitTrees;
   return (
     <section className="mx-auto max-w-7xl px-4 py-16">
       <div className="grid items-center gap-10 lg:grid-cols-2">
@@ -141,7 +146,7 @@ export function BrandStory() {
         </div>
         <div className="overflow-hidden rounded-3xl shadow-xl">
           <img
-            src={IMAGES.fruitTrees}
+            src={aboutImageSrc}
             alt="Noor Nursery garden with fruit trees and flowering plants"
             loading="lazy"
             className="aspect-[4/3] w-full object-cover"
