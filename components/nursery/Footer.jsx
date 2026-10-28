@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MessageCircle, ShieldCheck, Facebook, Instagram, Phone } from "lucide-react";
+import { MessageCircle, ShieldCheck, Facebook, Instagram, MapPin, Phone } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { buildWhatsAppUrl, formatStorePhone, generalSupportMessage, normalizeWhatsAppPhone } from "@/lib/whatsapp";
 import { useSiteSettings } from "@/lib/useSiteSettings";
@@ -38,8 +38,8 @@ export function Footer() {
             {BRAND.sloganSecondary}
           </p>
           <p className="mt-3 text-sm leading-relaxed text-primary-foreground/75">
-            Nurturing homes and gardens across Pakistan since 2012. Healthy, acclimatized plants
-            delivered to your doorstep with guaranteed live arrival.
+            Nurturing homes and gardens across Pakistan since {BRAND.since}. Healthy, acclimatized
+            plants delivered to your doorstep with guaranteed live arrival.
           </p>
           <div className="mt-6 flex items-center gap-4">
             <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="rounded-full bg-primary-foreground/10 p-2 text-primary-foreground transition hover:bg-leaf hover:text-leaf-foreground" aria-label="Facebook">
@@ -61,6 +61,20 @@ export function Footer() {
               <MessageCircle className="h-4 w-4" />
             </a>
           </div>
+          <a
+            href={BRAND.mainOffice.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 flex items-start gap-2.5 text-sm leading-relaxed text-primary-foreground/75 transition hover:text-leaf"
+          >
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-leaf" aria-hidden />
+            <span>
+              <span className="block font-semibold text-primary-foreground/90">
+                {BRAND.mainOffice.label}
+              </span>
+              {BRAND.mainOffice.address}
+            </span>
+          </a>
         </div>
 
         <div>

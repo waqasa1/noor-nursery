@@ -1,47 +1,48 @@
 import { NextResponse } from "next/server";
-import { jwtVerify } from "jose";
-import { SESSION_COOKIE, getAuthSecretKey } from "@/lib/auth/session";
+import {
+  SESSION_COOKIE,
+  getSessionCookieOptions,
+  verifySessionToken,
+} from "@/lib/auth/session-token";
 
 const adminPaths = ["/admin"];
-const authPaths = ["/login", "/signup", "/forgot-password", "/reset-password"];
 const protectedPaths = ["/account"];
 
-async function verifySession(token) {
-  try {
-    const { payload } = await jwtVerify(token, getAuthSecretKey());
-    return payload;
-  } catch {
-    return null;
-  }
+function clearSessionAndRedirect(request, path) {
+  const response = NextResponse.redirect(new URL(path, request.url));
+  response.cookies.set(SESSION_COOKIE, "", {
+    ...getSessionCookieOptions(),
+    maxAge: 0,
+  });
+  return response;
 }
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get(SESSION_COOKIE)?.value;
-  const session = token ? await verifySession(token) : null;
+  const session = token ? await verifySessionToken(token) : null;
 
   const isAdminRoute = adminPaths.some((p) => pathname.startsWith(p));
-  const isAuthRoute = authPaths.some((p) => pathname.startsWith(p));
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
+  // Missing/invalid JWT → login (cookie cleared). sessionVersion is checked in layouts/APIs.
   if (isAdminRoute) {
     if (!session) {
-      return NextResponse.redirect(new URL("/login?redirect=/admin", request.url));
+      return clearSessionAndRedirect(
+        request,
+        `/login?redirect=${encodeURIComponent(pathname)}`
+      );
     }
     if (session.role !== "admin") {
       return NextResponse.redirect(new URL("/account?error=forbidden", request.url));
     }
   }
 
-  if (isProtected && !session && pathname.startsWith("/account")) {
-    return NextResponse.redirect(
-      new URL(`/login?redirect=${encodeURIComponent(pathname)}`, request.url)
+  if (isProtected && !session) {
+    return clearSessionAndRedirect(
+      request,
+      `/login?redirect=${encodeURIComponent(pathname)}`
     );
-  }
-
-  if (isAuthRoute && session) {
-    const dest = session.role === "admin" ? "/admin" : "/account";
-    return NextResponse.redirect(new URL(dest, request.url));
   }
 
   const response = NextResponse.next();
@@ -54,5 +55,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/account/:path*", "/login", "/signup", "/forgot-password", "/reset-password"],
+  matcher: ["/admin/:path*", "/account/:path*"],
 };

@@ -25,6 +25,8 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, trim: true },
     passwordHash: { type: String, required: true, select: false },
     role: { type: String, enum: ["customer", "admin"], default: "customer" },
+    /** Incremented on password change — JWTs with an older `sv` are rejected. */
+    sessionVersion: { type: Number, default: 0 },
     addresses: [addressSchema],
     emailVerified: { type: Date },
     passwordResetTokenHash: { type: String, select: false },

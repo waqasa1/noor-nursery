@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
-import { requireAuth } from "@/lib/auth/session";
+import { requireAuth, bumpSessionVersion } from "@/lib/auth/session";
 import { verifyPassword, hashPassword } from "@/lib/auth/password";
 import { sendPasswordChangedEmail } from "@/lib/email";
-import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
+import { jsonSuccessWithSession, jsonError, handleApiError } from "@/lib/api-response";
 
 const schema = z.object({
   currentPassword: z.string().min(1),
@@ -30,11 +30,12 @@ export async function POST(request) {
     }
 
     user.passwordHash = await hashPassword(parsed.data.newPassword);
+    bumpSessionVersion(user);
     await user.save();
 
     sendPasswordChangedEmail(user.email, user.name).catch(() => {});
 
-    return jsonSuccess({ message: "Password updated" });
+    return jsonSuccessWithSession(user, { message: "Password updated" });
   } catch (error) {
     return handleApiError(error);
   }

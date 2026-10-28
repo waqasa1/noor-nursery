@@ -2,7 +2,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { hashPassword, hashResetToken, validatePassword } from "@/lib/auth/password";
-import { destroySession } from "@/lib/auth/session";
+import { bumpSessionVersion, destroySession } from "@/lib/auth/session";
 import { rateLimitAsync, getClientIp } from "@/lib/auth/rate-limit";
 import { sendPasswordChangedEmail } from "@/lib/email";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
@@ -47,6 +47,7 @@ export async function POST(request) {
     user.passwordHash = await hashPassword(parsed.data.password);
     user.passwordResetTokenHash = undefined;
     user.passwordResetExpiresAt = undefined;
+    bumpSessionVersion(user);
     await user.save();
 
     await destroySession();

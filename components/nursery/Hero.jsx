@@ -55,7 +55,7 @@ export function Hero() {
         </p>
 
         <p className="text-urdu animate-fade-up-delay-2 mt-3 text-lg text-primary-foreground/75" dir="rtl" lang="ur">
-          ۲۰۱۲ سے پاکستانی گھروں اور باغات کے لیے قابلِ اعتماد آن لائن نرسری
+          ۱۹۶۵ سے پاکستانی گھروں اور باغات کے لیے قابلِ اعتماد آن لائن نرسری
         </p>
 
         <div className="animate-fade-up-delay-3 mt-8 flex flex-wrap gap-3">
@@ -87,7 +87,7 @@ export function Hero() {
           {[
             { value: CATALOG_SPECIES_COUNT, label: "Plant varieties" },
             { value: "48-Hr", label: "Arrival Guarantee" },
-            { value: "2012", label: "Trusted Since" },
+            { value: String(BRAND.since), label: "Trusted Since" },
           ].map((s) => (
             <div
               key={s.label}
