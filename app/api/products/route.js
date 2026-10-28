@@ -3,6 +3,7 @@ import Product from "@/models/Product";
 import Category from "@/models/Category";
 import { jsonSuccess, handleApiError } from "@/lib/api-response";
 import { applyProductSearch } from "@/lib/products/search";
+import { applyVariantShopFilters } from "@/lib/products/filters";
 
 export async function GET(request) {
   try {
@@ -38,11 +39,7 @@ export async function GET(request) {
 
     if (featured === "true") filter.featured = true;
 
-    // Filter in the query (not after .limit()) so pages stay full.
-    if (available === "true") {
-      filter.variants = { $elemMatch: { isActive: true, stock: { $gt: 0 } } };
-    }
-
+    applyVariantShopFilters(filter, { minPrice, maxPrice, available });
     Object.assign(filter, applyProductSearch({}, search));
 
     let sortOption = { createdAt: -1 };
@@ -51,24 +48,15 @@ export async function GET(request) {
     if (sort === "featured") sortOption = { featured: -1, createdAt: -1 };
 
     const skip = (page - 1) * limit;
-    let products = await Product.find(filter)
-      .populate("categoryId", "nameEn nameUr slug")
-      .sort(sortOption)
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    if (minPrice || maxPrice) {
-      const min = parseFloat(minPrice) || 0;
-      const max = parseFloat(maxPrice) || Infinity;
-      products = products.filter((p) => {
-        const prices = p.variants?.filter((v) => v.isActive).map((v) => v.price) || [];
-        const lowest = Math.min(...prices);
-        return lowest >= min && lowest <= max;
-      });
-    }
-
-    const total = await Product.countDocuments(filter);
+    const [products, total] = await Promise.all([
+      Product.find(filter)
+        .populate("categoryId", "nameEn nameUr slug")
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Product.countDocuments(filter),
+    ]);
 
     return jsonSuccess({
       products,

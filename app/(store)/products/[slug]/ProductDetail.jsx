@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { ProductInfoSections } from "@/components/products/ProductInfoSections";
 import { CatalogProductCard } from "@/components/catalog/ProductCard";
+import { CatalogImage } from "@/components/catalog/CatalogImage";
 import { BRAND } from "@/lib/brand";
 import { extractBotanicalName, isPlantProduct } from "@/lib/products/product-detail-content";
 import { buildProductWhatsAppUrl } from "@/lib/whatsapp";
@@ -82,11 +83,13 @@ export function ProductDetail({ product, related }) {
 
       <div className="grid gap-10 lg:grid-cols-2">
         <div>
-          <div className="aspect-square overflow-hidden rounded-3xl bg-surface-low shadow-md">
-            <img
+          <div className="relative aspect-square overflow-hidden rounded-3xl bg-surface-low shadow-md">
+            <CatalogImage
               src={images[activeImage] || "/placeholder.jpg"}
               alt={`${product.nameEn} — ${product.nameUr}`}
-              className="h-full w-full object-cover"
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              priority
             />
           </div>
           {images.length > 1 && (
@@ -96,12 +99,17 @@ export function ProductDetail({ product, related }) {
                   key={img}
                   type="button"
                   onClick={() => setActiveImage(i)}
-                  className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 transition ${
+                  className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 transition ${
                     activeImage === i ? "border-secondary" : "border-transparent opacity-70 hover:opacity-100"
                   }`}
                   aria-label={`View image ${i + 1}`}
                 >
-                  <img src={img} alt="" className="h-full w-full object-cover" />
+                  <CatalogImage
+                    src={img}
+                    alt=""
+                    className="object-cover"
+                    sizes="64px"
+                  />
                 </button>
               ))}
             </div>

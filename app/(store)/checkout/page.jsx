@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
 import { formatPKR } from "@/lib/utils/currency";
 import { Truck, AlertCircle } from "lucide-react";
+import { OTHER_CITY_VALUE } from "@/lib/delivery-defaults";
 import { mapCheckoutFieldErrors, validateCheckoutForm } from "@/lib/validation/checkout";
+import {
+  CheckoutCitySelect,
+  resolveCheckoutCity,
+} from "@/components/store/CheckoutCitySelect";
 
 const COD_FALLBACK = [
   {
@@ -25,7 +30,6 @@ const ADDRESS_FIELDS = [
   { id: "addressLine1", label: "Address Line 1", span: 2 },
   { id: "addressLine2", label: "Address Line 2 (Optional)", span: 2 },
   { id: "area", label: "Area / Colony" },
-  { id: "city", label: "City" },
   { id: "province", label: "Province" },
   { id: "postalCode", label: "Postal Code" },
 ];
@@ -53,6 +57,11 @@ export default function CheckoutPage() {
   const [isMounted, setIsMounted] = useState(false);
   const { items, getSubtotal, clearCart } = useCartStore();
   const [paymentMethods, setPaymentMethods] = useState(COD_FALLBACK);
+  const [deliveryCities, setDeliveryCities] = useState([]);
+  const [defaultDeliveryFee, setDefaultDeliveryFee] = useState(250);
+  const [freeThreshold, setFreeThreshold] = useState(2500);
+  const [cityKey, setCityKey] = useState("lahore");
+  const [otherCity, setOtherCity] = useState("");
   const [validatedItems, setValidatedItems] = useState([]);
   const [cartValid, setCartValid] = useState(true);
   const [cartErrors, setCartErrors] = useState([]);
@@ -90,7 +99,21 @@ export default function CheckoutPage() {
         const methods = data.paymentMethods?.length ? data.paymentMethods : COD_FALLBACK;
         setPaymentMethods(methods);
         const defaultMethod = methods.find((m) => m.id === "cod")?.id || methods[0]?.id || "cod";
-        setForm((f) => ({ ...f, paymentMethod: defaultMethod }));
+
+        const cities = Array.isArray(data.delivery?.cities) ? data.delivery.cities : [];
+        setDeliveryCities(cities);
+        if (typeof data.delivery?.defaultFee === "number") {
+          setDefaultDeliveryFee(data.delivery.defaultFee);
+        }
+        if (typeof data.delivery?.freeThreshold === "number") {
+          setFreeThreshold(data.delivery.freeThreshold);
+        }
+
+        const preferred =
+          cities.find((c) => c.value === "lahore")?.value || cities[0]?.value || OTHER_CITY_VALUE;
+        const cityLabel = resolveCheckoutCity(preferred, "", cities) || "Lahore";
+        setCityKey(preferred);
+        setForm((f) => ({ ...f, paymentMethod: defaultMethod, city: cityLabel }));
       })
       .catch(() => {
         setPaymentMethods(COD_FALLBACK);
@@ -164,6 +187,17 @@ export default function CheckoutPage() {
     setSubmitError("");
   };
 
+  const handleCityKeyChange = (nextKey) => {
+    setCityKey(nextKey);
+    const city = resolveCheckoutCity(nextKey, otherCity, deliveryCities);
+    update("city", city);
+  };
+
+  const handleOtherCityChange = (value) => {
+    setOtherCity(value);
+    update("city", value.trim());
+  };
+
   const scrollToFirstError = (errors) => {
     const firstField = Object.keys(errors)[0];
     if (!firstField) return;
@@ -178,6 +212,18 @@ export default function CheckoutPage() {
     setFieldErrors({});
     setSubmitError("");
 
+    const resolvedCity = resolveCheckoutCity(cityKey, otherCity, deliveryCities);
+    if (cityKey === OTHER_CITY_VALUE && resolvedCity.length < 2) {
+      const errors = { city: "Enter your city name" };
+      setFieldErrors(errors);
+      scrollToFirstError(errors);
+      return;
+    }
+    const formForSubmit = { ...form, city: resolvedCity };
+    if (form.city !== resolvedCity) {
+      setForm((f) => ({ ...f, city: resolvedCity }));
+    }
+
     if (!cartValid) {
       setSubmitError(
         cartErrors[0] || "Your cart has invalid items. Remove them and add products from the shop."
@@ -185,7 +231,7 @@ export default function CheckoutPage() {
       return;
     }
 
-    const validation = validateCheckoutForm(form, items, appliedPromo);
+    const validation = validateCheckoutForm(formForSubmit, items, appliedPromo);
     if (!validation.valid) {
       setFieldErrors(validation.fieldErrors);
       scrollToFirstError(validation.fieldErrors);
@@ -255,6 +301,16 @@ export default function CheckoutPage() {
     accountTitle: jazzcashMethod?.accountTitle || "",
     accountNumber: jazzcashMethod?.accountNumber || "",
   };
+
+  const subtotalDisplay = totals.subtotal || (isMounted ? getSubtotal() : 0);
+  const shippingDisplay = useMemo(() => {
+    if (subtotalDisplay >= freeThreshold) return 0;
+    if (cityKey === OTHER_CITY_VALUE) return defaultDeliveryFee;
+    const match = deliveryCities.find((c) => c.value === cityKey);
+    return match != null ? Number(match.fee) || 0 : defaultDeliveryFee;
+  }, [cityKey, deliveryCities, defaultDeliveryFee, freeThreshold, subtotalDisplay]);
+  const discountDisplay = totals.discount || 0;
+  const totalDisplay = Math.max(0, subtotalDisplay + shippingDisplay - discountDisplay);
 
   if (orderRedirect) {
     return (
@@ -355,6 +411,15 @@ export default function CheckoutPage() {
                     <FieldError message={fieldErrors[f.id]} />
                   </div>
                 ))}
+                <CheckoutCitySelect
+                  cities={deliveryCities}
+                  cityKey={cityKey}
+                  otherCity={otherCity}
+                  onCityKeyChange={handleCityKeyChange}
+                  onOtherCityChange={handleOtherCityChange}
+                  error={fieldErrors.city}
+                  inputClassName={inputClass(!!fieldErrors.city)}
+                />
                 <div className="sm:col-span-2">
                   <label htmlFor="deliveryInstructions" className="block text-sm font-medium text-foreground">Delivery Instructions (Optional)</label>
                   <textarea
@@ -417,7 +482,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between gap-4 border-t pt-2">
                       <span className="text-muted-foreground">Amount to send</span>
-                      <span className="font-bold text-primary">{formatPKR(totals.total || getSubtotal())}</span>
+                      <span className="font-bold text-primary">{formatPKR(totalDisplay)}</span>
                     </div>
                   </div>
                   <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-xs leading-relaxed text-muted-foreground">
@@ -490,21 +555,23 @@ export default function CheckoutPage() {
                 <div className="mt-6 space-y-3 text-sm">
                   <div className="flex justify-between text-muted-foreground">
                     <span>Subtotal</span>
-                    <span className="font-medium text-foreground">{formatPKR(totals.subtotal || getSubtotal())}</span>
+                    <span className="font-medium text-foreground">{formatPKR(subtotalDisplay)}</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>Shipping</span>
-                    <span className="font-medium text-foreground">{formatPKR(totals.deliveryFee || 0)}</span>
+                    <span className="font-medium text-foreground">
+                      {shippingDisplay === 0 ? "Free" : formatPKR(shippingDisplay)}
+                    </span>
                   </div>
-                  {totals.discount > 0 && (
+                  {discountDisplay > 0 && (
                     <div className="flex justify-between text-leaf">
                       <span>Discount</span>
-                      <span className="font-medium">−{formatPKR(totals.discount)}</span>
+                      <span className="font-medium">−{formatPKR(discountDisplay)}</span>
                     </div>
                   )}
                   <div className="flex justify-between pt-4 font-display text-xl font-bold text-primary">
                     <span>Total</span>
-                    <span>{formatPKR(totals.total || getSubtotal())}</span>
+                    <span>{formatPKR(totalDisplay)}</span>
                   </div>
                 </div>
 

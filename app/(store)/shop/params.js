@@ -14,6 +14,9 @@ export function readShopParams(sp = {}) {
     featured: sp.featured || "",
     sort: sp.sort || "newest",
     page: Math.max(1, parseInt(sp.page || "1", 10) || 1),
+    minPrice: sp.minPrice || "",
+    maxPrice: sp.maxPrice || "",
+    available: sp.available === "true" ? "true" : "",
   };
 }
 

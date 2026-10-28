@@ -8,6 +8,7 @@ import { formatPKR } from "@/lib/utils/currency";
 import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { buildBulkOrderWhatsAppUrl, buildProductWhatsAppUrl } from "@/lib/whatsapp";
 import { SizeSelect, defaultSizeId } from "@/components/catalog/SizeSelect";
+import { CatalogImage } from "@/components/catalog/CatalogImage";
 
 function ProductCard({ product, onAdd }) {
   const router = useRouter();
@@ -37,11 +38,11 @@ function ProductCard({ product, onAdd }) {
         tabIndex={-1}
         aria-hidden="true"
       >
-        <img
-          src={product.featuredImage || product.images?.[0] || "/placeholder-plant.jpg"}
+        <CatalogImage
+          src={product.featuredImage || product.images?.[0]}
           alt={product.nameEn}
-          loading="lazy"
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          className="object-cover transition duration-500 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {product.tags?.length > 0 && (
           <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">

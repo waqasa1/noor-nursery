@@ -52,6 +52,9 @@ export default async function ShopPage({ searchParams }) {
     search: params.search || undefined,
     featured: params.featured === "true" ? true : undefined,
     sort: params.sort,
+    minPrice: params.minPrice || undefined,
+    maxPrice: params.maxPrice || undefined,
+    available: params.available === "true" ? true : undefined,
   });
 
   const plainProducts = serializeProducts(products);

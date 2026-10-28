@@ -44,10 +44,12 @@ export function ShopContent({ params, products, pagination }) {
   const pathname = usePathname();
 
   const [searchInput, setSearchInput] = useState(() => params.search || "");
+  const [minPriceInput, setMinPriceInput] = useState(() => params.minPrice || "");
+  const [maxPriceInput, setMaxPriceInput] = useState(() => params.maxPrice || "");
   const [toast, setToast] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
-  const { category, type, search, featured, sort } = params;
+  const { category, type, search, featured, sort, minPrice, maxPrice, available } = params;
 
   const buildUrl = useCallback(
     (patch = {}) => {
@@ -57,6 +59,9 @@ export function ShopContent({ params, products, pagination }) {
         search,
         featured,
         sort,
+        minPrice,
+        maxPrice,
+        available,
         page: "1",
         ...patch,
       };
@@ -70,12 +75,17 @@ export function ShopContent({ params, products, pagination }) {
       const qs = params.toString();
       return `${pathname}${qs ? `?${qs}` : ""}`;
     },
-    [pathname, category, type, search, featured, sort]
+    [pathname, category, type, search, featured, sort, minPrice, maxPrice, available]
   );
 
   useEffect(() => {
     setSearchInput(search);
   }, [search]);
+
+  useEffect(() => {
+    setMinPriceInput(minPrice || "");
+    setMaxPriceInput(maxPrice || "");
+  }, [minPrice, maxPrice]);
 
   const handleAdd = (item) => {
     addItem(item);
@@ -88,6 +98,17 @@ export function ShopContent({ params, products, pagination }) {
     router.push(buildUrl({ search: searchInput.trim(), page: "1" }));
   };
 
+  const applyPriceFilters = (e) => {
+    e.preventDefault();
+    router.push(
+      buildUrl({
+        minPrice: minPriceInput.trim(),
+        maxPrice: maxPriceInput.trim(),
+        page: "1",
+      })
+    );
+  };
+
   const isAccessory = isAccessoryView(params);
   const noun = isAccessory ? "accessories" : "products";
 
@@ -97,6 +118,9 @@ export function ShopContent({ params, products, pagination }) {
     search && { key: "search", label: `“${search}”`, clear: { search: "" } },
     category && { key: "category", label: category.replace(/-/g, " "), clear: { category: "" } },
     type && { key: "type", label: type === "accessories" ? "accessories" : "plants", clear: { type: "" } },
+    minPrice && { key: "minPrice", label: `From PKR ${minPrice}`, clear: { minPrice: "" } },
+    maxPrice && { key: "maxPrice", label: `Up to PKR ${maxPrice}`, clear: { maxPrice: "" } },
+    available === "true" && { key: "available", label: "In stock", clear: { available: "" } },
   ].filter(Boolean);
 
   const showingFrom = (pagination.page - 1) * PAGE_SIZE + 1;
@@ -154,6 +178,63 @@ export function ShopContent({ params, products, pagination }) {
             >
               Search
             </button>
+          </form>
+
+          <form
+            onSubmit={applyPriceFilters}
+            className="mt-4 flex flex-col gap-3 border-t border-foreground/10 pt-4 sm:flex-row sm:flex-wrap sm:items-end"
+          >
+            <div className="grid flex-1 grid-cols-2 gap-2 sm:max-w-xs">
+              <div>
+                <label htmlFor="shop-min-price" className="block text-[11px] font-extrabold uppercase tracking-wide text-muted-foreground">
+                  Min PKR
+                </label>
+                <input
+                  id="shop-min-price"
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={minPriceInput}
+                  onChange={(e) => setMinPriceInput(e.target.value)}
+                  placeholder="0"
+                  className="mt-1 w-full rounded-full border-2 border-foreground/15 bg-white px-3 py-2 text-sm font-semibold outline-none focus:border-secondary"
+                />
+              </div>
+              <div>
+                <label htmlFor="shop-max-price" className="block text-[11px] font-extrabold uppercase tracking-wide text-muted-foreground">
+                  Max PKR
+                </label>
+                <input
+                  id="shop-max-price"
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={maxPriceInput}
+                  onChange={(e) => setMaxPriceInput(e.target.value)}
+                  placeholder="Any"
+                  className="mt-1 w-full rounded-full border-2 border-foreground/15 bg-white px-3 py-2 text-sm font-semibold outline-none focus:border-secondary"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              className="rounded-full border-2 border-foreground/15 bg-white px-4 py-2.5 text-sm font-bold text-foreground transition hover:border-secondary hover:text-secondary"
+            >
+              Apply price
+            </button>
+            <label className="flex cursor-pointer items-center gap-2 rounded-full border-2 border-foreground/15 bg-white px-4 py-2.5 text-sm font-bold text-foreground transition hover:border-secondary">
+              <input
+                type="checkbox"
+                checked={available === "true"}
+                onChange={(e) =>
+                  router.push(
+                    buildUrl({ available: e.target.checked ? "true" : "", page: "1" })
+                  )
+                }
+                className="h-4 w-4 accent-secondary"
+              />
+              In stock only
+            </label>
           </form>
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-foreground/10 pt-4">

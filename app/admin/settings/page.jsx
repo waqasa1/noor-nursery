@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { AdminSettingsSkeleton } from "@/components/admin/AdminSkeleton";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { DEFAULT_CITY_FEES, titleCaseCity } from "@/lib/delivery-defaults";
 import { invalidateSiteSettingsCache } from "@/lib/useSiteSettings";
-import { Zap, Image as ImageIcon, Share2, Loader2 } from "lucide-react";
+import { Zap, Image as ImageIcon, Share2, Loader2, Plus, Trash2 } from "lucide-react";
 
 function normalizePromoCode(raw) {
   return String(raw || "").trim().toUpperCase();
@@ -38,6 +39,142 @@ function syncPromoToBanner(promoCodes, banner, discountValue, active) {
       label: existing.label || `${Number.isFinite(value) ? value : 20}% off your order`,
     },
   };
+}
+
+function DeliveryFeesSection({ delivery, onUpdate, onReplaceCityFees }) {
+  const [newCity, setNewCity] = useState("");
+  const [newFee, setNewFee] = useState("");
+  const cityFees = { ...DEFAULT_CITY_FEES, ...(delivery?.cityFees || {}) };
+  const rows = Object.entries(cityFees).sort(([a], [b]) => a.localeCompare(b));
+
+  const setCityFee = (city, fee) => {
+    const key = String(city).trim().toLowerCase();
+    if (!key) return;
+    onReplaceCityFees({ ...cityFees, [key]: Number(fee) || 0 });
+  };
+
+  const removeCity = (city) => {
+    const next = { ...cityFees };
+    delete next[city];
+    onReplaceCityFees(next);
+  };
+
+  const addCity = (e) => {
+    e.preventDefault();
+    const key = String(newCity).trim().toLowerCase();
+    if (!key) return;
+    onReplaceCityFees({ ...cityFees, [key]: Number(newFee) || 0 });
+    setNewCity("");
+    setNewFee("");
+  };
+
+  return (
+    <section className="rounded-2xl border bg-card p-5 lg:col-span-2">
+      <h2 className="font-semibold">Delivery Fees</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Free-delivery threshold also updates the top header line (“Free shipping over …”).
+        City fees apply when the order is under that threshold; unknown cities use the default fee.
+      </p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className="block text-xs font-medium">Default Fee (PKR)</label>
+          <input
+            type="number"
+            min={0}
+            value={delivery?.defaultFee ?? 250}
+            onChange={(e) => onUpdate("delivery", "defaultFee", Number(e.target.value))}
+            className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium">Free Delivery Threshold (PKR)</label>
+          <input
+            type="number"
+            min={0}
+            value={delivery?.freeThreshold ?? 2500}
+            onChange={(e) => onUpdate("delivery", "freeThreshold", Number(e.target.value))}
+            className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+          />
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Shown in the storefront header as free shipping over this amount.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <h3 className="text-sm font-semibold">City fees (PKR)</h3>
+        <p className="mt-1 text-xs text-muted-foreground">
+          These cities appear in the checkout dropdown. Customers can also pick &quot;Other city&quot; for the default fee.
+        </p>
+        <div className="mt-3 overflow-hidden rounded-xl border">
+          <table className="w-full text-sm">
+            <thead className="bg-surface-low text-left text-xs uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 font-semibold">City</th>
+                <th className="px-3 py-2 font-semibold">Fee (PKR)</th>
+                <th className="px-3 py-2 w-12" />
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(([city, fee]) => (
+                <tr key={city} className="border-t">
+                  <td className="px-3 py-2 font-medium">{titleCaseCity(city)}</td>
+                  <td className="px-3 py-2">
+                    <input
+                      type="number"
+                      min={0}
+                      value={fee}
+                      onChange={(e) => setCityFee(city, e.target.value)}
+                      className="w-28 rounded-lg border px-2 py-1.5 text-sm"
+                    />
+                  </td>
+                  <td className="px-3 py-2">
+                    <button
+                      type="button"
+                      onClick={() => removeCity(city)}
+                      className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+                      aria-label={`Remove ${city}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <form onSubmit={addCity} className="mt-3 flex flex-wrap items-end gap-2">
+          <div>
+            <label className="block text-xs font-medium">Add city</label>
+            <input
+              value={newCity}
+              onChange={(e) => setNewCity(e.target.value)}
+              placeholder="e.g. Peshawar"
+              className="mt-1 w-40 rounded-xl border px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium">Fee</label>
+            <input
+              type="number"
+              min={0}
+              value={newFee}
+              onChange={(e) => setNewFee(e.target.value)}
+              placeholder="250"
+              className="mt-1 w-28 rounded-xl border px-3 py-2 text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            className="inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-bold transition hover:bg-surface-low"
+          >
+            <Plus className="h-4 w-4" /> Add
+          </button>
+        </form>
+      </div>
+    </section>
+  );
 }
 
 export default function AdminSettingsPage() {
@@ -382,35 +519,16 @@ export default function AdminSettingsPage() {
         </section>
 
         {/* ── Delivery Fees ── */}
-        <section className="rounded-2xl border bg-card p-5">
-          <h2 className="font-semibold">Delivery Fees</h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Free-delivery threshold also updates the top header line (“Free shipping over …”).
-          </p>
-          <div className="mt-4 space-y-3">
-            <div>
-              <label className="block text-xs font-medium">Default Fee (PKR)</label>
-              <input
-                type="number"
-                value={settings.delivery.defaultFee}
-                onChange={(e) => update("delivery", "defaultFee", Number(e.target.value))}
-                className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium">Free Delivery Threshold (PKR)</label>
-              <input
-                type="number"
-                value={settings.delivery.freeThreshold}
-                onChange={(e) => update("delivery", "freeThreshold", Number(e.target.value))}
-                className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-              />
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                Shown in the storefront header as free shipping over this amount.
-              </p>
-            </div>
-          </div>
-        </section>
+        <DeliveryFeesSection
+          delivery={settings.delivery}
+          onUpdate={update}
+          onReplaceCityFees={(cityFees) =>
+            setSettings((s) => ({
+              ...s,
+              delivery: { ...s.delivery, cityFees },
+            }))
+          }
+        />
 
         {/* ── Promo discount (tied to banner code) ── */}
         <section className="rounded-2xl border bg-card p-5">

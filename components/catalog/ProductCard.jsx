@@ -7,6 +7,7 @@ import { ShoppingCart } from "lucide-react";
 import { formatPKR } from "@/lib/utils/currency";
 import { useCartStore } from "@/store/cart";
 import { SizeSelect, defaultSizeId } from "@/components/catalog/SizeSelect";
+import { CatalogImage } from "@/components/catalog/CatalogImage";
 import { startRouteProgress } from "@/lib/navigation/route-progress";
 
 export function CatalogProductCard({ product, onAddToCart }) {
@@ -67,11 +68,11 @@ export function CatalogProductCard({ product, onAddToCart }) {
         tabIndex={-1}
         aria-hidden="true"
       >
-        <img
-          src={product.featuredImage || product.images?.[0] || "/placeholder-plant.jpg"}
+        <CatalogImage
+          src={product.featuredImage || product.images?.[0]}
           alt={`${product.nameEn} — ${product.nameUr}`}
-          loading="lazy"
-          className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+          className="object-cover transition duration-700 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent opacity-0 transition group-hover:opacity-100" />
         {product.featured && (
