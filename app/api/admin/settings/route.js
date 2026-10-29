@@ -155,6 +155,8 @@ export async function PUT(request) {
     if (data.site_content) updates.push(setSetting("site_content", data.site_content));
 
     await Promise.all(updates);
+    const { revalidateSiteSettings } = await import("@/lib/cache/site-settings");
+    revalidateSiteSettings();
     return jsonSuccess({ message: "Settings saved" });
   } catch (error) {
     return handleApiError(error);

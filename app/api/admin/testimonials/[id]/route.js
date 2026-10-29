@@ -28,6 +28,8 @@ export async function PUT(request, { params }) {
 
     testimonials[idx] = { ...testimonials[idx], ...parsed.data };
     await setSetting("testimonials", testimonials);
+    const { revalidateSiteSettings } = await import("@/lib/cache/site-settings");
+    revalidateSiteSettings();
     return jsonSuccess({ testimonial: testimonials[idx] });
   } catch (error) {
     return handleApiError(error);
@@ -45,6 +47,8 @@ export async function DELETE(request, { params }) {
       return jsonError("Testimonial not found", 404);
     }
     await setSetting("testimonials", filtered);
+    const { revalidateSiteSettings } = await import("@/lib/cache/site-settings");
+    revalidateSiteSettings();
     return jsonSuccess({ deleted: id });
   } catch (error) {
     return handleApiError(error);

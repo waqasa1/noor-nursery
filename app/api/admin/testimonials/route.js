@@ -37,6 +37,8 @@ export async function POST(request) {
       ...parsed.data,
     };
     await setSetting("testimonials", [...testimonials, newItem]);
+    const { revalidateSiteSettings } = await import("@/lib/cache/site-settings");
+    revalidateSiteSettings();
     return jsonSuccess({ testimonial: newItem }, 201);
   } catch (error) {
     return handleApiError(error);
