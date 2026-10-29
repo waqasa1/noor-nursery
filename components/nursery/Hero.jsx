@@ -15,6 +15,7 @@ import { BRAND } from "@/lib/brand";
 import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { buildPlantDoctorWhatsAppUrl } from "@/lib/whatsapp";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 
 export function Hero() {
   const settings = useSiteSettings();
@@ -103,7 +104,11 @@ export function Hero() {
       </div>
 
       <div className="relative border-t border-primary-foreground/10 bg-primary/95 backdrop-blur-sm">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-6 lg:grid-cols-4">
+        <Stagger
+          className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-6 lg:grid-cols-4"
+          stagger={0.08}
+          delay={0.35}
+        >
           {[
             {
               icon: Package,
@@ -130,7 +135,7 @@ export function Hero() {
               sub: "Pay courier or send via JazzCash",
             },
           ].map((f) => (
-            <div key={f.title} className="flex items-start gap-3">
+            <StaggerItem key={f.title} className="flex items-start gap-3">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-leaf/20">
                 <f.icon className="h-5 w-5 text-leaf" />
               </span>
@@ -141,9 +146,9 @@ export function Hero() {
                 </p>
                 <p className="text-xs text-primary-foreground/65">{f.sub}</p>
               </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
     </section>
   );
@@ -165,7 +170,7 @@ export function Categories({ categories = [] }) {
 
   return (
     <section id="categories" className="mx-auto max-w-7xl px-4 py-16">
-      <div className="mb-10 max-w-2xl">
+      <Reveal className="mb-10 max-w-2xl">
         <p className="text-xs font-bold uppercase tracking-widest text-secondary">
           Shop by Category
         </p>
@@ -176,46 +181,47 @@ export function Categories({ categories = [] }) {
           Hand-picked varieties for home, terrace, and lawn — browse with confidence.
           Tools, pots, seeds, and more are under Accessories.
         </p>
-      </div>
+      </Reveal>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <Stagger className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5" stagger={0.07}>
         {list.slice(0, 5).map((c) => (
-          <a
-            key={c.slug || c.nameEn}
-            href={c.slug ? `/categories/${c.slug}` : "#plants"}
-            className="group relative aspect-[3/4] overflow-hidden rounded-3xl shadow-md transition duration-500 hover:-translate-y-1 hover:shadow-xl"
-          >
-            <img
-              src={c.image || "/placeholder.jpg"}
-              alt={c.nameEn}
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent transition duration-500 group-hover:from-primary/95" />
-            <div className="absolute inset-x-0 bottom-0 p-4">
-              <p className="font-display text-base font-bold text-primary-foreground sm:text-lg">
-                {c.nameEn}
-              </p>
-              <p
-                className="text-urdu mt-0.5 text-xs text-primary-foreground/75 opacity-0 transition duration-300 group-hover:opacity-100"
-                dir="rtl"
-                lang="ur"
-              >
-                {c.nameUr}
-              </p>
-            </div>
-          </a>
+          <StaggerItem key={c.slug || c.nameEn}>
+            <a
+              href={c.slug ? `/categories/${c.slug}` : "#plants"}
+              className="group relative block aspect-[3/4] overflow-hidden rounded-3xl shadow-md transition duration-500 hover:-translate-y-1 hover:shadow-xl"
+            >
+              <img
+                src={c.image || "/placeholder.jpg"}
+                alt={c.nameEn}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent transition duration-500 group-hover:from-primary/95" />
+              <div className="absolute inset-x-0 bottom-0 p-4">
+                <p className="font-display text-base font-bold text-primary-foreground sm:text-lg">
+                  {c.nameEn}
+                </p>
+                <p
+                  className="text-urdu mt-0.5 text-xs text-primary-foreground/75 opacity-0 transition duration-300 group-hover:opacity-100"
+                  dir="rtl"
+                  lang="ur"
+                >
+                  {c.nameUr}
+                </p>
+              </div>
+            </a>
+          </StaggerItem>
         ))}
-      </div>
+      </Stagger>
 
-      <div className="mt-8 text-center">
+      <Reveal className="mt-8 text-center" delay={0.15}>
         <Link
           href="/categories"
           className="inline-flex items-center gap-1.5 text-sm font-bold text-secondary transition hover:text-primary"
         >
           View All Categories →
         </Link>
-      </div>
+      </Reveal>
     </section>
   );
 }

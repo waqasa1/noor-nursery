@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BadgeCheck, Leaf, MapPin, Package, Sprout, Truck } from "lucide-react";
 import { ContentCtaLink, ContentHero } from "@/components/content/ContentHero";
+import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { BRAND } from "@/lib/brand";
 import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { IMAGES } from "@/components/nursery/data";
@@ -91,7 +92,7 @@ export default function AboutPage() {
         className="scroll-mt-24 relative overflow-hidden bg-[linear-gradient(165deg,var(--surface-low)_0%,var(--background)_45%,var(--surface-mid)_100%)]"
       >
         <div className="mx-auto grid max-w-6xl items-start gap-12 px-4 py-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:px-6 lg:py-20">
-          <div className="lg:sticky lg:top-28 lg:self-start">
+          <Reveal className="lg:sticky lg:top-28 lg:self-start">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">
               Our story
             </p>
@@ -142,11 +143,11 @@ export default function AboutPage() {
                 </a>
               </div>
             </div>
-          </div>
+          </Reveal>
 
-          <ol className="relative space-y-0 border-l border-secondary/30 pl-6 sm:pl-8">
+          <Stagger className="relative space-y-0 border-l border-secondary/30 pl-6 sm:pl-8" stagger={0.1}>
             {STORY.map((block) => (
-              <li key={block.era} className="relative pb-10 last:pb-2">
+              <StaggerItem key={block.era} className="relative pb-10 last:pb-2">
                 <span
                   className="absolute -left-[1.55rem] top-1 grid h-7 w-7 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground sm:-left-[2.05rem]"
                   aria-hidden
@@ -157,9 +158,9 @@ export default function AboutPage() {
                   {block.heading}
                 </h3>
                 <p className="mt-3 text-base leading-relaxed text-foreground/80">{block.body}</p>
-              </li>
+              </StaggerItem>
             ))}
-          </ol>
+          </Stagger>
         </div>
       </section>
 

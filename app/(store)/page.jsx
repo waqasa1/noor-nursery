@@ -13,7 +13,7 @@ export default async function Page() {
 
   try {
     [products, categories] = await Promise.all([
-      getFeaturedProducts(3),
+      getFeaturedProducts(12),
       getCategories(),
     ]);
   } catch (error) {

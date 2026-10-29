@@ -257,6 +257,10 @@
 @layer utilities {
   .text-urdu {
     font-family: var(--font-noto-urdu), var(--font-plus-jakarta), serif;
+    /* Nastaliq has tall ascenders/descenders — don't clip */
+    line-height: 2.1;
+    padding-block: 0.15em;
+    overflow: visible;
   }
 
   .animate-fade-up {
@@ -277,6 +281,18 @@
 
   .animate-hero-zoom {
     animation: hero-zoom 1.2s ease-out both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-up-delay-1,
+  .animate-fade-up-delay-2,
+  .animate-fade-up-delay-3,
+  .animate-hero-zoom {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 

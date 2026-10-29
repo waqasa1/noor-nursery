@@ -9,6 +9,8 @@ import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { buildBulkOrderWhatsAppUrl, buildProductWhatsAppUrl } from "@/lib/whatsapp";
 import { SizeSelect, defaultSizeId } from "@/components/catalog/SizeSelect";
 import { CatalogImage } from "@/components/catalog/CatalogImage";
+import { Carousel, CarouselItem } from "@/components/motion/Carousel";
+import { Reveal } from "@/components/motion/Reveal";
 
 function ProductCard({ product, onAdd }) {
   const router = useRouter();
@@ -30,11 +32,11 @@ function ProductCard({ product, onAdd }) {
   return (
     <article
       onClick={handleCardClick}
-      className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
       <Link
         href={`/products/${product.slug}`}
-        className="relative aspect-square overflow-hidden bg-surface-low"
+        className="relative aspect-square shrink-0 overflow-hidden bg-surface-low"
         tabIndex={-1}
         aria-hidden="true"
       >
@@ -63,21 +65,28 @@ function ProductCard({ product, onAdd }) {
       </Link>
 
       <div className="flex flex-1 flex-col p-4">
-        <div className="flex items-baseline justify-between gap-2">
-          <h3 className="font-display text-base font-bold leading-tight text-foreground transition group-hover:text-secondary">
+        <div className="flex items-start justify-between gap-2 overflow-visible">
+          <h3 className="min-w-0 flex-1 line-clamp-2 font-display text-base font-bold leading-snug text-foreground transition group-hover:text-secondary">
             {product.nameEn}
           </h3>
-          <span className="text-urdu shrink-0 text-sm text-secondary" dir="rtl" lang="ur">
-            {product.nameUr}
-          </span>
+          {product.nameUr ? (
+            <span
+              className="text-urdu max-w-[42%] shrink-0 text-right text-sm text-secondary"
+              dir="rtl"
+              lang="ur"
+              title={product.nameUr}
+            >
+              {product.nameUr}
+            </span>
+          ) : null}
         </div>
 
-        {product.careInstructionsEn && (
-          <p className="mt-2 flex items-start gap-1.5 rounded-lg bg-surface-low px-2.5 py-2 text-[11px] font-medium text-muted-foreground">
-            <Sun className="mt-px h-3.5 w-3.5 shrink-0 text-gold-foreground" />
-            {product.careInstructionsEn}
-          </p>
-        )}
+        <p className="mt-2 flex min-h-[3.25rem] items-start gap-1.5 rounded-lg bg-surface-low px-2.5 py-2 text-[11px] font-medium leading-snug text-muted-foreground">
+          <Sun className="mt-px h-3.5 w-3.5 shrink-0 text-gold-foreground" />
+          <span className="line-clamp-2">
+            {product.careInstructionsEn || "Healthy nursery plant — ready for your space."}
+          </span>
+        </p>
 
         <div className="mt-auto pt-4">
           <SizeSelect
@@ -88,7 +97,7 @@ function ProductCard({ product, onAdd }) {
             compact
           />
 
-          <div className="mt-3 flex items-baseline gap-2">
+          <div className="mt-3 flex min-h-[1.75rem] items-baseline gap-2">
             <span className="font-display text-xl font-bold text-primary">
               {formatPKR(variant?.price ?? minPrice)}
             </span>
@@ -136,7 +145,7 @@ function ProductCard({ product, onAdd }) {
 }
 
 export function Products({ products = [], onAdd }) {
-  const list = products.slice(0, 3);
+  const list = products;
 
   if (!products.length) {
     return (
@@ -160,42 +169,57 @@ export function Products({ products = [], onAdd }) {
   return (
     <section id="plants" className="bg-surface-low py-14">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="text-center">
+        <Reveal className="text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-secondary">
             Catalog · {CATALOG_SPECIES_COUNT} acclimatized live plants
           </p>
           <h2 className="mt-2 text-3xl font-bold tracking-tight text-primary sm:text-4xl">
             Featured Nursery Plants &amp; Size Variants
           </h2>
-        </div>
+        </Reveal>
 
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((p) => (
-            <ProductCard key={p._id} product={p} onAdd={onAdd} />
-          ))}
-        </div>
+        <Reveal className="mt-8" delay={0.1}>
+          <Carousel label="Featured plants" autoplay>
+            {list.map((p) => (
+              <CarouselItem key={p._id}>
+                <ProductCard product={p} onAdd={onAdd} />
+              </CarouselItem>
+            ))}
+          </Carousel>
+        </Reveal>
 
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-primary px-6 py-7 text-primary-foreground sm:px-10">
-          <div className="flex items-start gap-4">
-            <Flower2 className="mt-1 h-8 w-8 shrink-0 text-leaf" />
-            <div>
-              <p className="font-display text-lg font-bold">
-                Need custom bulk nursery orders for farmhouses or offices?
-              </p>
-              <p className="text-sm text-primary-foreground/75">
-                We deliver commercial landscaping trucks across Punjab &amp; Sindh.
-              </p>
-            </div>
-          </div>
-          <a
-            href={buildBulkOrderWhatsAppUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-leaf px-6 py-3 text-sm font-bold text-leaf-foreground transition hover:bg-gold hover:text-gold-foreground"
+        <div className="mt-8 text-center">
+          <Link
+            href="/shop?type=plants"
+            className="inline-flex text-sm font-bold text-secondary transition hover:text-primary"
           >
-            Request Bulk Nursery Quote (WhatsApp)
-          </a>
+            View all plants →
+          </Link>
         </div>
+
+        <Reveal className="mt-10" delay={0.05}>
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-primary px-6 py-7 text-primary-foreground sm:px-10">
+            <div className="flex items-start gap-4">
+              <Flower2 className="mt-1 h-8 w-8 shrink-0 text-leaf" />
+              <div>
+                <p className="font-display text-lg font-bold">
+                  Need custom bulk nursery orders for farmhouses or offices?
+                </p>
+                <p className="text-sm text-primary-foreground/75">
+                  We deliver commercial landscaping trucks across Punjab &amp; Sindh.
+                </p>
+              </div>
+            </div>
+            <a
+              href={buildBulkOrderWhatsAppUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-leaf px-6 py-3 text-sm font-bold text-leaf-foreground transition hover:bg-gold hover:text-gold-foreground"
+            >
+              Request Bulk Nursery Quote (WhatsApp)
+            </a>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

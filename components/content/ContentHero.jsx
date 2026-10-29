@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
+
+const EASE = [0.22, 1, 0.36, 1];
 
 /**
  * Slim brand-led hero for About / Contact / policy pages.
- * Gradient + pattern only (no remote Google image) so these pages paint fast.
  */
 export function ContentHero({
   eyebrow = "Noor Nursery",
@@ -11,6 +15,17 @@ export function ContentHero({
   lead,
   actions,
 }) {
+  const reduce = useReducedMotion();
+
+  const fade = (delay) =>
+    reduce
+      ? {}
+      : {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.7, delay, ease: EASE },
+        };
+
   return (
     <header className="relative isolate overflow-hidden bg-primary text-primary-foreground">
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-forest" />
@@ -26,21 +41,38 @@ export function ContentHero({
       <div className="absolute -left-16 bottom-0 h-56 w-56 rounded-full bg-gold/10 blur-3xl" aria-hidden />
 
       <div className="relative mx-auto flex min-h-[36vh] max-w-6xl flex-col justify-end px-4 pb-12 pt-20 sm:min-h-[32vh] sm:pb-14 lg:px-6">
-        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-leaf">{eyebrow}</p>
-        <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+        <motion.p className="text-[11px] font-bold uppercase tracking-[0.22em] text-leaf" {...fade(0)}>
+          {eyebrow}
+        </motion.p>
+        <motion.h1
+          className="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
+          {...fade(0.12)}
+        >
           {title}
-        </h1>
+        </motion.h1>
         {titleUr ? (
-          <p className="text-urdu mt-3 text-xl text-primary-foreground/85 sm:text-2xl" dir="rtl" lang="ur">
+          <motion.p
+            className="text-urdu mt-3 text-xl text-primary-foreground/85 sm:text-2xl"
+            dir="rtl"
+            lang="ur"
+            {...fade(0.2)}
+          >
             {titleUr}
-          </p>
+          </motion.p>
         ) : null}
         {lead ? (
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-primary-foreground/80 sm:text-lg">
+          <motion.p
+            className="mt-4 max-w-2xl text-base leading-relaxed text-primary-foreground/80 sm:text-lg"
+            {...fade(0.28)}
+          >
             {lead}
-          </p>
+          </motion.p>
         ) : null}
-        {actions ? <div className="mt-7 flex flex-wrap gap-3">{actions}</div> : null}
+        {actions ? (
+          <motion.div className="mt-7 flex flex-wrap gap-3" {...fade(0.38)}>
+            {actions}
+          </motion.div>
+        ) : null}
       </div>
     </header>
   );

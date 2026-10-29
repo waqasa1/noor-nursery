@@ -18,6 +18,8 @@ import {
 import { IMAGES } from "./data";
 import { BRAND } from "@/lib/brand";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
+import { Carousel, CarouselItem } from "@/components/motion/Carousel";
 
 export function FeaturedPlant() {
   const settings = useSiteSettings();
@@ -25,7 +27,7 @@ export function FeaturedPlant() {
   return (
     <section className="bg-card py-16">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 lg:grid-cols-2">
-        <div className="relative order-2 lg:order-1">
+        <Reveal className="relative order-2 lg:order-1" x={-24}>
           <div className="overflow-hidden rounded-3xl shadow-2xl">
             <img
               src={indoorImageSrc}
@@ -34,8 +36,8 @@ export function FeaturedPlant() {
               className="aspect-[4/5] w-full object-cover"
             />
           </div>
-        </div>
-        <div className="order-1 lg:order-2">
+        </Reveal>
+        <Reveal className="order-1 lg:order-2" delay={0.12} x={24}>
           <p className="text-xs font-bold uppercase tracking-widest text-secondary">
             Plant of the Season
           </p>
@@ -55,7 +57,7 @@ export function FeaturedPlant() {
           >
             Explore Collection
           </Link>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -86,36 +88,39 @@ export function PlantCareFinder() {
   return (
     <section className="bg-surface-low py-16">
       <div className="mx-auto max-w-3xl px-4 text-center">
-        <p className="text-xs font-bold uppercase tracking-widest text-secondary">Plant Care</p>
-        <h2 className="mt-2 text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-          Find the Right Plant for Your Space
-        </h2>
-        <p className="mt-3 text-sm text-muted-foreground">
-          How much sunlight do you have? Start here.
-        </p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <Reveal>
+          <p className="text-xs font-bold uppercase tracking-widest text-secondary">Plant Care</p>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-primary sm:text-4xl">
+            Find the Right Plant for Your Space
+          </h2>
+          <p className="mt-3 text-sm text-muted-foreground">
+            How much sunlight do you have? Start here.
+          </p>
+        </Reveal>
+        <Stagger className="mt-8 grid gap-4 sm:grid-cols-3" stagger={0.1}>
           {options.map((o) => (
-            <Link
-              key={o.label}
-              href="/faq#plant-finder"
-              className="group rounded-2xl border bg-card p-6 shadow-sm transition hover:-translate-y-1 hover:border-secondary hover:shadow-lg"
-            >
-              <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-surface-low transition group-hover:bg-secondary group-hover:text-secondary-foreground">
-                <o.icon className="h-6 w-6 text-secondary group-hover:text-secondary-foreground" />
-              </span>
-              <p className="mt-4 font-display text-base font-bold text-foreground">{o.label}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{o.desc}</p>
-            </Link>
+            <StaggerItem key={o.label}>
+              <Link
+                href="/faq#plant-finder"
+                className="group block rounded-2xl border bg-card p-6 shadow-sm transition hover:-translate-y-1 hover:border-secondary hover:shadow-lg"
+              >
+                <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-surface-low transition group-hover:bg-secondary group-hover:text-secondary-foreground">
+                  <o.icon className="h-6 w-6 text-secondary group-hover:text-secondary-foreground" />
+                </span>
+                <p className="mt-4 font-display text-base font-bold text-foreground">{o.label}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{o.desc}</p>
+              </Link>
+            </StaggerItem>
           ))}
-        </div>
-        <div className="mt-8 text-center">
+        </Stagger>
+        <Reveal className="mt-8 text-center" delay={0.15}>
           <Link
             href="/faq#plant-finder"
             className="inline-flex rounded-full bg-secondary px-8 py-3 text-sm font-bold text-secondary-foreground transition hover:bg-primary hover:text-primary-foreground"
           >
             Take the Full Plant Finder Quiz →
           </Link>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -127,7 +132,7 @@ export function BrandStory() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16">
       <div className="grid items-center gap-10 lg:grid-cols-2">
-        <div>
+        <Reveal x={-20}>
           <p className="text-xs font-bold uppercase tracking-widest text-secondary">About Us</p>
           <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
             Growing Spaces. Creating Connections.
@@ -143,15 +148,17 @@ export function BrandStory() {
           >
             Read Our Story →
           </Link>
-        </div>
-        <div className="overflow-hidden rounded-3xl shadow-xl">
-          <img
-            src={aboutImageSrc}
-            alt="Noor Nursery garden with fruit trees and flowering plants"
-            loading="lazy"
-            className="aspect-[4/3] w-full object-cover"
-          />
-        </div>
+        </Reveal>
+        <Reveal delay={0.12} x={20}>
+          <div className="overflow-hidden rounded-3xl shadow-xl">
+            <img
+              src={aboutImageSrc}
+              alt="Noor Nursery garden with fruit trees and flowering plants"
+              loading="lazy"
+              className="aspect-[4/3] w-full object-cover"
+            />
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -175,7 +182,7 @@ export function FinalCTA() {
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/90 to-primary/80" />
-      <div className="relative mx-auto max-w-2xl px-4">
+      <Reveal className="relative mx-auto max-w-2xl px-4">
         <h2 className="font-display text-3xl font-bold sm:text-4xl">
           Your Space Deserves Something Alive.
         </h2>
@@ -189,7 +196,7 @@ export function FinalCTA() {
         >
           Explore Our Collection
         </Link>
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -224,7 +231,7 @@ export function Trust() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16">
-      <div className="max-w-3xl">
+      <Reveal className="max-w-3xl">
         <p className="text-xs font-bold uppercase tracking-widest text-secondary">
           Why Noor Nursery
         </p>
@@ -234,22 +241,24 @@ export function Trust() {
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           {BRAND.sloganSecondary}
         </p>
-      </div>
+      </Reveal>
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <Stagger className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" stagger={0.08}>
         {items.map((i) => (
-          <div key={i.title} className="rounded-2xl border bg-card p-6 shadow-sm">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-surface-low">
-              <i.icon className="h-6 w-6 text-secondary" />
-            </span>
-            <h3 className="mt-4 font-display text-lg font-bold text-foreground">{i.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{i.body}</p>
-            <p className="text-urdu mt-3 text-sm text-secondary" dir="rtl" lang="ur">
-              {i.urdu}
-            </p>
-          </div>
+          <StaggerItem key={i.title}>
+            <div className="h-full rounded-2xl border bg-card p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-surface-low">
+                <i.icon className="h-6 w-6 text-secondary" />
+              </span>
+              <h3 className="mt-4 font-display text-lg font-bold text-foreground">{i.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{i.body}</p>
+              <p className="text-urdu mt-3 text-sm text-secondary" dir="rtl" lang="ur">
+                {i.urdu}
+              </p>
+            </div>
+          </StaggerItem>
         ))}
-      </div>
+      </Stagger>
     </section>
   );
 }
@@ -263,7 +272,7 @@ export function Testimonials() {
   return (
     <section className="bg-primary py-14 text-primary-foreground">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="text-center">
+        <Reveal className="text-center">
           <div className="flex justify-center gap-1">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star key={i} className="h-5 w-5 fill-gold text-gold" />
@@ -277,45 +286,44 @@ export function Testimonials() {
             Reviews from customers across Pakistan ·{" "}
             <strong className="text-leaf">Shared by real buyers</strong>
           </p>
-        </div>
+        </Reveal>
 
-        <div className="mt-9 grid gap-5 md:grid-cols-3">
+        <Carousel className="mt-9" label="Customer reviews" autoplay>
           {testimonials.map((t) => (
-            <figure
-              key={t.id || t.name}
-              className="rounded-2xl bg-card p-6 text-card-foreground shadow-lg"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex gap-0.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-gold text-gold" />
-                  ))}
-                </div>
-                {t.when ? (
-                  <span className="text-xs text-muted-foreground">{t.when}</span>
-                ) : null}
-              </div>
-              <blockquote
-                className={`mt-3 text-sm leading-relaxed text-foreground ${t.rtl ? "text-urdu" : ""}`}
-                dir={t.rtl ? "rtl" : "ltr"}
-                lang={t.rtl ? "ur" : "en"}
-              >
-                &ldquo;{t.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mt-5 flex items-center gap-3 border-t pt-4">
-                <span className="grid h-11 w-11 place-items-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground">
-                  {t.initials}
-                </span>
-                <div>
-                  <p className="text-sm font-bold text-foreground">{t.name}</p>
-                  {t.location ? (
-                    <p className="text-xs text-muted-foreground">{t.location}</p>
+            <CarouselItem key={t.id || t.name} className="sm:w-[320px] lg:w-[340px]">
+              <figure className="h-full rounded-2xl bg-card p-6 text-card-foreground shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-gold text-gold" />
+                    ))}
+                  </div>
+                  {t.when ? (
+                    <span className="text-xs text-muted-foreground">{t.when}</span>
                   ) : null}
                 </div>
-              </figcaption>
-            </figure>
+                <blockquote
+                  className={`mt-3 text-sm leading-relaxed text-foreground ${t.rtl ? "text-urdu" : ""}`}
+                  dir={t.rtl ? "rtl" : "ltr"}
+                  lang={t.rtl ? "ur" : "en"}
+                >
+                  &ldquo;{t.quote}&rdquo;
+                </blockquote>
+                <figcaption className="mt-5 flex items-center gap-3 border-t pt-4">
+                  <span className="grid h-11 w-11 place-items-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground">
+                    {t.initials}
+                  </span>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{t.name}</p>
+                    {t.location ? (
+                      <p className="text-xs text-muted-foreground">{t.location}</p>
+                    ) : null}
+                  </div>
+                </figcaption>
+              </figure>
+            </CarouselItem>
           ))}
-        </div>
+        </Carousel>
       </div>
     </section>
   );

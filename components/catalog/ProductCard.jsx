@@ -94,19 +94,22 @@ export function CatalogProductCard({ product, onAddToCart }) {
           </p>
         )}
 
-        <div className="mt-1 flex items-start justify-between gap-2">
-          <Link href={`/products/${product.slug}`} className="min-w-0">
-            <h3 className="font-display text-base font-bold leading-snug text-foreground transition group-hover:text-secondary">
+        <div className="mt-1 flex items-start justify-between gap-2 overflow-visible">
+          <Link href={`/products/${product.slug}`} className="min-w-0 flex-1">
+            <h3 className="line-clamp-2 font-display text-base font-bold leading-snug text-foreground transition group-hover:text-secondary">
               {product.nameEn}
             </h3>
           </Link>
-          <span
-            className="text-urdu shrink-0 text-sm leading-snug text-secondary"
-            dir="rtl"
-            lang="ur"
-          >
-            {product.nameUr}
-          </span>
+          {product.nameUr ? (
+            <span
+              className="text-urdu max-w-[42%] shrink-0 text-right text-sm text-secondary"
+              dir="rtl"
+              lang="ur"
+              title={product.nameUr}
+            >
+              {product.nameUr}
+            </span>
+          ) : null}
         </div>
 
         {product.shortDescriptionEn && (
