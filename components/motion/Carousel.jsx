@@ -97,10 +97,11 @@ export function Carousel({
 }
 
 export function CarouselItem({ children, className = "" }) {
+  // Widths sized so ~half of the next card peeks (1.5 / 2.5 / 3.5 visible).
   return (
     <div
       data-carousel-item
-      className={`flex w-[min(78vw,280px)] shrink-0 snap-start flex-col sm:w-[260px] lg:w-[280px] ${className}`}
+      className={`flex w-[calc((100%-1rem)/1.5)] shrink-0 snap-start flex-col sm:w-[calc((100%-2rem)/2.5)] lg:w-[calc((100%-3rem)/3.5)] ${className}`}
     >
       {children}
     </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Leaf, ShoppingBag } from "lucide-react";
 import { CatalogImage } from "@/components/catalog/CatalogImage";
+import { Carousel, CarouselItem } from "@/components/motion/Carousel";
 import { getCategories } from "@/lib/data/products";
 import { IMAGES } from "@/components/nursery/data";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -19,34 +20,32 @@ function CategoryCard({ cat, badge }) {
   return (
     <Link
       href={`/categories/${cat.slug}`}
-      className="group flex flex-col overflow-hidden rounded-3xl border bg-card shadow-sm transition-all hover:border-primary/30 hover:shadow-xl"
+      className="group flex h-full flex-col overflow-hidden rounded-3xl border bg-card shadow-sm transition-all hover:border-primary/30 hover:shadow-xl"
     >
-      {cat.image && (
-        <div className="relative aspect-[4/3] overflow-hidden bg-surface-low">
-          <CatalogImage
-            src={cat.image}
-            alt={`${cat.nameEn} — ${cat.nameUr}`}
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
-          {badge && (
-            <span className="absolute left-3 top-3 rounded-full bg-secondary px-2.5 py-1 text-[10px] font-bold uppercase text-secondary-foreground">
-              {badge}
-            </span>
-          )}
-        </div>
-      )}
-      <div className="flex flex-1 flex-col justify-between p-6 sm:p-8">
+      <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-surface-low">
+        <CatalogImage
+          src={cat.image || "/placeholder-plant.jpg"}
+          alt={`${cat.nameEn} — ${cat.nameUr}`}
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 640px) 80vw, 320px"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+        {badge && (
+          <span className="absolute left-3 top-3 rounded-full bg-secondary px-2.5 py-1 text-[10px] font-bold uppercase text-secondary-foreground">
+            {badge}
+          </span>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col justify-between p-5 sm:p-6">
         <div>
-          <h3 className="font-display text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
+          <h3 className="font-display text-xl font-bold text-foreground transition-colors group-hover:text-primary sm:text-2xl">
             {cat.nameEn}
           </h3>
           <p className="text-urdu mt-1 text-secondary" dir="rtl" lang="ur">
             {cat.nameUr}
           </p>
           {cat.descriptionEn && (
-            <p className="mt-3 text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+            <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
               {cat.descriptionEn}
             </p>
           )}
@@ -77,6 +76,7 @@ export default async function CategoriesPage() {
       href: "/shop?type=plants",
       cta: "All Plants",
       items: plants,
+      badge: undefined,
     },
     {
       key: "accessory",
@@ -85,16 +85,16 @@ export default async function CategoriesPage() {
       href: "/shop?type=accessories",
       cta: "All Accessories",
       items: accessories,
+      badge: "Accessory",
     },
   ].filter((s) => s.items.length > 0);
 
   return (
     <>
-    {/* Decorative Header */}
       <div className="relative h-64 w-full bg-primary lg:h-80">
         <div className="absolute inset-0 z-0 opacity-30">
           <img src={IMAGES.hero} alt="Plants background" className="h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-primary/70 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-primary/70 mix-blend-multiply" />
         </div>
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-leaf text-leaf-foreground shadow-lg">
@@ -146,15 +146,16 @@ export default async function CategoriesPage() {
               </Link>
             </div>
 
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <Carousel className="mt-6" label={section.title}>
               {section.items.map((cat) => (
-                <CategoryCard key={cat._id} cat={cat} badge={section.key === "accessory" ? "Accessory" : undefined} />
+                <CarouselItem key={cat._id}>
+                  <CategoryCard cat={cat} badge={section.badge} />
+                </CarouselItem>
               ))}
-            </div>
+            </Carousel>
           </section>
         ))}
       </div>
-  
     </>
   );
 }
