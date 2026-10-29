@@ -179,7 +179,7 @@ export function Products({ products = [], onAdd }) {
         </Reveal>
 
         <Reveal className="mt-8" delay={0.1}>
-          <Carousel label="Featured plants" autoplay>
+          <Carousel label="Featured plants">
             {list.map((p) => (
               <CarouselItem key={p._id}>
                 <ProductCard product={p} onAdd={onAdd} />

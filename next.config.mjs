@@ -3,6 +3,8 @@ const nextConfig = {
   images: {
     // Serve originals as-is — no Vercel Image Optimization / transformation quota
     unoptimized: true,
+    // Next 16 requires an explicit allow-list (Hero uses quality={85}; 75 is the default)
+    qualities: [75, 85],
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },
       // Admin/category images pasted from Google (e.g. Gemini/AIDA public URLs)

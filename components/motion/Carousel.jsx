@@ -11,8 +11,6 @@ export function Carousel({
   children,
   className = "",
   label = "Carousel",
-  autoplay = false,
-  intervalMs = 4500,
 }) {
   const trackRef = useRef(null);
   const [canPrev, setCanPrev] = useState(false);
@@ -45,21 +43,6 @@ export function Carousel({
     const amount = card ? card.getBoundingClientRect().width + 16 : el.clientWidth * 0.8;
     el.scrollBy({ left: dir * amount, behavior: "smooth" });
   };
-
-  useEffect(() => {
-    if (!autoplay) return undefined;
-    const id = setInterval(() => {
-      const el = trackRef.current;
-      if (!el) return;
-      const max = el.scrollWidth - el.clientWidth - 4;
-      if (el.scrollLeft >= max) {
-        el.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        scrollByCard(1);
-      }
-    }, intervalMs);
-    return () => clearInterval(id);
-  }, [autoplay, intervalMs]);
 
   return (
     <div className={`relative max-w-full min-w-0 overflow-x-clip ${className}`}>

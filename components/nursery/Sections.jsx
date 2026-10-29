@@ -302,7 +302,7 @@ export function Testimonials() {
           </p>
         </Reveal>
 
-        <Carousel className="mt-9" label="Customer reviews" autoplay>
+        <Carousel className="mt-9" label="Customer reviews">
           {testimonials.map((t) => (
             <CarouselItem key={t.id || t.name}>
               <figure className="h-full rounded-2xl bg-card p-6 text-card-foreground shadow-lg">
