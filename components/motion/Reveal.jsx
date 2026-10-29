@@ -1,11 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useLayoutEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const EASE = [0.22, 1, 0.36, 1];
+gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Scroll-triggered fade/slide — soft and premium (Haris-style liveliness).
+ * Scroll-triggered fade/slide (GSAP).
  */
 export function Reveal({
   children,
@@ -14,74 +16,96 @@ export function Reveal({
   y = 28,
   x = 0,
   once = true,
-  as = "div",
 }) {
-  const reduce = useReducedMotion();
-  const Comp = motion[as] || motion.div;
+  const ref = useRef(null);
 
-  if (reduce) {
-    return <div className={className}>{children}</div>;
-  }
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
 
-  return (
-    <Comp
-      className={className}
-      initial={{ opacity: 0, y, x }}
-      whileInView={{ opacity: 1, y: 0, x: 0 }}
-      viewport={{ once, amount: 0.18, margin: "0px 0px -40px 0px" }}
-      transition={{ duration: 0.65, delay, ease: EASE }}
-    >
-      {children}
-    </Comp>
-  );
-}
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return undefined;
+    }
 
-/** Stagger children that are also Reveal / motion items */
-export function Stagger({ children, className = "", stagger = 0.08, delay = 0 }) {
-  const reduce = useReducedMotion();
-
-  if (reduce) {
-    return <div className={className}>{children}</div>;
-  }
-
-  return (
-    <motion.div
-      className={className}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.12 }}
-      variants={{
-        hidden: {},
-        show: {
-          transition: { staggerChildren: stagger, delayChildren: delay },
-        },
-      }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-export function StaggerItem({ children, className = "", y = 24 }) {
-  const reduce = useReducedMotion();
-
-  if (reduce) {
-    return <div className={className}>{children}</div>;
-  }
-
-  return (
-    <motion.div
-      className={className}
-      variants={{
-        hidden: { opacity: 0, y },
-        show: {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el,
+        { opacity: 0, y, x },
+        {
           opacity: 1,
           y: 0,
-          transition: { duration: 0.55, ease: EASE },
-        },
-      }}
-    >
+          x: 0,
+          duration: 0.65,
+          delay,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 88%",
+            once,
+          },
+        }
+      );
+    }, el);
+
+    return () => ctx.revert();
+  }, [delay, y, x, once]);
+
+  return (
+    <div ref={ref} className={className}>
       {children}
-    </motion.div>
+    </div>
+  );
+}
+
+/** Parent that staggers its direct children on scroll */
+export function Stagger({ children, className = "", stagger = 0.08, delay = 0 }) {
+  const ref = useRef(null);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return undefined;
+    }
+
+    const items = el.querySelectorAll("[data-stagger-item]");
+    if (!items.length) return undefined;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        items,
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.55,
+          stagger,
+          delay,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+            once: true,
+          },
+        }
+      );
+    }, el);
+
+    return () => ctx.revert();
+  }, [stagger, delay]);
+
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  );
+}
+
+export function StaggerItem({ children, className = "" }) {
+  return (
+    <div data-stagger-item className={className}>
+      {children}
+    </div>
   );
 }

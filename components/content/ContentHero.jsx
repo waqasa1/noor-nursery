@@ -1,9 +1,8 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
-
-const EASE = [0.22, 1, 0.36, 1];
+import gsap from "gsap";
 
 /**
  * Slim brand-led hero for About / Contact / policy pages.
@@ -15,19 +14,38 @@ export function ContentHero({
   lead,
   actions,
 }) {
-  const reduce = useReducedMotion();
+  const rootRef = useRef(null);
 
-  const fade = (delay) =>
-    reduce
-      ? {}
-      : {
-          initial: { opacity: 0, y: 20 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.7, delay, ease: EASE },
-        };
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return undefined;
+    }
+
+    const ctx = gsap.context(() => {
+      const parts = root.querySelectorAll("[data-content-hero]");
+      gsap.fromTo(
+        parts,
+        { opacity: 0, y: 22 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          stagger: 0.1,
+          ease: "power3.out",
+        }
+      );
+    }, root);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <header className="relative isolate overflow-hidden bg-primary text-primary-foreground">
+    <header
+      ref={rootRef}
+      className="relative isolate overflow-hidden bg-primary text-primary-foreground"
+    >
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-forest" />
       <div
         className="absolute inset-0 opacity-[0.14]"
@@ -41,37 +59,40 @@ export function ContentHero({
       <div className="absolute -left-16 bottom-0 h-56 w-56 rounded-full bg-gold/10 blur-3xl" aria-hidden />
 
       <div className="relative mx-auto flex min-h-[36vh] max-w-6xl flex-col justify-end px-4 pb-12 pt-20 sm:min-h-[32vh] sm:pb-14 lg:px-6">
-        <motion.p className="text-[11px] font-bold uppercase tracking-[0.22em] text-leaf" {...fade(0)}>
+        <p
+          data-content-hero
+          className="text-[11px] font-bold uppercase tracking-[0.22em] text-leaf"
+        >
           {eyebrow}
-        </motion.p>
-        <motion.h1
+        </p>
+        <h1
+          data-content-hero
           className="mt-3 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
-          {...fade(0.12)}
         >
           {title}
-        </motion.h1>
+        </h1>
         {titleUr ? (
-          <motion.p
+          <p
+            data-content-hero
             className="text-urdu mt-3 text-xl text-primary-foreground/85 sm:text-2xl"
             dir="rtl"
             lang="ur"
-            {...fade(0.2)}
           >
             {titleUr}
-          </motion.p>
+          </p>
         ) : null}
         {lead ? (
-          <motion.p
+          <p
+            data-content-hero
             className="mt-4 max-w-2xl text-base leading-relaxed text-primary-foreground/80 sm:text-lg"
-            {...fade(0.28)}
           >
             {lead}
-          </motion.p>
+          </p>
         ) : null}
         {actions ? (
-          <motion.div className="mt-7 flex flex-wrap gap-3" {...fade(0.38)}>
+          <div data-content-hero className="mt-7 flex flex-wrap gap-3">
             {actions}
-          </motion.div>
+          </div>
         ) : null}
       </div>
     </header>

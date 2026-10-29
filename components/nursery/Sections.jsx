@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import {
   ChevronDown,
@@ -20,15 +20,22 @@ import { BRAND } from "@/lib/brand";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { Carousel, CarouselItem } from "@/components/motion/Carousel";
+import { useFeaturedReveal } from "@/components/motion/useFeaturedReveal";
 
 export function FeaturedPlant() {
   const settings = useSiteSettings();
   const indoorImageSrc = settings.site_content?.indoorImage || IMAGES.indoor;
+  const rootRef = useRef(null);
+  useFeaturedReveal(rootRef);
+
   return (
-    <section className="bg-card py-16">
+    <section ref={rootRef} className="bg-card py-16">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 lg:grid-cols-2">
-        <Reveal className="relative order-2 lg:order-1" x={-24}>
-          <div className="overflow-hidden rounded-3xl shadow-2xl">
+        <div className="relative order-2 lg:order-1">
+          <div
+            data-featured-media
+            className="overflow-hidden rounded-3xl shadow-2xl will-change-transform"
+          >
             <img
               src={indoorImageSrc}
               alt="Lush indoor plant collection featuring monstera and tropical foliage"
@@ -36,8 +43,8 @@ export function FeaturedPlant() {
               className="aspect-[4/5] w-full object-cover"
             />
           </div>
-        </Reveal>
-        <Reveal className="order-1 lg:order-2" delay={0.12} x={24}>
+        </div>
+        <div data-featured-copy className="order-1 lg:order-2">
           <p className="text-xs font-bold uppercase tracking-widest text-secondary">
             Plant of the Season
           </p>
@@ -57,7 +64,7 @@ export function FeaturedPlant() {
           >
             Explore Collection
           </Link>
-        </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -339,7 +346,7 @@ export function Faq() {
   return (
     <section id="faq" className="bg-surface-low py-14">
       <div className="mx-auto max-w-3xl px-4">
-        <div className="text-center">
+        <Reveal className="text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-secondary">
             Help &amp; Answers
           </p>
@@ -349,34 +356,36 @@ export function Faq() {
           <p className="mt-2 text-sm text-muted-foreground">
             Common queries regarding plant delivery in Pakistan, survivability, and payments
           </p>
-        </div>
+        </Reveal>
 
-        <div className="mt-8 space-y-3">
+        <Stagger className="mt-8 space-y-3" stagger={0.1}>
           {faqs.map((f, i) => (
-            <div key={f.id || f.q} className="overflow-hidden rounded-2xl border bg-card shadow-sm">
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-                aria-expanded={open === i}
-              >
-                <span className="font-display text-base font-bold text-foreground">{f.q}</span>
-                <ChevronDown
-                  className={`h-5 w-5 shrink-0 text-secondary transition ${open === i ? "rotate-180" : ""}`}
-                />
-              </button>
-              {open === i && (
-                <p className="border-t px-5 py-4 text-sm leading-relaxed text-muted-foreground">
-                  {f.a}
-                </p>
-              )}
-            </div>
+            <StaggerItem key={f.id || f.q}>
+              <div className="overflow-hidden rounded-2xl border bg-card shadow-sm transition hover:shadow-md">
+                <button
+                  onClick={() => setOpen(open === i ? null : i)}
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+                  aria-expanded={open === i}
+                >
+                  <span className="font-display text-base font-bold text-foreground">{f.q}</span>
+                  <ChevronDown
+                    className={`h-5 w-5 shrink-0 text-secondary transition ${open === i ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {open === i && (
+                  <p className="border-t px-5 py-4 text-sm leading-relaxed text-muted-foreground">
+                    {f.a}
+                  </p>
+                )}
+              </div>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
 
-        <div className="mt-8 flex items-center justify-center gap-3 text-sm text-muted-foreground">
+        <Reveal className="mt-8 flex items-center justify-center gap-3 text-sm text-muted-foreground" delay={0.15}>
           <HeartHandshake className="h-5 w-5 text-secondary" />
           Still unsure? Our horticulturists reply within minutes on +92 349 2849062.
-        </div>
+        </Reveal>
       </div>
     </section>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -16,51 +17,89 @@ import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { buildPlantDoctorWhatsAppUrl } from "@/lib/whatsapp";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
+import { useHeroGsap } from "@/components/motion/useHeroGsap";
+
+const HEADLINE = "Bring Nature Into Your Life.";
 
 export function Hero() {
   const settings = useSiteSettings();
   const heroImageSrc = settings.site_content?.heroImage || IMAGES.hero;
+  const rootRef = useRef(null);
+  useHeroGsap(rootRef, { ready: true });
+
+  const words = HEADLINE.split(" ");
+
   return (
-    <section className="relative min-h-[88vh] overflow-hidden">
-      <div className="absolute inset-0">
-        <Image
-          src={heroImageSrc}
-          alt="Noor Nursery — healthy plants ready for Pakistani homes and gardens"
-          fill
-          priority
-          sizes="100vw"
-          quality={85}
-          className="animate-hero-zoom object-cover"
-        />
+    <section ref={rootRef} className="relative min-h-[88vh] overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        <div data-hero-image className="absolute inset-0 will-change-transform">
+          <Image
+            src={heroImageSrc}
+            alt="Noor Nursery — healthy plants ready for Pakistani homes and gardens"
+            fill
+            priority
+            sizes="100vw"
+            quality={85}
+            className="object-cover"
+          />
+        </div>
         <div className="absolute inset-0 bg-gradient-to-r from-primary/92 via-primary/75 to-primary/35" />
         <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent" />
       </div>
 
-      <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 py-16 lg:py-24">
-        <p className="animate-fade-up inline-flex max-w-fit items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-leaf backdrop-blur-sm">
+      <div
+        className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 py-16 lg:py-24"
+        style={{ perspective: 900 }}
+      >
+        <p
+          data-hero-badge
+          className="inline-flex max-w-fit items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-leaf backdrop-blur-sm"
+        >
           <BadgeCheck className="h-4 w-4" />
           {BRAND.sloganPrimary}
         </p>
 
-        <h1 className="animate-fade-up-delay-1 mt-6 max-w-3xl text-4xl font-bold leading-[1.08] tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl xl:text-7xl">
-          Bring Nature Into Your Life.
+        <h1 className="mt-6 max-w-3xl text-4xl font-bold leading-[1.08] tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl xl:text-7xl">
+          {words.map((word, i) => (
+            <span key={`${word}-${i}`} className="mr-[0.28em] inline-block overflow-hidden align-bottom last:mr-0">
+              <span
+                data-hero-word
+                className="inline-block will-change-transform"
+                style={{ transformOrigin: "50% 100%" }}
+              >
+                {word}
+              </span>
+            </span>
+          ))}
         </h1>
 
-        <p className="animate-fade-up-delay-2 mt-5 max-w-xl text-lg font-medium text-leaf sm:text-xl">
+        <p
+          data-hero-line
+          className="mt-5 max-w-xl text-lg font-medium text-leaf sm:text-xl"
+        >
           {BRAND.sloganSecondary}
         </p>
 
-        <p className="animate-fade-up-delay-2 mt-4 max-w-xl text-base leading-relaxed text-primary-foreground/85 sm:text-lg">
+        <p
+          data-hero-line
+          className="mt-4 max-w-xl text-base leading-relaxed text-primary-foreground/85 sm:text-lg"
+        >
           Discover beautiful, healthy plants carefully selected for your home, garden, and
           workspace — acclimatized for Pakistan and delivered with care nationwide.
         </p>
 
-        <p className="text-urdu animate-fade-up-delay-2 mt-3 text-lg text-primary-foreground/75" dir="rtl" lang="ur">
+        <p
+          data-hero-line
+          className="text-urdu mt-3 text-lg text-primary-foreground/75"
+          dir="rtl"
+          lang="ur"
+        >
           ۱۹۶۵ سے پاکستانی گھروں اور باغات کے لیے قابلِ اعتماد آن لائن نرسری
         </p>
 
-        <div className="animate-fade-up-delay-3 mt-8 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-wrap gap-3">
           <Link
+            data-hero-cta
             href="/shop"
             className="inline-flex items-center gap-2 rounded-full bg-leaf px-7 py-3.5 font-semibold text-leaf-foreground shadow-lg transition hover:bg-gold hover:text-gold-foreground"
           >
@@ -68,12 +107,14 @@ export function Hero() {
             Explore Our Collection
           </Link>
           <Link
+            data-hero-cta
             href="/faq#plant-finder"
             className="inline-flex items-center gap-2 rounded-full border-2 border-primary-foreground/30 bg-primary-foreground/10 px-7 py-3.5 font-semibold text-primary-foreground backdrop-blur-sm transition hover:bg-primary-foreground/20"
           >
             Discover Your Perfect Plant
           </Link>
           <a
+            data-hero-cta
             href={buildPlantDoctorWhatsAppUrl()}
             target="_blank"
             rel="noopener noreferrer"
@@ -84,7 +125,7 @@ export function Hero() {
           </a>
         </div>
 
-        <div className="animate-fade-up-delay-3 mt-10 grid max-w-lg grid-cols-3 gap-3">
+        <div className="mt-10 grid max-w-lg grid-cols-3 gap-3">
           {[
             { value: CATALOG_SPECIES_COUNT, label: "Plant varieties" },
             { value: "48-Hr", label: "Arrival Guarantee" },
@@ -92,6 +133,7 @@ export function Hero() {
           ].map((s) => (
             <div
               key={s.label}
+              data-hero-stat
               className="rounded-2xl border border-primary-foreground/15 bg-primary-foreground/10 px-3 py-3 text-center backdrop-blur-sm"
             >
               <p className="font-display text-xl font-bold text-leaf sm:text-2xl">{s.value}</p>
@@ -104,10 +146,9 @@ export function Hero() {
       </div>
 
       <div className="relative border-t border-primary-foreground/10 bg-primary/95 backdrop-blur-sm">
-        <Stagger
+        <div
+          data-hero-trust
           className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-6 lg:grid-cols-4"
-          stagger={0.08}
-          delay={0.35}
         >
           {[
             {
@@ -135,7 +176,7 @@ export function Hero() {
               sub: "Pay courier or send via JazzCash",
             },
           ].map((f) => (
-            <StaggerItem key={f.title} className="flex items-start gap-3">
+            <div key={f.title} className="flex items-start gap-3">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-leaf/20">
                 <f.icon className="h-5 w-5 text-leaf" />
               </span>
@@ -146,9 +187,9 @@ export function Hero() {
                 </p>
                 <p className="text-xs text-primary-foreground/65">{f.sub}</p>
               </div>
-            </StaggerItem>
+            </div>
           ))}
-        </Stagger>
+        </div>
       </div>
     </section>
   );
