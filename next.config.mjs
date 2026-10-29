@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    formats: ["image/avif", "image/webp"],
+    // Serve originals as-is — no Vercel Image Optimization / transformation quota
+    unoptimized: true,
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },
       // Admin/category images pasted from Google (e.g. Gemini/AIDA public URLs)
