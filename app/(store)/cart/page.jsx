@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
+import { CatalogImage } from "@/components/catalog/CatalogImage";
 import { useCartStore } from "@/store/cart";
 import { formatPKR } from "@/lib/utils/currency";
 
@@ -48,8 +49,13 @@ export default function CartPage() {
                 {displayItems.map((item) => (
                   <li key={`${item.productId}-${item.variantId}`} className="group flex gap-4 rounded-3xl border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-md sm:p-6">
                     {item.image && (
-                      <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl sm:h-32 sm:w-32">
-                        <img src={item.image} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl sm:h-32 sm:w-32">
+                        <CatalogImage
+                          src={item.image}
+                          alt={item.nameEn || ""}
+                          className="object-cover transition-transform group-hover:scale-105"
+                          sizes="128px"
+                        />
                       </div>
                     )}
                     <div className="flex flex-1 flex-col justify-between">

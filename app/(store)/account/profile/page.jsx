@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -26,21 +26,24 @@ export default function ProfilePage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const loadProfile = () =>
-    fetch("/api/account/profile")
-      .then((r) => r.json())
-      .then((data) => {
-        if (!data.success) {
-          router.push("/login?redirect=/account/profile");
-          return;
-        }
-        setUser(data.user);
-        setProfile({ name: data.user.name, phone: data.user.phone || "" });
-      });
+  const loadProfile = useCallback(
+    () =>
+      fetch("/api/account/profile")
+        .then((r) => r.json())
+        .then((data) => {
+          if (!data.success) {
+            router.push("/login?redirect=/account/profile");
+            return;
+          }
+          setUser(data.user);
+          setProfile({ name: data.user.name, phone: data.user.phone || "" });
+        }),
+    [router]
+  );
 
   useEffect(() => {
     loadProfile();
-  }, [router]);
+  }, [loadProfile]);
 
   const saveProfile = async (e) => {
     e.preventDefault();

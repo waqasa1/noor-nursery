@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AdminOrderDetailSkeleton } from "@/components/admin/AdminSkeleton";
 import { formatPKR } from "@/lib/utils/currency";
@@ -37,26 +37,29 @@ export default function AdminOrderDetailPage() {
     internalNote: "",
   });
 
-  const load = () =>
-    fetch(`/api/admin/orders/${params.id}`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.order) {
-          setOrder(d.order);
-          setUpdates({
-            orderStatus: d.order.orderStatus,
-            paymentStatus: d.order.paymentStatus,
-            paymentReference: d.order.paymentReference || "",
-            internalNote: d.order.internalNote || "",
-          });
-        }
-      })
-      .finally(() => setLoading(false));
+  const load = useCallback(
+    () =>
+      fetch(`/api/admin/orders/${params.id}`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.order) {
+            setOrder(d.order);
+            setUpdates({
+              orderStatus: d.order.orderStatus,
+              paymentStatus: d.order.paymentStatus,
+              paymentReference: d.order.paymentReference || "",
+              internalNote: d.order.internalNote || "",
+            });
+          }
+        })
+        .finally(() => setLoading(false)),
+    [params.id]
+  );
 
   useEffect(() => {
     setLoading(true);
     load();
-  }, [params.id]);
+  }, [load]);
 
   const save = async () => {
     await fetch(`/api/admin/orders/${params.id}`, {

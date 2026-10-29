@@ -231,11 +231,12 @@ export function Categories({ categories = [] }) {
               href={c.slug ? `/categories/${c.slug}` : "#plants"}
               className="group relative block aspect-[3/4] overflow-hidden rounded-3xl shadow-md transition duration-500 hover:-translate-y-1 hover:shadow-xl"
             >
-              <img
+              <Image
                 src={c.image || "/placeholder.jpg"}
                 alt={c.nameEn}
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                fill
+                sizes="(max-width: 640px) 50vw, 20vw"
+                className="object-cover transition duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent transition duration-500 group-hover:from-primary/95" />
               <div className="absolute inset-x-0 bottom-0 p-4">

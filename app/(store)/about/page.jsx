@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BadgeCheck, Leaf, MapPin, Package, Sprout, Truck } from "lucide-react";
 import { ContentCtaLink, ContentHero } from "@/components/content/ContentHero";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
@@ -109,11 +110,15 @@ export default function AboutPage() {
             </p>
 
             <div className="relative mt-8 overflow-hidden rounded-[1.75rem] shadow-[0_24px_60px_-28px_rgba(20,60,40,0.45)]">
-              <img
-                src={IMAGES.indoor}
-                alt="Lush indoor plants arranged in a bright living space"
-                className="aspect-[5/4] w-full object-cover lg:aspect-[4/5]"
-              />
+              <div className="relative aspect-[5/4] w-full lg:aspect-[4/5]">
+                <Image
+                  src={IMAGES.indoor}
+                  alt="Lush indoor plants arranged in a bright living space"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                />
+              </div>
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent p-6 pt-24">
                 <p className="flex items-center gap-2 text-sm font-semibold text-primary-foreground">
                   <BadgeCheck className="h-4 w-4 text-leaf" />

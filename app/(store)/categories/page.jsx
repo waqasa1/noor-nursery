@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Leaf, ShoppingBag } from "lucide-react";
 import { CatalogImage } from "@/components/catalog/CatalogImage";
 import { Carousel, CarouselItem } from "@/components/motion/Carousel";
@@ -93,7 +94,7 @@ export default async function CategoriesPage() {
     <>
       <div className="relative h-64 w-full bg-primary lg:h-80">
         <div className="absolute inset-0 z-0 opacity-30">
-          <img src={IMAGES.hero} alt="Plants background" className="h-full w-full object-cover" />
+          <Image src={IMAGES.hero} alt="Plants background" fill className="object-cover" sizes="100vw" priority />
           <div className="absolute inset-0 bg-primary/70 mix-blend-multiply" />
         </div>
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">

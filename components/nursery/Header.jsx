@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
@@ -368,10 +369,13 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
           data-nav-brand
           className="flex shrink-0 items-center gap-2 sm:gap-3"
         >
-          <img
+          <Image
             src="/logo.png"
             alt="Noor Nursery"
+            width={48}
+            height={48}
             className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-leaf sm:h-12 sm:w-12"
+            priority
           />
           <div>
             <p className="nav-brand-title whitespace-nowrap font-display text-sm font-bold leading-tight tracking-tight text-primary sm:text-lg lg:text-xl">

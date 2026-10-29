@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { formatPKR } from "@/lib/utils/currency";
 import { IMAGES } from "@/components/nursery/data";
 import { Leaf, MessageCircle, Package, Search } from "lucide-react";
@@ -55,7 +56,7 @@ function TrackOrderContent() {
     <div className="flex min-h-[calc(100vh-140px)] flex-col lg:flex-row">
         <div className="relative hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-between lg:bg-primary lg:p-12">
           <div className="absolute inset-0 z-0 opacity-40">
-            <img src={IMAGES.indoor} alt="Plants background" className="h-full w-full object-cover" />
+            <Image src={IMAGES.indoor} alt="Plants background" fill className="object-cover" sizes="50vw" priority />
             <div className="absolute inset-0 bg-primary/70 mix-blend-multiply"></div>
           </div>
           <div className="relative z-10 flex items-center gap-3">

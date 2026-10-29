@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { IMAGES } from "@/components/nursery/data";
 import { Leaf } from "lucide-react";
@@ -29,7 +30,7 @@ export default function ForgotPasswordPage() {
         {/* Left Side: Image */}
         <div className="relative hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-between lg:bg-primary lg:p-12">
           <div className="absolute inset-0 z-0 opacity-40">
-            <img src={IMAGES.fruitTrees} alt="Fruit trees" className="h-full w-full object-cover" />
+            <Image src={IMAGES.fruitTrees} alt="Fruit trees" fill className="object-cover" sizes="50vw" priority />
             <div className="absolute inset-0 bg-primary/60 mix-blend-multiply"></div>
           </div>
           <div className="relative z-10 flex items-center gap-3">

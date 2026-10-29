@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Package, Pencil, Search, Trash2 } from "lucide-react";
 import { AdminPageHeaderSkeleton, AdminTableSkeleton } from "@/components/admin/AdminSkeleton";
+import { CatalogImage } from "@/components/catalog/CatalogImage";
 import { formatPKR } from "@/lib/utils/currency";
 import { archiveAdminProduct, fetchAdminProducts, productKeys } from "@/lib/query/products";
 
@@ -131,11 +132,14 @@ export function ProductList({ type, title, addHref, addLabel }) {
                   >
                     <td className="p-3">
                       <div className="flex items-center gap-3">
-                        <img
-                          src={p.featuredImage || "/placeholder-plant.jpg"}
-                          alt=""
-                          className="h-11 w-11 shrink-0 rounded-lg border object-cover"
-                        />
+                        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border">
+                          <CatalogImage
+                            src={p.featuredImage || "/placeholder-plant.jpg"}
+                            alt=""
+                            className="object-cover"
+                            sizes="44px"
+                          />
+                        </div>
                         <div className="min-w-0">
                           <p className="font-bold text-foreground">{p.nameEn}</p>
                           <p className="text-urdu text-xs text-secondary" dir="rtl" lang="ur">

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { CatalogImage } from "@/components/catalog/CatalogImage";
 import { useCartStore } from "@/store/cart";
 import { formatPKR } from "@/lib/utils/currency";
 import { Truck, AlertCircle } from "lucide-react";
@@ -516,8 +517,13 @@ export default function CheckoutPage() {
                   {(validatedItems.length ? validatedItems : displayItems).map((item) => (
                     <li key={`${item.productId}-${item.variantId}`} className="flex gap-4">
                       {item.image && (
-                        <div className="h-16 w-16 shrink-0 rounded-xl bg-surface-low">
-                          <img src={item.image} alt="" className="h-full w-full rounded-xl object-cover" />
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-surface-low">
+                          <CatalogImage
+                            src={item.image}
+                            alt={item.nameEn || ""}
+                            className="rounded-xl object-cover"
+                            sizes="64px"
+                          />
                         </div>
                       )}
                       <div className="flex flex-1 flex-col justify-center">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { ImagePlus, Loader2 } from "lucide-react";
 
 export function ImageUpload({
@@ -54,9 +55,12 @@ export function ImageUpload({
       <label className="block text-sm font-medium">{label}</label>
       <div className="mt-2 flex flex-wrap items-start gap-4">
         {value ? (
-          <img
+          <Image
             src={value}
             alt=""
+            width={96}
+            height={96}
+            unoptimized
             className="h-24 w-24 rounded-xl border object-cover"
           />
         ) : (

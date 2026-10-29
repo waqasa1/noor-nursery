@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { MessageCircle, ShieldCheck, Facebook, Instagram, MapPin, Phone } from "lucide-react";
 import { BRAND } from "@/lib/brand";
@@ -24,9 +25,11 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src="/logo.png"
               alt=""
+              width={48}
+              height={48}
               className="h-12 w-12 rounded-full object-cover ring-2 ring-leaf"
             />
             <div>

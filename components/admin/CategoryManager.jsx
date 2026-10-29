@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FolderPlus, Loader2, Pencil, Search, Trash2, X } from "lucide-react";
 import { AdminCategoriesSkeleton } from "@/components/admin/AdminSkeleton";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { CatalogImage } from "@/components/catalog/CatalogImage";
 
 const EMPTY = {
   nameEn: "",
@@ -274,10 +275,9 @@ export function CategoryManager({ type, title, description }) {
           {filtered.map((c) => (
             <li key={c._id} className="flex flex-col rounded-2xl border-2 border-foreground/15 bg-card p-4">
               <div className="flex items-start gap-3">
-                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 border-foreground/10 bg-surface-low">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 border-foreground/10 bg-surface-low">
                   {c.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={c.image} alt="" className="h-full w-full object-cover" />
+                    <CatalogImage src={c.image} alt="" className="object-cover" sizes="64px" />
                   ) : (
                     <div className="grid h-full w-full place-items-center text-[10px] font-bold uppercase text-muted-foreground">
                       No img

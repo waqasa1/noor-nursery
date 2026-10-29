@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronDown,
@@ -36,12 +37,15 @@ export function FeaturedPlant() {
             data-featured-media
             className="overflow-hidden rounded-3xl shadow-2xl will-change-transform"
           >
-            <img
-              src={indoorImageSrc}
-              alt="Lush indoor plant collection featuring monstera and tropical foliage"
-              loading="lazy"
-              className="aspect-[4/5] w-full object-cover"
-            />
+            <div className="relative aspect-[4/5] w-full">
+              <Image
+                src={indoorImageSrc}
+                alt="Lush indoor plant collection featuring monstera and tropical foliage"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
         <div data-featured-copy className="order-1 lg:order-2">
@@ -157,12 +161,13 @@ export function BrandStory() {
           </Link>
         </Reveal>
         <Reveal delay={0.12} x={20}>
-          <div className="overflow-hidden rounded-3xl shadow-xl">
-            <img
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-xl">
+            <Image
               src={aboutImageSrc}
               alt="Noor Nursery garden with fruit trees and flowering plants"
-              loading="lazy"
-              className="aspect-[4/3] w-full object-cover"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
             />
           </div>
         </Reveal>
@@ -181,11 +186,13 @@ export function FinalCTA() {
   return (
     <section className="relative overflow-hidden bg-primary py-20 text-center text-primary-foreground">
       <div className="absolute inset-0 opacity-20">
-        <img
+        <Image
           src={ctaImage}
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover"
+          fill
+          sizes="100vw"
+          className="object-cover"
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/90 to-primary/80" />

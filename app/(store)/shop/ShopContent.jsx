@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -131,7 +132,7 @@ export function ShopContent({ params, products, pagination }) {
       {/* Hero */}
       <div className="relative h-52 w-full overflow-hidden bg-primary lg:h-64">
         <div className="absolute inset-0 z-0 opacity-30">
-          <img src={IMAGES.fruitTrees} alt="" className="h-full w-full object-cover" />
+          <Image src={IMAGES.fruitTrees} alt="" fill className="object-cover" sizes="100vw" priority />
           <div className="absolute inset-0 bg-primary/70 mix-blend-multiply" />
         </div>
         <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-4">

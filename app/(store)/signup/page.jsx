@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { IMAGES } from "@/components/nursery/data";
@@ -39,7 +40,7 @@ export default function SignupPage() {
         {/* Right Side: Image */}
         <div className="relative hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-between lg:bg-primary lg:p-12">
           <div className="absolute inset-0 z-0 opacity-40">
-            <img src={IMAGES.hero} alt="Outdoor plants" className="h-full w-full object-cover" />
+            <Image src={IMAGES.hero} alt="Outdoor plants" fill className="object-cover" sizes="50vw" priority />
             <div className="absolute inset-0 bg-primary/60 mix-blend-multiply"></div>
           </div>
           <div className="relative z-10 flex items-center gap-3">
