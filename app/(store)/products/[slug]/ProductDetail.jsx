@@ -15,24 +15,31 @@ import { ProductInfoSections } from "@/components/products/ProductInfoSections";
 import { CatalogProductCard } from "@/components/catalog/ProductCard";
 import { CatalogImage } from "@/components/catalog/CatalogImage";
 import { BRAND } from "@/lib/brand";
+import { buildProductGallery, isRealCatalogImage } from "@/lib/catalog/images";
 import { extractBotanicalName, isPlantProduct } from "@/lib/products/product-detail-content";
 import { buildProductWhatsAppUrl } from "@/lib/whatsapp";
 import { useCartStore } from "@/store/cart";
 import { formatPKR } from "@/lib/utils/currency";
 
+function initialVariantIndex(variants) {
+  const inStock = variants.findIndex((v) => v.stock > 0);
+  return inStock >= 0 ? inStock : 0;
+}
+
+function imageIndexForVariant(images, variant) {
+  if (!isRealCatalogImage(variant?.image)) return 0;
+  const idx = images.indexOf(variant.image);
+  return idx >= 0 ? idx : 0;
+}
+
 export function ProductDetail({ product, related }) {
   const activeVariants = product.variants?.filter((v) => v.isActive) || [];
-  const images = [
-    product.featuredImage,
-    ...(product.images || []).filter((img) => img && img !== product.featuredImage),
-  ].filter(Boolean);
+  const images = buildProductGallery(product);
 
-  const [selectedIdx, setSelectedIdx] = useState(
-    activeVariants.findIndex((v) => v.stock > 0) >= 0
-      ? activeVariants.findIndex((v) => v.stock > 0)
-      : 0
+  const [selectedIdx, setSelectedIdx] = useState(() => initialVariantIndex(activeVariants));
+  const [activeImage, setActiveImage] = useState(() =>
+    imageIndexForVariant(images, activeVariants[initialVariantIndex(activeVariants)])
   );
-  const [activeImage, setActiveImage] = useState(0);
   const [toast, setToast] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
@@ -40,6 +47,14 @@ export function ProductDetail({ product, related }) {
   const outOfStock = !variant || variant.stock <= 0;
   const isPlant = isPlantProduct(product);
   const botanical = extractBotanicalName(product);
+
+  const selectVariant = (index) => {
+    setSelectedIdx(index);
+    const next = activeVariants[index];
+    if (isRealCatalogImage(next?.image)) {
+      setActiveImage(imageIndexForVariant(images, next));
+    }
+  };
 
   const handleAdd = () => {
     if (outOfStock) return;
@@ -51,7 +66,7 @@ export function ProductDetail({ product, related }) {
       sizeLabelEn: variant.sizeLabelEn,
       sizeLabelUr: variant.sizeLabelUr,
       unitPrice: variant.price,
-      image: variant.image || product.featuredImage,
+      image: (isRealCatalogImage(variant.image) && variant.image) || product.featuredImage,
       maxStock: variant.stock,
       quantity: 1,
     });
@@ -85,7 +100,7 @@ export function ProductDetail({ product, related }) {
         <div>
           <div className="relative aspect-square overflow-hidden rounded-3xl bg-surface-low shadow-md">
             <CatalogImage
-              src={images[activeImage] || "/placeholder.jpg"}
+              src={images[activeImage] || product.featuredImage || "/placeholder-plant.jpg"}
               alt={`${product.nameEn} — ${product.nameUr}`}
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -96,7 +111,7 @@ export function ProductDetail({ product, related }) {
             <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
               {images.map((img, i) => (
                 <button
-                  key={img}
+                  key={`${img}-${i}`}
                   type="button"
                   onClick={() => setActiveImage(i)}
                   className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 transition ${
@@ -189,7 +204,7 @@ export function ProductDetail({ product, related }) {
                 key={v._id}
                 type="button"
                 disabled={v.stock <= 0}
-                onClick={() => setSelectedIdx(i)}
+                onClick={() => selectVariant(i)}
                 aria-pressed={selectedIdx === i}
                 className={`rounded-xl border px-2 py-3 text-sm font-semibold transition ${
                   v.stock <= 0

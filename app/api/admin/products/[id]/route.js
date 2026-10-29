@@ -3,6 +3,7 @@ import Product from "@/models/Product";
 import { requireAdmin } from "@/lib/auth/session";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 import { revalidateCatalog } from "@/lib/cache/catalog";
+import { sanitizeProductImageFields } from "@/lib/catalog/sanitize-product-images";
 import { productUpdateSchema } from "@/lib/validation/product";
 
 export async function GET(_request, { params }) {
@@ -29,9 +30,11 @@ export async function PUT(request, { params }) {
       return jsonError("Validation failed", 400, parsed.error.flatten().fieldErrors);
     }
 
+    const data = sanitizeProductImageFields(parsed.data);
+
     const product = await Product.findByIdAndUpdate(
       id,
-      { $set: parsed.data },
+      { $set: data },
       {
         returnDocument: "after",
         runValidators: true,

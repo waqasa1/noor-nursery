@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth/session";
 import { slugify } from "@/lib/utils/slug";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 import { revalidateCatalog } from "@/lib/cache/catalog";
+import { sanitizeProductImageFields } from "@/lib/catalog/sanitize-product-images";
 import { productWriteSchema } from "@/lib/validation/product";
 import { applyProductSearch } from "@/lib/products/search";
 
@@ -56,7 +57,7 @@ export async function POST(request) {
     const existing = await Product.findOne({ slug });
     if (existing) return jsonError("Slug already exists", 400);
 
-    const product = await Product.create({ ...parsed.data, slug });
+    const product = await Product.create({ ...sanitizeProductImageFields(parsed.data), slug });
     revalidateCatalog({ slug });
     return jsonSuccess({ product }, 201);
   } catch (error) {
