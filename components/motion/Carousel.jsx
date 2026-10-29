@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
- * Horizontal product/category carousel with arrows (inspired by Haris Nursery).
- * Drag/scroll native; buttons snap by card width.
+ * Horizontal carousel with arrows.
+ * Card widths use vw (not % of the flex track) so items can't inflate page width.
  */
 export function Carousel({
   children,
@@ -62,7 +62,7 @@ export function Carousel({
   }, [autoplay, intervalMs]);
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative max-w-full min-w-0 overflow-x-clip ${className}`}>
       <div className="mb-4 flex justify-end gap-2">
         <button
           type="button"
@@ -88,7 +88,7 @@ export function Carousel({
         ref={trackRef}
         role="region"
         aria-label={label}
-        className="flex items-stretch snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex max-w-full min-w-0 items-stretch snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {children}
       </div>
@@ -97,11 +97,11 @@ export function Carousel({
 }
 
 export function CarouselItem({ children, className = "" }) {
-  // Widths sized so ~half of the next card peeks (1.5 / 2.5 / 3.5 visible).
+  // vw-based widths (~1.5 / 2.5 / 3.5 visible) — never % of an indefinite flex track
   return (
     <div
       data-carousel-item
-      className={`flex w-[calc((100%-1rem)/1.5)] shrink-0 snap-start flex-col sm:w-[calc((100%-2rem)/2.5)] lg:w-[calc((100%-3rem)/3.5)] ${className}`}
+      className={`flex w-[min(72vw,16.5rem)] shrink-0 snap-start flex-col sm:w-[min(40vw,17rem)] lg:w-[min(26vw,18rem)] ${className}`}
     >
       {children}
     </div>

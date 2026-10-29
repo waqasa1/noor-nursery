@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -251,7 +252,16 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   const [user, setUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
   const [accessoryCats, setAccessoryCats] = useState(ACCESSORY_FALLBACK);
+  const [menuTop, setMenuTop] = useState(64);
+  const [portalReady, setPortalReady] = useState(false);
+  const barRef = useRef(null);
+  const menuRef = useRef(null);
   const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setPortalReady(true);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -302,14 +312,44 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
     };
   }, []);
 
+  // Close drawer on route change so an active page never traps mid-scroll
   useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    setMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+
+    const measure = () => {
+      const bar = barRef.current;
+      if (!bar) return;
+      setMenuTop(bar.getBoundingClientRect().bottom);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+
+    // Lock page scroll (avoid position:fixed — it shifts portaled drawers off-screen)
+    const html = document.documentElement;
+    const { body } = document;
+    const prev = {
+      htmlOverflow: html.style.overflow,
+      bodyOverflow: body.style.overflow,
+      bodyOverflowX: body.style.overflowX,
+    };
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.overflowX = "hidden"; // override globals.css overflow-x: clip for this session
+
+    requestAnimationFrame(() => {
+      measure();
+      menuRef.current?.scrollTo({ top: 0 });
+    });
+
     return () => {
-      document.body.style.overflow = "";
+      window.removeEventListener("resize", measure);
+      html.style.overflow = prev.htmlOverflow;
+      body.style.overflow = prev.bodyOverflow;
+      body.style.overflowX = prev.bodyOverflowX;
     };
   }, [menuOpen]);
 
@@ -362,8 +402,11 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-card/95 shadow-sm backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-4 sm:px-4 sm:py-3">
+    <header className="sticky top-0 z-[220] border-b bg-card/95 shadow-sm backdrop-blur">
+      <div
+        ref={barRef}
+        className="relative z-[220] mx-auto flex max-w-7xl items-center gap-2 bg-card/95 px-3 py-2.5 sm:gap-4 sm:px-4 sm:py-3"
+      >
         <Link
           href="/"
           data-nav-brand
@@ -433,7 +476,12 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
             className="rounded-full border bg-surface-low p-2 text-foreground transition hover:bg-surface-mid lg:hidden"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((o) => !o)}
+            onClick={() => {
+              if (!menuOpen && barRef.current) {
+                setMenuTop(barRef.current.getBoundingClientRect().bottom);
+              }
+              setMenuOpen((o) => !o);
+            }}
           >
             {menuOpen ? (
               <X className="h-5 w-5" />
@@ -444,42 +492,60 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
         </div>
       </div>
 
-      {menuOpen && (
-        <div className="border-t bg-card lg:hidden overflow-y-auto max-h-[calc(100svh-3.5rem)]">
-          <div className="mx-auto max-w-7xl px-4 py-4">
-            <form onSubmit={handleSearch} className="mb-3">
-              <div className="flex items-center gap-2 rounded-full border bg-surface-low px-4 py-2">
-                <Search className="h-4 w-4 text-muted-foreground" />
-                <input
-                  className="w-full bg-transparent text-sm outline-none"
-                  placeholder="Search plants..."
-                  aria-label="Search plants"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </form>
-            <Link
-              href={accountHref}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
+      {portalReady &&
+        menuOpen &&
+        createPortal(
+          <div className="lg:hidden" data-mobile-nav-portal>
+            <button
+              type="button"
+              aria-label="Close menu"
+              className="fixed inset-0 z-[200] bg-primary/35"
               onClick={() => setMenuOpen(false)}
+            />
+            <div
+              ref={menuRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mobile navigation"
+              className="fixed inset-x-0 bottom-0 z-[210] overflow-y-auto overscroll-y-contain border-t bg-card shadow-2xl"
+              style={{ top: menuTop }}
             >
-              <User className="h-4 w-4" />
-              <span className="truncate">
-                {user ? user.name : "Login / Create Account"}
-              </span>
-            </Link>
-            <nav className="mt-3 grid gap-1" aria-label="Mobile navigation">
-              <Suspense fallback={null}>
-                <MobileNavigationLinks
-                  navLinks={navLinks}
-                  setMenuOpen={setMenuOpen}
-                />
-              </Suspense>
-            </nav>
-          </div>
-        </div>
-      )}
+              <div className="mx-auto max-w-7xl px-4 py-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+                <form onSubmit={handleSearch} className="mb-3">
+                  <div className="flex items-center gap-2 rounded-full border bg-surface-low px-4 py-2">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <input
+                      className="w-full bg-transparent text-sm outline-none"
+                      placeholder="Search plants..."
+                      aria-label="Search plants"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                </form>
+                <Link
+                  href={accountHref}
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <User className="h-4 w-4" />
+                  <span className="truncate">
+                    {user ? user.name : "Login / Create Account"}
+                  </span>
+                </Link>
+                <nav className="mt-3 grid gap-1" aria-label="Mobile navigation">
+                  <Suspense fallback={null}>
+                    <MobileNavigationLinks
+                      navLinks={navLinks}
+                      setMenuOpen={setMenuOpen}
+                    />
+                  </Suspense>
+                </nav>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
 
       <nav
         className="hidden border-t bg-surface-low lg:block"

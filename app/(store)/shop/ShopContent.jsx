@@ -347,13 +347,14 @@ export function ShopContent({ params, products, pagination }) {
 
 function Pagination({ current, total, href }) {
   if (!total || total <= 1) return null;
-  const pages = pageWindow(current, total);
+  // 3 numbered pages keeps prev/next on one row on narrow phones
+  const pages = pageWindow(current, total, 3);
 
   const arrow = (target, disabled, Icon, label) =>
     disabled ? (
       <span
         aria-hidden="true"
-        className="grid h-11 w-11 place-items-center rounded-full border-2 border-foreground/10 bg-white text-foreground/30"
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-foreground/10 bg-white text-foreground/30 sm:h-11 sm:w-11"
       >
         <Icon className="h-4 w-4" />
       </span>
@@ -361,7 +362,7 @@ function Pagination({ current, total, href }) {
       <a
         href={href(target)}
         aria-label={label}
-        className="grid h-11 w-11 place-items-center rounded-full border-2 border-foreground/15 bg-white text-foreground transition hover:border-secondary hover:text-secondary"
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-foreground/15 bg-white text-foreground transition hover:border-secondary hover:text-secondary sm:h-11 sm:w-11"
       >
         <Icon className="h-4 w-4" />
       </a>
@@ -369,11 +370,11 @@ function Pagination({ current, total, href }) {
 
   return (
     <nav className="mt-12 flex flex-col items-center gap-3" aria-label="Pagination">
-      <div className="flex flex-wrap items-center justify-center gap-1.5">
+      <div className="flex flex-nowrap items-center justify-center gap-1 sm:gap-1.5">
         {arrow(current - 1, current <= 1, ChevronLeft, "Previous page")}
 
         {pages[0] > 1 && (
-          <span className="grid h-11 min-w-11 place-items-center px-1 text-sm font-bold text-muted-foreground">
+          <span className="grid h-9 min-w-7 shrink-0 place-items-center px-0.5 text-sm font-bold text-muted-foreground sm:h-11 sm:min-w-11 sm:px-1">
             …
           </span>
         )}
@@ -384,7 +385,7 @@ function Pagination({ current, total, href }) {
             href={href(p)}
             aria-current={p === current ? "page" : undefined}
             aria-label={`Page ${p}`}
-            className={`grid h-11 min-w-11 place-items-center rounded-full px-3 text-sm font-bold transition ${
+            className={`grid h-9 min-w-9 shrink-0 place-items-center rounded-full px-2 text-sm font-bold transition sm:h-11 sm:min-w-11 sm:px-3 ${
               p === current
                 ? "bg-primary text-primary-foreground shadow-md"
                 : "border-2 border-foreground/15 bg-white text-foreground hover:border-secondary hover:text-secondary"
@@ -395,7 +396,7 @@ function Pagination({ current, total, href }) {
         ))}
 
         {total > pages[pages.length - 1] && (
-          <span className="grid h-11 min-w-11 place-items-center px-1 text-sm font-bold text-muted-foreground">
+          <span className="grid h-9 min-w-7 shrink-0 place-items-center px-0.5 text-sm font-bold text-muted-foreground sm:h-11 sm:min-w-11 sm:px-1">
             …
           </span>
         )}

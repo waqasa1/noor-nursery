@@ -17,6 +17,7 @@ import { CATALOG_SPECIES_COUNT } from "@/lib/catalog/copy";
 import { buildPlantDoctorWhatsAppUrl } from "@/lib/whatsapp";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
+import { Carousel, CarouselItem } from "@/components/motion/Carousel";
 import { useHeroGsap } from "@/components/motion/useHeroGsap";
 
 const HEADLINE = "Bring Nature Into Your Life.";
@@ -209,8 +210,38 @@ export function Categories({ categories = [] }) {
 
   if (!list.length) return null;
 
+  const items = list.slice(0, 5);
+
+  const card = (c) => (
+    <a
+      href={c.slug ? `/categories/${c.slug}` : "#plants"}
+      className="group relative block aspect-[3/4] h-full overflow-hidden rounded-3xl shadow-md transition duration-500 hover:-translate-y-1 hover:shadow-xl"
+    >
+      <Image
+        src={c.image || "/placeholder-plant.jpg"}
+        alt={c.nameEn}
+        fill
+        sizes="(max-width: 640px) 70vw, 20vw"
+        className="object-cover transition duration-700 group-hover:scale-110"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent transition duration-500 group-hover:from-primary/95" />
+      <div className="absolute inset-x-0 bottom-0 p-4">
+        <p className="font-display text-base font-bold text-primary-foreground sm:text-lg">
+          {c.nameEn}
+        </p>
+        <p
+          className="text-urdu mt-0.5 text-xs text-primary-foreground/90 sm:text-primary-foreground/75 sm:opacity-0 sm:transition sm:duration-300 sm:group-hover:opacity-100"
+          dir="rtl"
+          lang="ur"
+        >
+          {c.nameUr}
+        </p>
+      </div>
+    </a>
+  );
+
   return (
-    <section id="categories" className="mx-auto max-w-7xl px-4 py-16">
+    <section id="categories" className="mx-auto max-w-7xl overflow-x-clip px-4 py-16">
       <Reveal className="mb-10 max-w-2xl">
         <p className="text-xs font-bold uppercase tracking-widest text-secondary">
           Shop by Category
@@ -224,35 +255,22 @@ export function Categories({ categories = [] }) {
         </p>
       </Reveal>
 
-      <Stagger className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5" stagger={0.07}>
-        {list.slice(0, 5).map((c) => (
-          <StaggerItem key={c.slug || c.nameEn}>
-            <a
-              href={c.slug ? `/categories/${c.slug}` : "#plants"}
-              className="group relative block aspect-[3/4] overflow-hidden rounded-3xl shadow-md transition duration-500 hover:-translate-y-1 hover:shadow-xl"
-            >
-              <Image
-                src={c.image || "/placeholder.jpg"}
-                alt={c.nameEn}
-                fill
-                sizes="(max-width: 640px) 50vw, 20vw"
-                className="object-cover transition duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent transition duration-500 group-hover:from-primary/95" />
-              <div className="absolute inset-x-0 bottom-0 p-4">
-                <p className="font-display text-base font-bold text-primary-foreground sm:text-lg">
-                  {c.nameEn}
-                </p>
-                <p
-                  className="text-urdu mt-0.5 text-xs text-primary-foreground/75 opacity-0 transition duration-300 group-hover:opacity-100"
-                  dir="rtl"
-                  lang="ur"
-                >
-                  {c.nameUr}
-                </p>
-              </div>
-            </a>
-          </StaggerItem>
+      {/* Mobile: horizontal carousel with half-card peek */}
+      <div className="sm:hidden">
+        <Carousel label="Shop by category">
+          {items.map((c) => (
+            <CarouselItem key={c.slug || c.nameEn}>{card(c)}</CarouselItem>
+          ))}
+        </Carousel>
+      </div>
+
+      {/* Tablet / desktop: grid */}
+      <Stagger
+        className="hidden gap-4 sm:grid sm:grid-cols-3 lg:grid-cols-5"
+        stagger={0.07}
+      >
+        {items.map((c) => (
+          <StaggerItem key={c.slug || c.nameEn}>{card(c)}</StaggerItem>
         ))}
       </Stagger>
 

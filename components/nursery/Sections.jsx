@@ -30,9 +30,9 @@ export function FeaturedPlant() {
   useFeaturedReveal(rootRef);
 
   return (
-    <section ref={rootRef} className="bg-card py-16">
+    <section ref={rootRef} className="overflow-x-clip bg-card py-16">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 lg:grid-cols-2">
-        <div className="relative order-2 lg:order-1">
+        <div className="relative order-2 overflow-hidden lg:order-1">
           <div
             data-featured-media
             className="overflow-hidden rounded-3xl shadow-2xl will-change-transform"
@@ -141,9 +141,9 @@ export function BrandStory() {
   const settings = useSiteSettings();
   const aboutImageSrc = settings.site_content?.aboutImage || IMAGES.fruitTrees;
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16">
+    <section className="mx-auto max-w-7xl overflow-x-clip px-4 py-16">
       <div className="grid items-center gap-10 lg:grid-cols-2">
-        <Reveal x={-20}>
+        <Reveal>
           <p className="text-xs font-bold uppercase tracking-widest text-secondary">About Us</p>
           <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
             Growing Spaces. Creating Connections.
@@ -160,7 +160,7 @@ export function BrandStory() {
             Read Our Story →
           </Link>
         </Reveal>
-        <Reveal delay={0.12} x={20}>
+        <Reveal delay={0.12}>
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-xl">
             <Image
               src={aboutImageSrc}
@@ -284,7 +284,7 @@ export function Testimonials() {
   if (testimonials.length === 0) return null;
 
   return (
-    <section className="bg-primary py-14 text-primary-foreground">
+    <section className="overflow-x-clip bg-primary py-14 text-primary-foreground">
       <div className="mx-auto max-w-7xl px-4">
         <Reveal className="text-center">
           <div className="flex justify-center gap-1">
@@ -304,7 +304,7 @@ export function Testimonials() {
 
         <Carousel className="mt-9" label="Customer reviews" autoplay>
           {testimonials.map((t) => (
-            <CarouselItem key={t.id || t.name} className="sm:w-[320px] lg:w-[340px]">
+            <CarouselItem key={t.id || t.name}>
               <figure className="h-full rounded-2xl bg-card p-6 text-card-foreground shadow-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex gap-0.5">

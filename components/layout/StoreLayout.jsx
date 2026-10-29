@@ -34,14 +34,14 @@ export function StoreLayout({ children, showFlashDeal }) {
   const flash = showFlashDeal ?? defaultShowFlashDeal(pathname);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen max-w-full flex-col overflow-x-clip bg-background">
       <Suspense fallback={null}>
         <ScrollToTop />
       </Suspense>
       <TopBar />
       <Header cartCount={displayCount} cartTotal={displayTotal} />
       {flash && <FlashDeal />}
-      <main className="flex-1">{children}</main>
+      <main className="min-w-0 flex-1 overflow-x-clip">{children}</main>
       <Footer />
       <HelpPanel />
     </div>

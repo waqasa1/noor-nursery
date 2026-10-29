@@ -19,11 +19,27 @@ export function useFeaturedReveal(rootRef) {
       const copy = root.querySelector("[data-featured-copy]");
 
       if (media) {
+        // Scale the inner frame, not the clipped shell — avoids mobile page-wide
+        // horizontal overflow while the scrub animation is mid-flight.
+        const frame = media.firstElementChild || media;
         gsap.fromTo(
           media,
-          { clipPath: "inset(18% 18% 18% 18% round 2rem)", scale: 1.15 },
+          { clipPath: "inset(12% 12% 12% 12% round 2rem)" },
           {
             clipPath: "inset(0% 0% 0% 0% round 1.5rem)",
+            ease: "none",
+            scrollTrigger: {
+              trigger: root,
+              start: "top 75%",
+              end: "top 25%",
+              scrub: 1,
+            },
+          }
+        );
+        gsap.fromTo(
+          frame,
+          { scale: 1.08 },
+          {
             scale: 1,
             ease: "none",
             scrollTrigger: {
@@ -39,7 +55,7 @@ export function useFeaturedReveal(rootRef) {
       if (copy) {
         gsap.from(copy.children, {
           opacity: 0,
-          x: 40,
+          y: 28,
           duration: 0.7,
           stagger: 0.1,
           ease: "power3.out",

@@ -167,7 +167,7 @@ export function Products({ products = [], onAdd }) {
   }
 
   return (
-    <section id="plants" className="bg-surface-low py-14">
+    <section id="plants" className="overflow-x-clip bg-surface-low py-14">
       <div className="mx-auto max-w-7xl px-4">
         <Reveal className="text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-secondary">

@@ -104,10 +104,17 @@
     }
   }
 
+  html {
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    /* Kill mobile sideways “ghost margin” from carousels / GSAP transforms */
+    overflow-x: clip;
+    max-width: 100%;
   }
 
   h1, h2, h3, h4, .font-display {
