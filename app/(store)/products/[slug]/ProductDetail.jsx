@@ -132,18 +132,31 @@ export function ProductDetail({ product, related }) {
         </div>
 
         <div>
-          {product.tags?.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {product.tags.map((tag) => (
+          <div className="flex flex-wrap gap-2">
+            {product.categoryId?.nameEn && (
+              <Link
+                href={`/categories/${product.categoryId.slug}`}
+                className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-secondary transition hover:bg-secondary/20"
+              >
+                {product.categoryId.nameEn}
+              </Link>
+            )}
+            {(product.tags || [])
+              .filter(
+                (tag) =>
+                  tag &&
+                  tag.toLowerCase() !== product.categoryId?.nameEn?.toLowerCase()
+              )
+              .slice(0, 3)
+              .map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-secondary"
+                  className="rounded-full bg-surface-low px-3 py-1 text-xs font-bold uppercase tracking-wide text-muted-foreground"
                 >
                   {tag}
                 </span>
               ))}
-            </div>
-          )}
+          </div>
 
           <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
             {product.nameEn}

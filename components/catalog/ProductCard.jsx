@@ -21,7 +21,9 @@ export function CatalogProductCard({ product, onAddToCart }) {
   const [selectedId, setSelectedId] = useState(() => defaultSizeId(options));
   const selected = options.find((v) => v._id === selectedId) || options[0];
 
-  const eyebrow = product.tags?.[0] || product.categoryId?.nameEn || "";
+  // Always prefer the live category — seeded/marketing tags often still say
+  // "Indoor Plants" / "Decorative" after a product is moved to a new category.
+  const eyebrow = product.categoryId?.nameEn || product.tags?.[0] || "";
   const inStockCount = inStock.length;
 
   const handleCardClick = (e) => {

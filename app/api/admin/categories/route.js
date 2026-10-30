@@ -5,6 +5,7 @@ import Product from "@/models/Product";
 import { requireAdmin } from "@/lib/auth/session";
 import { slugify } from "@/lib/utils/slug";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
+import { revalidateCatalog } from "@/lib/cache/catalog";
 
 const categorySchema = z.object({
   nameEn: z.string().min(1),
@@ -56,6 +57,7 @@ export async function POST(request) {
     await connectDB();
     const slug = parsed.data.slug || slugify(parsed.data.nameEn);
     const category = await Category.create({ ...parsed.data, slug });
+    revalidateCatalog();
     return jsonSuccess({ category }, 201);
   } catch (error) {
     return handleApiError(error);

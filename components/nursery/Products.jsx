@@ -46,20 +46,11 @@ function ProductCard({ product, onAdd }) {
           className="object-cover transition duration-500 group-hover:scale-105"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
-        {product.tags?.length > 0 && (
+        {(product.categoryId?.nameEn || product.tags?.[0]) && (
           <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
-            {product.tags.slice(0, 2).map((t, i) => (
-              <span
-                key={t}
-                className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow ${
-                  i === 0
-                    ? "bg-secondary text-secondary-foreground"
-                    : "bg-card text-secondary"
-                }`}
-              >
-                {t}
-              </span>
-            ))}
+            <span className="rounded-full bg-secondary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-secondary-foreground shadow">
+              {product.categoryId?.nameEn || product.tags[0]}
+            </span>
           </div>
         )}
       </Link>
