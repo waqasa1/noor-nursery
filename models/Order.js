@@ -1,8 +1,28 @@
 import mongoose from "mongoose";
 
-const orderItemSchema = new mongoose.Schema(
+const bundleContentSchema = new mongoose.Schema(
   {
     productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+    productSlug: { type: String },
+    variantId: { type: String, required: true },
+    nameEn: { type: String, required: true },
+    nameUr: { type: String, default: "" },
+    size: { type: String },
+    sizeLabelEn: { type: String },
+    sizeLabelUr: { type: String, default: "" },
+    sku: { type: String, default: "" },
+    image: { type: String },
+    quantity: { type: Number, required: true, min: 1 },
+    catalogPrice: { type: Number },
+  },
+  { _id: false }
+);
+
+const orderItemSchema = new mongoose.Schema(
+  {
+    lineType: { type: String, enum: ["product", "bundle"], default: "product" },
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+    bundleId: { type: mongoose.Schema.Types.ObjectId, ref: "Bundle" },
     productSlug: { type: String, required: true },
     nameEn: { type: String, required: true },
     nameUr: { type: String, required: true },
@@ -15,6 +35,7 @@ const orderItemSchema = new mongoose.Schema(
     unitPrice: { type: Number, required: true },
     quantity: { type: Number, required: true, min: 1 },
     lineTotal: { type: Number, required: true },
+    bundleContents: [bundleContentSchema],
   },
   { _id: false }
 );

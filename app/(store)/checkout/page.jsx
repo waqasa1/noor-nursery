@@ -7,7 +7,12 @@ import { useCartStore } from "@/store/cart";
 import { formatPKR } from "@/lib/utils/currency";
 import { Truck, AlertCircle } from "lucide-react";
 import { OTHER_CITY_VALUE } from "@/lib/delivery-defaults";
-import { mapCheckoutFieldErrors, validateCheckoutForm } from "@/lib/validation/checkout";
+import {
+  mapCheckoutFieldErrors,
+  toCheckoutCartItem,
+  validateCheckoutForm,
+} from "@/lib/validation/checkout";
+import { cartLineKey, isBundleLine } from "@/lib/cart/line-key";
 import {
   CheckoutCitySelect,
   resolveCheckoutCity,
@@ -128,13 +133,7 @@ export default function CheckoutPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: items.map((i) => ({
-          productId: i.productId,
-          variantId: i.variantId,
-          quantity: i.quantity,
-          nameEn: i.nameEn,
-          sizeLabelEn: i.sizeLabelEn,
-        })),
+        items: items.map(toCheckoutCartItem),
         city: form.city,
         promoCode: appliedPromo || undefined,
       }),
@@ -154,13 +153,7 @@ export default function CheckoutPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: items.map((i) => ({
-          productId: i.productId,
-          variantId: i.variantId,
-          quantity: i.quantity,
-          nameEn: i.nameEn,
-          sizeLabelEn: i.sizeLabelEn,
-        })),
+        items: items.map(toCheckoutCartItem),
         city: form.city,
         promoCode,
       }),
@@ -515,7 +508,7 @@ export default function CheckoutPage() {
 
                 <ul className="mt-6 space-y-4 border-b border-border pb-6">
                   {(validatedItems.length ? validatedItems : displayItems).map((item) => (
-                    <li key={`${item.productId}-${item.variantId}`} className="flex gap-4">
+                    <li key={cartLineKey(item)} className="flex gap-4">
                       {item.image && (
                         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-surface-low">
                           <CatalogImage
@@ -528,6 +521,18 @@ export default function CheckoutPage() {
                       )}
                       <div className="flex flex-1 flex-col justify-center">
                         <p className="text-sm font-semibold text-foreground">{item.nameEn}</p>
+                        {isBundleLine(item) ? (
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            Bundle
+                            {item.bundleContents?.length
+                              ? ` · ${item.bundleContents.length} items`
+                              : item.contents?.length
+                                ? ` · ${item.contents.length} items`
+                                : ""}
+                          </p>
+                        ) : item.sizeLabelEn ? (
+                          <p className="mt-0.5 text-xs text-muted-foreground">{item.sizeLabelEn}</p>
+                        ) : null}
                         <div className="mt-1 flex justify-between text-sm text-muted-foreground">
                           <span>Qty: {item.quantity}</span>
                           <span className="font-medium text-foreground">{formatPKR((item.unitPrice || 0) * item.quantity)}</span>

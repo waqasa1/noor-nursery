@@ -2,6 +2,9 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { cartLineKey } from "@/lib/cart/line-key";
+
+export { cartLineKey };
 
 export const useCartStore = create(
   persist(
@@ -9,14 +12,13 @@ export const useCartStore = create(
       items: [],
       addItem: (item) => {
         const items = get().items;
-        const existing = items.find(
-          (i) => i.productId === item.productId && i.variantId === item.variantId
-        );
+        const key = cartLineKey(item);
+        const existing = items.find((i) => cartLineKey(i) === key);
         if (existing) {
           set({
             items: items.map((i) =>
-              i.productId === item.productId && i.variantId === item.variantId
-                ? { ...i, quantity: Math.min(i.quantity + item.quantity, item.maxStock || 99) }
+              cartLineKey(i) === key
+                ? { ...i, quantity: Math.min(i.quantity + item.quantity, item.maxStock || i.maxStock || 99) }
                 : i
             ),
           });
@@ -24,24 +26,22 @@ export const useCartStore = create(
           set({ items: [...items, item] });
         }
       },
-      updateQuantity: (productId, variantId, quantity) => {
+      updateQuantity: (lineKey, quantity) => {
         if (quantity <= 0) {
-          get().removeItem(productId, variantId);
+          get().removeItem(lineKey);
           return;
         }
         set({
           items: get().items.map((i) =>
-            i.productId === productId && i.variantId === variantId
+            cartLineKey(i) === lineKey
               ? { ...i, quantity: Math.min(quantity, i.maxStock || 99) }
               : i
           ),
         });
       },
-      removeItem: (productId, variantId) => {
+      removeItem: (lineKey) => {
         set({
-          items: get().items.filter(
-            (i) => !(i.productId === productId && i.variantId === variantId)
-          ),
+          items: get().items.filter((i) => cartLineKey(i) !== lineKey),
         });
       },
       clearCart: () => set({ items: [] }),
@@ -52,9 +52,8 @@ export const useCartStore = create(
         const local = get().items;
         const merged = [...local];
         for (const item of serverItems) {
-          const existing = merged.find(
-            (i) => i.productId === item.productId && i.variantId === item.variantId
-          );
+          const key = cartLineKey(item);
+          const existing = merged.find((i) => cartLineKey(i) === key);
           if (existing) {
             existing.quantity = Math.max(existing.quantity, item.quantity);
           } else {

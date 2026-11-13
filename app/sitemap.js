@@ -2,12 +2,13 @@ import { getEnv } from "@/lib/env";
 import { connectDB, isDBConfigured } from "@/lib/db";
 import Product from "@/models/Product";
 import Category from "@/models/Category";
+import Bundle from "@/models/Bundle";
 
 export default async function sitemap() {
   const baseUrl = getEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
 
   const staticPages = [
-    "", "/shop", "/categories", "/about", "/contact", "/faq",
+    "", "/shop", "/bundles", "/categories", "/about", "/contact", "/faq",
     "/shipping-policy", "/return-policy", "/privacy-policy", "/terms",
   ].map((path) => ({
     url: `${baseUrl}${path}`,
@@ -20,9 +21,10 @@ export default async function sitemap() {
 
   try {
     await connectDB();
-    const [products, categories] = await Promise.all([
+    const [products, categories, bundles] = await Promise.all([
       Product.find({ isActive: true }).select("slug updatedAt").lean(),
       Category.find({ isActive: true }).select("slug updatedAt").lean(),
+      Bundle.find({ isActive: true }).select("slug updatedAt").lean(),
     ]);
 
     return [
@@ -38,6 +40,12 @@ export default async function sitemap() {
         lastModified: p.updatedAt,
         changeFrequency: "weekly",
         priority: 0.9,
+      })),
+      ...bundles.map((b) => ({
+        url: `${baseUrl}/bundles/${b.slug}`,
+        lastModified: b.updatedAt,
+        changeFrequency: "weekly",
+        priority: 0.8,
       })),
     ];
   } catch {

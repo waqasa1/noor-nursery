@@ -3,18 +3,11 @@ import { connectDB, isDBConfigured } from "@/lib/db";
 import { validateCartItems, buildCartSummary } from "@/lib/cart/validation";
 import { calculateDeliveryFeeAsync } from "@/lib/delivery";
 import { validatePromoCode } from "@/lib/promo";
+import { cartItemSchema } from "@/lib/validation/checkout";
 import { jsonSuccess, jsonError, handleApiError } from "@/lib/api-response";
 
 const schema = z.object({
-  items: z.array(
-    z.object({
-      productId: z.string(),
-      variantId: z.string(),
-      quantity: z.number().int().min(1),
-      nameEn: z.string().optional(),
-      sizeLabelEn: z.string().optional(),
-    })
-  ),
+  items: z.array(cartItemSchema),
   city: z.string().optional(),
   promoCode: z.string().optional(),
 });

@@ -79,7 +79,8 @@ function useIsActive() {
     currentPath === href ||
     (href === "/shop" &&
       currentPath.startsWith("/shop") &&
-      !searchParams.toString());
+      !searchParams.toString()) ||
+    (href === "/bundles" && pathname.startsWith("/bundles"));
 
   return { currentPath, isActive };
 }
@@ -385,6 +386,7 @@ export function Header({ cartCount = 0, cartTotal = "PKR 0" }) {
       label: "Accessories",
       children: accessoryLinks,
     },
+    { href: "/bundles", label: "Bundles" },
     { href: "/categories", label: "Categories" },
     { href: "/about", label: "About" },
   ];

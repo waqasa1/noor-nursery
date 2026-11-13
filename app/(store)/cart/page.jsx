@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { CatalogImage } from "@/components/catalog/CatalogImage";
-import { useCartStore } from "@/store/cart";
+import { useCartStore, cartLineKey } from "@/store/cart";
+import { isBundleLine } from "@/lib/cart/line-key";
 import { formatPKR } from "@/lib/utils/currency";
 
 export default function CartPage() {
@@ -46,8 +47,11 @@ export default function CartPage() {
             {/* Cart Items */}
             <div className="flex-1">
               <ul className="space-y-6" aria-label="Cart items">
-                {displayItems.map((item) => (
-                  <li key={`${item.productId}-${item.variantId}`} className="group flex gap-4 rounded-3xl border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-md sm:p-6">
+                {displayItems.map((item) => {
+                  const key = cartLineKey(item);
+                  const contents = item.contents || item.bundleContents || [];
+                  return (
+                  <li key={key} className="group flex gap-4 rounded-3xl border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-md sm:p-6">
                     {item.image && (
                       <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl sm:h-32 sm:w-32">
                         <CatalogImage
@@ -59,13 +63,34 @@ export default function CartPage() {
                       </div>
                     )}
                     <div className="flex flex-1 flex-col justify-between">
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="font-display text-lg font-bold text-foreground">{item.nameEn}</p>
-                          <p className="text-urdu text-secondary" dir="rtl" lang="ur">{item.nameUr}</p>
-                          <span className="mt-2 inline-block rounded-lg bg-surface-low px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                            {item.sizeLabelEn}
-                          </span>
+                          {item.nameUr ? (
+                            <p className="text-urdu text-secondary" dir="rtl" lang="ur">{item.nameUr}</p>
+                          ) : null}
+                          {isBundleLine(item) ? (
+                            <div className="mt-2">
+                              <span className="inline-block rounded-lg bg-leaf/15 px-2.5 py-1 text-xs font-medium text-leaf">
+                                Bundle
+                              </span>
+                              {contents.length > 0 && (
+                                <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
+                                  {contents.map((c) => (
+                                    <li key={`${c.productId}-${c.variantId}`}>
+                                      {c.quantity > 1 ? `${c.quantity}× ` : ""}
+                                      {c.nameEn}
+                                      {c.sizeLabelEn ? ` (${c.sizeLabelEn})` : ""}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="mt-2 inline-block rounded-lg bg-surface-low px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                              {item.sizeLabelEn}
+                            </span>
+                          )}
                         </div>
                         <p className="font-display text-lg font-bold text-primary">{formatPKR(item.unitPrice)}</p>
                       </div>
@@ -75,7 +100,7 @@ export default function CartPage() {
                           <button
                             type="button"
                             aria-label="Decrease quantity"
-                            onClick={() => updateQuantity(item.productId, item.variantId, item.quantity - 1)}
+                            onClick={() => updateQuantity(key, item.quantity - 1)}
                             className="grid h-8 w-8 place-items-center rounded-full bg-card text-foreground shadow-sm transition hover:text-primary"
                           >
                             <Minus className="h-4 w-4" />
@@ -84,7 +109,7 @@ export default function CartPage() {
                           <button
                             type="button"
                             aria-label="Increase quantity"
-                            onClick={() => updateQuantity(item.productId, item.variantId, item.quantity + 1)}
+                            onClick={() => updateQuantity(key, item.quantity + 1)}
                             className="grid h-8 w-8 place-items-center rounded-full bg-card text-foreground shadow-sm transition hover:text-primary"
                           >
                             <Plus className="h-4 w-4" />
@@ -93,7 +118,7 @@ export default function CartPage() {
                         <button
                           type="button"
                           aria-label={`Remove ${item.nameEn}`}
-                          onClick={() => removeItem(item.productId, item.variantId)}
+                          onClick={() => removeItem(key)}
                           className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-destructive transition hover:bg-destructive/10"
                         >
                           <Trash2 className="h-4 w-4" /> <span className="hidden sm:inline">Remove</span>
@@ -101,7 +126,8 @@ export default function CartPage() {
                       </div>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </div>
 

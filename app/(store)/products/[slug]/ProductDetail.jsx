@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { ProductInfoSections } from "@/components/products/ProductInfoSections";
 import { CatalogProductCard } from "@/components/catalog/ProductCard";
+import { BundleCard } from "@/components/catalog/BundleCard";
 import { CatalogImage } from "@/components/catalog/CatalogImage";
 import { BRAND } from "@/lib/brand";
 import { buildProductGallery, isRealCatalogImage } from "@/lib/catalog/images";
@@ -32,7 +33,7 @@ function imageIndexForVariant(images, variant) {
   return idx >= 0 ? idx : 0;
 }
 
-export function ProductDetail({ product, related }) {
+export function ProductDetail({ product, related, suggestedBundles = [] }) {
   const activeVariants = product.variants?.filter((v) => v.isActive) || [];
   const images = buildProductGallery(product);
 
@@ -325,6 +326,23 @@ export function ProductDetail({ product, related }) {
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((p) => (
               <CatalogProductCard key={p._id} product={p} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {suggestedBundles?.length > 0 && (
+        <div className="mt-14">
+          <h2 className="font-display text-2xl font-bold text-primary">Suggested bundles</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Sets that include {product.nameEn}
+          </p>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {suggestedBundles.map((b) => (
+              <BundleCard key={b._id} bundle={b} onAdded={() => {
+                setToast(true);
+                setTimeout(() => setToast(false), 2600);
+              }} />
             ))}
           </div>
         </div>

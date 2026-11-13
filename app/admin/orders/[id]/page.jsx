@@ -262,7 +262,22 @@ export default function AdminOrderDetailPage() {
         <h2 className="font-semibold">Items — Total: {formatPKR(order.total)}</h2>
         <ul className="mt-3 space-y-2 text-sm">
           {order.items.map((item, i) => (
-            <li key={i}>{item.nameEn} ({item.sizeLabelEn}) × {item.quantity} — {formatPKR(item.lineTotal)}</li>
+            <li key={i}>
+              {item.nameEn}
+              {item.lineType === "bundle" ? " (Bundle)" : item.sizeLabelEn ? ` (${item.sizeLabelEn})` : ""}
+              {" "}× {item.quantity} — {formatPKR(item.lineTotal)}
+              {item.lineType === "bundle" && item.bundleContents?.length > 0 && (
+                <ul className="mt-1 ml-4 list-disc text-muted-foreground">
+                  {item.bundleContents.map((c, j) => (
+                    <li key={j}>
+                      {c.quantity > 1 ? `${c.quantity}× ` : ""}
+                      {c.nameEn}
+                      {c.sizeLabelEn ? ` (${c.sizeLabelEn})` : ""}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
           ))}
         </ul>
       </div>

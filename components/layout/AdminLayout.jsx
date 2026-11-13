@@ -27,6 +27,7 @@ const NAV_GROUPS = [
     title: "Sales",
     items: [
       { href: "/admin/orders", label: "Orders" },
+      { href: "/admin/bundles", label: "Bundles" },
       { href: "/admin/customers", label: "Customers" },
     ],
   },

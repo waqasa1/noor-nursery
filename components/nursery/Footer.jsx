@@ -87,6 +87,7 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/80">
             {[
               { href: "/shop", label: "All Products" },
+              { href: "/bundles", label: "Bundles" },
               { href: "/shop?category=indoor-plants", label: "Indoor Plants" },
               { href: "/shop?category=flowering-plants", label: "Flowering Plants" },
               { href: "/shop?type=plants", label: "All Plants" },

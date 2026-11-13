@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { ProductDetail } from "./ProductDetail";
 import { getProductBySlug, getRelatedProducts } from "@/lib/data/products";
+import { getBundlesForProduct } from "@/lib/data/bundles";
 import { serializeProduct, serializeProducts } from "@/lib/utils/serialize";
 import { productJsonLd, breadcrumbJsonLd, absoluteUrl } from "@/lib/seo/structured-data";
 import { JsonLdScript } from "@/lib/seo/JsonLdScript";
@@ -45,6 +46,12 @@ export default async function ProductPage({ params }) {
   if (!product) notFound();
 
   const related = await getRelatedProducts(product.categoryId?._id || product.categoryId, product._id);
+  let suggestedBundles = [];
+  try {
+    suggestedBundles = await getBundlesForProduct(product._id);
+  } catch (error) {
+    console.error("[product] Failed to load suggested bundles:", error.message);
+  }
 
   return (
     <>
@@ -56,7 +63,11 @@ export default async function ProductPage({ params }) {
           { name: product.nameEn },
         ])}
       />
-      <ProductDetail product={serializeProduct(product)} related={serializeProducts(related)} />
+      <ProductDetail
+        product={serializeProduct(product)}
+        related={serializeProducts(related)}
+        suggestedBundles={suggestedBundles}
+      />
     </>
   );
 }
